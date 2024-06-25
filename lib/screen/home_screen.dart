@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:smart_wedding/screen/contract_page.dart';
 import 'package:smart_wedding/screen/d_day_card.dart';
+import 'package:smart_wedding/screen/budget_page.dart';
+import 'package:smart_wedding/screen/my_page.dart';
+import 'package:smart_wedding/screen/schedule_page.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -16,7 +20,7 @@ class WeddingHomePage extends StatefulWidget {
 }
 
 class _WeddingHomePageState extends State<WeddingHomePage> {
-  final PageController _pageController = PageController(viewportFraction: 0.8);
+  final PageController _pageController = PageController(viewportFraction: 1.0);
   int _currentPage = 0;
 
   @override
@@ -79,7 +83,6 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
             // D-Day and Marriage Info
             Container(
               height: 200,
-              width: 1000,
               child: Column(
                 children: [
                   Expanded(
@@ -87,19 +90,19 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
                       controller: _pageController,
                       children: [
                         DDayCardWidget(
-                          title: 'D-69',
+                          title: 'D-68',
                           subtitle: 'Marriage',
                           date: '2024.09.01',
                           imagePath: 'asset/img/wed_01.jpg',
                         ),
                         DDayCardWidget(
-                          title: 'D-69',
+                          title: 'D-68',
                           subtitle: 'Marriage',
                           date: '2024.09.01',
                           imagePath: 'asset/img/wed_01.jpg',
                         ),
                         DDayCardWidget(
-                          title: 'D-69',
+                          title: 'D-68',
                           subtitle: 'Marriage',
                           date: '2024.09.01',
                           imagePath: 'asset/img/wed_01.jpg',
@@ -107,7 +110,7 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(3, (index) {
@@ -223,41 +226,67 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         unselectedItemColor: Colors.black,
         selectedItemColor: Colors.black,
-        iconSize: 40,
+        iconSize: 35,
         items: [
           BottomNavigationBarItem(
-            icon: Padding(
-              padding: const EdgeInsets.only(top: 16.0),
+            icon: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BudgetPage()),
+                );
+              },
               child: Icon(Icons.attach_money),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Padding(
-              padding: const EdgeInsets.only(right: 35.0, top: 5.0),
-              child: Icon(Icons.description),
+            icon: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ContractPage()),
+                );
+              },
+              child: Icon(Icons.document_scanner),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Padding(
-              padding: const EdgeInsets.only(right:20.0, top: 5.0),
+            icon: GestureDetector(
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => WeddingHomePage()),
+                );
+              },
               child: Icon(Icons.home),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Padding(
-              padding: const EdgeInsets.only(right:10.0, top: 5.0),
-              child: Icon(Icons.dashboard),
+            icon: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SchedulePage()),
+                );
+              },
+              child: Icon(Icons.calendar_month),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Padding(
-              padding: const EdgeInsets.only(right:20.0, top: 5.0),
+            icon: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyPage()),
+                );
+              },
               child: Icon(Icons.person),
             ),
             label: '',
