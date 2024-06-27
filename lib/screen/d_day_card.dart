@@ -19,7 +19,7 @@ class DDayCardWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: Colors.amber[100],
+        color: Colors.lime[100],
         borderRadius: BorderRadius.circular(15),
       ),
       margin: EdgeInsets.all(12.0),
@@ -51,7 +51,7 @@ class DDayCardWidget extends StatelessWidget {
             height: 85,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.yellow, width: 2),
+              //border: Border.all(color: Colors.yellow, width: 2),
             ),
             child: Stack(
               children: [
