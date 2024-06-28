@@ -14,9 +14,14 @@ class _SchedulePageState extends State<SchedulePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Schedule Page'),
-      ),
+      // appBar: AppBar(
+      //   actions: [
+      //     TextButton(
+      //       onPressed: () {},
+      //       child: Icon(Icons.search),
+      //     ),
+      //   ],
+      // ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -73,6 +78,68 @@ class _SchedulePageState extends State<SchedulePage> {
                   ),
                 );
               },
+            ),
+          ),
+          SizedBox(height: 16),
+          Text(
+            '{2024년 06월 28일}',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'am 11:00',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(width: 8),
+                Text(
+                  '드레스샵 투어 시작',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 5),
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(Icons.add, size: 24), // onTap또는 onPress추가
+                SizedBox(width: 8),
+                Text(
+                  '새로운 이벤트',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ),
         ],
