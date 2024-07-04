@@ -4,6 +4,7 @@ import 'package:smart_wedding/screen/budget_page.dart';
 import 'package:smart_wedding/screen/my_page.dart';
 import 'package:smart_wedding/screen/schedule_page.dart';
 import 'package:smart_wedding/screen/home_content.dart';
+import 'package:smart_wedding/screen/alarm_list_page.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -21,6 +22,7 @@ class WeddingHomePage extends StatefulWidget {
 
 class _WeddingHomePageState extends State<WeddingHomePage> {
   int currentIndex = 2;
+  //
   final screens = [
     BudgetPage(),
     ContractPage(),
@@ -29,27 +31,44 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
     MyPage(),
   ];
 
+  void navigateToMainPage() {
+    setState(() {
+      currentIndex = 2;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Image.asset(
-              'asset/img/ring.png',  // 이미지 파일 경로
-              height: 30,  // 이미지 높이 조정
-              width: 30,   // 이미지 너비 조정
-            ),
-            SizedBox(width: 15),  // 이미지와 텍스트 사이의 간격 조정
-            Text('스마트웨딩', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),),  // 기존 title 텍스트
-          ],
+        title: GestureDetector(
+          onTap: navigateToMainPage,
+          child: Row(
+            children: [
+              Image.asset(
+                'asset/img/ring.png',
+                height: 30,
+                width: 30,
+              ),
+              SizedBox(width: 15),
+              Text(
+                '스마트웨딩',
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ),
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),
             iconSize: 40,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AlarmListPage()),
+              );
+            },
           ),
         ],
       ),
