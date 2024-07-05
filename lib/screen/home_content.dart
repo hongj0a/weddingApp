@@ -1,5 +1,3 @@
-// home_content.dart
-
 import 'package:flutter/material.dart';
 import 'package:smart_wedding/screen/d_day_card.dart';
 
@@ -107,19 +105,19 @@ class _HomeContentState extends State<HomeContent> {
               children: [
                 Text(
                   '흩어져 있는 결혼 준비... 한 곳에 모아서 관리하세요 😊',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Text("💍", style: TextStyle(fontSize: 20)),  // Ring
-                    Text("💼", style: TextStyle(fontSize: 20)),  // Suit
-                    Text("🤵", style: TextStyle(fontSize: 20)),  // Groom
-                    Text("👰", style: TextStyle(fontSize: 20)),  // Bride
-                    Text("👑", style: TextStyle(fontSize: 20)),  // Crown
-                    Text("👗", style: TextStyle(fontSize: 20)),  // Dress
-                    Text("✈️", style: TextStyle(fontSize: 20)),  // Honeymoon
+                    Text("💍", style: TextStyle(fontSize: 30)),  // Ring
+                    Text("💼", style: TextStyle(fontSize: 30)),  // Suit
+                    Text("🤵", style: TextStyle(fontSize: 30)),  // Groom
+                    Text("👰", style: TextStyle(fontSize: 30)),  // Bride
+                    Text("👑", style: TextStyle(fontSize: 30)),  // Crown
+                    Text("👗", style: TextStyle(fontSize: 30)),  // Dress
+                    Text("✈️", style: TextStyle(fontSize: 30)),  // Honeymoon
                   ],
                 ),
               ],
@@ -146,19 +144,19 @@ class _HomeContentState extends State<HomeContent> {
               children: [
                 Text(
                   '{예시니}님의 총예산 ₩ {35,000,000}원',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       '이용금액',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                     ),
                     Text(
                       '₩ {16,500,000}원',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -168,11 +166,11 @@ class _HomeContentState extends State<HomeContent> {
                   children: [
                     Text(
                       '잔여한도',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),
                     ),
                     Text(
                       '₩ {18,500,000}원',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),

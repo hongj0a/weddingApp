@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_wedding/screen/d_day_management.dart';
 
-import 'd_day_management.dart';
-
 class DDayCardWidget extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -29,7 +27,7 @@ class DDayCardWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20.0),
         decoration: BoxDecoration(
-          color: Colors.lime[100],
+          color: Color.fromRGBO(222, 183, 247, 1.0),
           borderRadius: BorderRadius.circular(15),
         ),
         margin: EdgeInsets.all(12.0),
@@ -55,7 +53,7 @@ class DDayCardWidget extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(width: 180),
+            SizedBox(width: 160),
             Container(
               width: 80,
               height: 85,

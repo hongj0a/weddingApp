@@ -62,7 +62,7 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),
-            iconSize: 40,
+            iconSize: 30,
             onPressed: () {
               Navigator.push(
                 context,
@@ -78,7 +78,7 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
         type: BottomNavigationBarType.shifting,
         backgroundColor: Colors.white,
         unselectedItemColor: Colors.grey,
-        selectedItemColor: Colors.green,
+        selectedItemColor: Color.fromRGBO(219, 145, 197, 1.0),
         iconSize: 35,
         onTap: (index) => setState(() => currentIndex = index),
         items: [

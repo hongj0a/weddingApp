@@ -26,11 +26,11 @@ class AlarmListPage extends StatelessWidget {
         ],
       ),
       body: ListView.builder(
-        itemCount: 10, // 알림 항목 수
+        itemCount: 10,
         itemBuilder: (context, index) {
           return ListTile(
             leading: Image.asset(
-              'asset/img/ring.png', // 이미지 파일 경로
+              'asset/img/ring.png',
               height: 30,
               width: 30,
             ),

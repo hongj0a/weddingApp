@@ -9,7 +9,6 @@ class DDayManagementPage extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                // 메인 페이지로 이동
                 Navigator.pop(context);
               },
               child: Text('디데이 관리'),
@@ -32,21 +31,21 @@ class DDayManagementPage extends StatelessWidget {
             description: '본식',
             date: '2024.09.01',
             imagePath: 'asset/img/wed_01.jpg',
-            cardColor: Colors.orange,
+            cardColor: Color.fromRGBO(255, 222, 246, 1.0),
           ),
           DDayCard(
             days: 'D+446',
             description: '처음 만난날',
             date: '2024.09.01',
             imagePath: 'asset/img/wed_01.jpg',
-            cardColor: Colors.pink,
+            cardColor: Color.fromRGBO(192, 249, 252, 1.0),
           ),
           DDayCard(
             days: 'D-23',
             description: '촬영',
             date: '2024.09.01',
             imagePath: 'asset/img/wed_01.jpg',
-            cardColor: Colors.grey,
+            cardColor: Color.fromRGBO(255, 242, 166, 1.0),
           ),
           SizedBox(height: 20),
           Center(
@@ -54,19 +53,20 @@ class DDayManagementPage extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton.icon(
                 icon: Icon(Icons.add),
-                label: Text('추가하기'),
+                label: Text('추가하기',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                ),),
                 onPressed: () {
                   // 추가하기 버튼 클릭 시 처리할 코드
                 },
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 14.0), // 버튼의 세로 패딩 조정
+                  padding: EdgeInsets.symmetric(vertical: 14.0),
                 ),
               ),
             ),
           ),
-
-          SizedBox(height: 20),
-          Text('...', textAlign: TextAlign.center),
         ],
       ),
     );
