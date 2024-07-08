@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_wedding/screen/add_item_page.dart';
 
 class BudgetPage extends StatefulWidget {
   @override
@@ -164,7 +165,12 @@ class _BudgetPageState extends State<BudgetPage> {
                           padding: const EdgeInsets.all(16.0),
                           child: ElevatedButton(
                             onPressed: () {
-                              // Add your onPressed code here!
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddItemPage(),
+                                ),
+                              );
                             },
                             child: Text('추가하기'),
                           ),

@@ -75,7 +75,7 @@ class _HomeContentState extends State<HomeContent> {
                       height: 10.0,
                       width: _currentPage == index ? 24.0 : 16.0,
                       decoration: BoxDecoration(
-                        color: _currentPage == index ? Colors.lime : Colors.grey,
+                        color: _currentPage == index ? Colors.purple : Colors.grey,
                         borderRadius: BorderRadius.circular(12),
                       ),
                     );
