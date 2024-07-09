@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_wedding/screen/add_budget_page.dart';
 import 'package:smart_wedding/screen/add_item_page.dart';
 
 class BudgetPage extends StatefulWidget {
@@ -168,7 +169,7 @@ class _BudgetPageState extends State<BudgetPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => AddItemPage(),
+                                  builder: (context) => AddBudgetPage(),
                                 ),
                               );
                             },

@@ -5,14 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="11742957-3fdc-4257-b625-c75b3070cca4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/screen/add_budget_page.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/screen/add_item_page.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/screen/document_upload.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/add_budget_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/add_budget_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/add_item_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/add_item_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screen/budget_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/budget_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/contract_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/contract_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screen/home_content.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/home_content.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/schedule_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/schedule_page.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

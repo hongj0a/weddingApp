@@ -85,7 +85,6 @@ class _HomeContentState extends State<HomeContent> {
             ),
           ),
           SizedBox(height: 16),
-          // Wedding Preparation Icons
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
@@ -100,6 +99,7 @@ class _HomeContentState extends State<HomeContent> {
                 ),
               ],
             ),
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

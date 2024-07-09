@@ -12,7 +12,7 @@ class _AddItemPageState extends State<AddItemPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('체크 항목'),
+        title: Text('체크리스트 항목 추가하기'),
         actions: [
           TextButton(
             onPressed: () {
@@ -76,12 +76,22 @@ class _AddItemPageState extends State<AddItemPage> {
               ),
             ),
             SizedBox(height: 16.0),
-            ListTile(
-              title: Text('메모'),
-              trailing: Text('메모를 남겨보세요(최대 50자)'),
-              onTap: () {
-                // Implement memo input if needed
-              },
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '메모',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                SizedBox(height: 8.0),
+                TextField(
+                  textAlign: TextAlign.right,
+                  decoration: InputDecoration(
+                    hintText: '메모를 남겨보세요. (최대 100자)',
+                  ),
+                  maxLength: 100,
+                ),
+              ],
             ),
           ],
         ),
