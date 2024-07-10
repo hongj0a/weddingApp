@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_wedding/screen/d_day_management.dart';
+import 'package:smart_wedding/screen/profile_edit.dart';
 
 class MyPage extends StatelessWidget {
   @override
@@ -49,7 +50,10 @@ class MyPage extends StatelessWidget {
                   IconButton(
                     icon: Icon(Icons.edit, color: Colors.black),
                     onPressed: () {
-                      // 편집 버튼을 눌렀을 때 실행될 코드
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfileEditPage()),
+                      );
                     },
                   ),
                 ],
