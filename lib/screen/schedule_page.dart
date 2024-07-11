@@ -180,65 +180,70 @@ class _SchedulePageState extends State<SchedulePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('새 일정 추가'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextField(
-                  controller: eventController,
-                  decoration: InputDecoration(
-                    hintText: '일정 내용을 입력하세요',
-                  ),
-                ),
-                SizedBox(height: 16.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () async {
-                        final TimeOfDay? pickedTime = await showTimePicker(
-                          context: context,
-                          initialTime: selectedTime,
-                        );
-                        if (pickedTime != null && pickedTime != selectedTime) {
-                          setState(() {
-                            selectedTime = pickedTime;
-                          });
-                        }
-                      },
-                      child: Text('시간 선택'),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('새 일정 추가'),
+              contentPadding: EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 0.0),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    TextField(
+                      controller: eventController,
+                      decoration: InputDecoration(
+                        hintText: '일정 내용을 입력하세요',
+                      ),
                     ),
-                    Text(
-                      '${selectedTime.hour}:${selectedTime.minute}',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    SizedBox(height: 16.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () async {
+                            final TimeOfDay? pickedTime = await showTimePicker(
+                              context: context,
+                              initialTime: selectedTime,
+                            );
+                            if (pickedTime != null && pickedTime != selectedTime) {
+                              setState(() {
+                                selectedTime = pickedTime;
+                              });
+                            }
+                          },
+                          child: Text('시간 선택'),
+                        ),
+                        Text(
+                          '${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                   ],
                 ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('취소'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (eventController.text.isNotEmpty) {
+                      String eventText = eventController.text;
+                      String timeString = '${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}';
+                      String fullEvent = '$eventText - $timeString';
+                      _addEvent(fullEvent); // 일정 추가
+                      Navigator.of(context).pop(); // 다이얼로그 닫기
+                    }
+                  },
+                  child: Text('추가'),
+                ),
               ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('취소'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (eventController.text.isNotEmpty) {
-                  String eventText = eventController.text;
-                  String timeString = '${selectedTime.hour}:${selectedTime.minute}';
-                  String fullEvent = '$eventText - $timeString';
-                  _addEvent(fullEvent);
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Text('추가'),
-            ),
-          ],
+            );
+          },
         );
       },
     );

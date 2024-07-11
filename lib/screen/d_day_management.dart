@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter/cupertino.dart';
 
 class DDayManagementPage extends StatefulWidget {
   @override
@@ -13,6 +15,9 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
       date: '2024.09.01',
       imagePath: 'asset/img/wed_01.jpg',
       cardColor: Color.fromRGBO(255, 222, 246, 1.0),
+      onEditDescription: (String newDescription) {},
+      onDateChanged: (String newDate) {},
+      onDelete:() {},
     ),
     DDayCard(
       days: 'D+446',
@@ -20,6 +25,9 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
       date: '2024.09.01',
       imagePath: 'asset/img/wed_01.jpg',
       cardColor: Color.fromRGBO(192, 249, 252, 1.0),
+      onEditDescription: (String newDescription) {},
+      onDateChanged: (String newDate) {},
+      onDelete:() {},
     ),
     DDayCard(
       days: 'D-23',
@@ -27,6 +35,9 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
       date: '2024.09.01',
       imagePath: 'asset/img/wed_01.jpg',
       cardColor: Color.fromRGBO(255, 242, 166, 1.0),
+      onEditDescription: (String newDescription) {},
+      onDateChanged: (String newDate) {},
+      onDelete:() {},
     ),
   ];
 
@@ -39,8 +50,28 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
           date: '2024.09.01',
           imagePath: 'asset/img/wed_01.jpg',
           cardColor: Color.fromRGBO(255, 242, 166, 1.0),
+          onEditDescription: (String newDescription) {},
+          onDateChanged: (String newDate) {},
+          onDelete:() {},
         ),
       );
+    });
+  }
+  void _updateCardDate(int index, String newDate) {
+    setState(() {
+      ddayCards[index].date = newDate;
+
+      // Calculate days difference
+      DateTime pickedDate = DateTime.parse(newDate.replaceAll('.', '-'));
+      DateTime now = DateTime.now();
+      int difference = pickedDate.difference(now).inDays;
+      ddayCards[index].days = difference >= 0 ? 'D+${difference.abs()}' : 'D-${difference.abs()}';
+    });
+  }
+
+  void _deleteDDayCard(int index) {
+    setState(() {
+      ddayCards.removeAt(index);
     });
   }
 
@@ -56,7 +87,6 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
               },
               child: Text('디데이 관리'),
             ),
-            //Icon(Icons.favorite, color: Colors.pink),
           ],
         ),
         leading: IconButton(
@@ -69,7 +99,28 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
       body: ListView(
         padding: EdgeInsets.all(16),
         children: [
-          ...ddayCards,
+          ...ddayCards.asMap().entries.map((entry) {
+            int index = entry.key;
+            DDayCard card = entry.value;
+            return DDayCard(
+              days: card.days,
+              description: card.description,
+              date: card.date,
+              imagePath: card.imagePath,
+              cardColor: card.cardColor,
+              onEditDescription: (String newDescription) {
+                setState(() {
+                  ddayCards[index].description = newDescription;
+                });
+              },
+              onDateChanged: (String newDate) {
+                _updateCardDate(index, newDate);
+              },
+              onDelete: () {
+                _deleteDDayCard(index);
+              },
+            );
+          }).toList(),
           SizedBox(height: 20),
           Center(
             child: Container(
@@ -96,12 +147,15 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
   }
 }
 
-class DDayCard extends StatelessWidget {
-  final String days;
-  final String description;
-  final String date;
+class DDayCard extends StatefulWidget {
+  String days;
+  String description;
+  String date;
   final String imagePath;
-  final Color cardColor;
+  Color cardColor;
+  final Function(String) onEditDescription;
+  final Function(String) onDateChanged;
+  final VoidCallback onDelete;
 
   DDayCard({
     required this.days,
@@ -109,30 +163,186 @@ class DDayCard extends StatelessWidget {
     required this.date,
     required this.imagePath,
     required this.cardColor,
+    required this.onEditDescription,
+    required this.onDateChanged,
+    required this.onDelete,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: cardColor,
-      child: ListTile(
-        leading: CircleAvatar(
-          radius: 50.0,
-          backgroundImage: AssetImage(imagePath),
-        ),
-        title: Text(days, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(description, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text(date),
+  _DDayCardState createState() => _DDayCardState();
+}
+
+class _DDayCardState extends State<DDayCard> {
+  bool _isEditingDescription = false;
+  TextEditingController _descriptionController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _descriptionController.text = widget.description;
+  }
+
+  void _toggleEditing() {
+    setState(() {
+      _isEditingDescription = !_isEditingDescription;
+    });
+  }
+
+  void _finalizeEditing() {
+    setState(() {
+      _isEditingDescription = false;
+      widget.onEditDescription(_descriptionController.text);
+    });
+  }
+
+  void showColorPicker(BuildContext context, Function(Color) onColorChanged) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        Color pickerColor = Colors.white;
+        return AlertDialog(
+          title: Text('배경 색상 변경'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: pickerColor,
+              onColorChanged: (Color color) {
+                pickerColor = color;
+              },
+              showLabel: true,
+              pickerAreaHeightPercent: 0.8,
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: Text('확인'),
+              onPressed: () {
+                onColorChanged(pickerColor);
+                Navigator.of(context).pop();
+              },
+            ),
           ],
-        ),
-        trailing: IconButton(
-          icon: Icon(Icons.edit, color: Colors.black),
-          onPressed: () {
-            // 수정 버튼 클릭 시 처리할 코드
-          },
+        );
+      },
+    );
+  }
+
+  void _pickDate(BuildContext context) async {
+    DateTime? pickedDate = await showModalBottomSheet(
+      context: context,
+      builder: (BuildContext builder) {
+        return Container(
+          height: MediaQuery
+              .of(context)
+              .size
+              .height / 3,
+          child: CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.date,
+            initialDateTime: DateTime.now(),
+            minimumDate: DateTime(2000),
+            maximumDate: DateTime(2101),
+            onDateTimeChanged: (pickedDate) {
+              if (pickedDate != null) {
+                // Format the pickedDate to 'yyyy.MM.dd' format
+                String formattedDate = '${pickedDate.year}.${pickedDate.month
+                    .toString().padLeft(2, '0')}.${pickedDate.day.toString()
+                    .padLeft(2, '0')}';
+                widget.onDateChanged(formattedDate);
+
+                // Calculate days difference
+                DateTime now = DateTime.now();
+                int difference = pickedDate
+                    .difference(now)
+                    .inDays;
+                String daysLabel = difference >= 0
+                    ? 'D+${difference.abs()}'
+                    : 'D-${difference.abs()}';
+
+                // Update days in the widget state
+                setState(() {
+                  widget.days = daysLabel;
+                });
+              }
+            },
+          ),
+        );
+      },
+    );
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (_isEditingDescription) {
+          _finalizeEditing();
+        }
+      },
+      child: Card(
+        color: widget.cardColor,
+        child: Stack(
+          children: [
+            ListTile(
+              leading: CircleAvatar(
+                radius: 60.0,
+                backgroundImage: AssetImage(widget.imagePath),
+              ),
+              title: Text(widget.days,
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      _toggleEditing();
+                    },
+                    child: _isEditingDescription
+                        ? TextField(
+                      controller: _descriptionController,
+                      onSubmitted: (newDescription) {
+                        setState(() {
+                          _isEditingDescription = false;
+                          widget.onEditDescription(newDescription);
+                        });
+                      },
+                    )
+                        : Text(widget.description,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+                  Row(
+                    children: [
+                      Text(widget.date),
+                      IconButton(
+                        icon: Icon(Icons.arrow_drop_down, size: 16),
+                        onPressed: () {
+                          _pickDate(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              trailing: IconButton(
+                icon: Icon(Icons.edit, color: Colors.black),
+                onPressed: () {
+                  showColorPicker(context, (Color color) {
+                    setState(() {
+                      widget.cardColor = color;
+                    });
+                  });
+                },
+              ),
+            ),
+            Positioned(
+              bottom: 90,
+              left: 330,
+              child: IconButton(
+                icon: Icon(Icons.close, color: Colors.black),
+                onPressed: widget.onDelete,
+              ),
+            ),
+          ],
         ),
       ),
     );
