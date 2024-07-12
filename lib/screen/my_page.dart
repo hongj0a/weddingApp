@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:smart_wedding/screen/budget_setting.dart';
 import 'package:smart_wedding/screen/d_day_management.dart';
+import 'package:smart_wedding/screen/notice_list.dart';
 import 'package:smart_wedding/screen/profile_edit.dart';
 
 class MyPage extends StatelessWidget {
@@ -68,7 +70,12 @@ class MyPage extends StatelessWidget {
                 ListTile(
                   leading: Icon(Icons.attach_money),
                   title: Text('예산설정'),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => BudgetSetting()),
+                    );
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.calendar_today),
@@ -88,7 +95,12 @@ class MyPage extends StatelessWidget {
                 ListTile(
                   leading: Icon(Icons.notifications),
                   title: Text('공지사항'),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => NoticeList()),
+                    );
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.policy),
