@@ -34,7 +34,6 @@ class _BudgetSettingState extends State<BudgetSetting> {
     }
   }
 
-
   @override
   void dispose() {
     for (var controller in _controllers.values) {
@@ -74,42 +73,97 @@ class _BudgetSettingState extends State<BudgetSetting> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '총예산',
-                style: TextStyle(fontSize: 18.0, color: Colors.grey),
+                '{총예산}',
+                style: TextStyle(fontSize: 25.0,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w700),
               ),
               SizedBox(height: 10),
               Expanded(
-                child: ListView.builder(
-                  itemCount: budgetItems.length,
-                  itemBuilder: (context, index) {
-                    final item = budgetItems[index];
-                    return Card(
-                      child: ListTile(
-                        title: Text(item['label'] ?? ''),
-                        trailing: SizedBox(
-                          width: 100,
-                          child: TextFormField(
-                            controller: _controllers[item['label']],
-                            focusNode: _focusNodes[item['label']],
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: budgetItems.length,
+                        itemBuilder: (context, index) {
+                          final item = budgetItems[index];
+                          return Card(
+                            child: ListTile(
+                              title: Text(item['label'] ?? ''),
+                              trailing: SizedBox(
+                                width: 100,
+                                child: TextFormField(
+                                  controller: _controllers[item['label']!],
+                                  focusNode: _focusNodes[item['label']!],
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.end,
+                                  onTap: () {
+                                    _focusNodes[item['label']!]!.requestFocus();
+                                  },
+                                ),
+                              ),
                             ),
-                            keyboardType: TextInputType.number,
-                            textAlign: TextAlign.end,
-                            onTap: () {
-                              _focusNodes[item['label']]!.requestFocus();
-                            },
-                          ),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                        width: double.infinity, // ListTile의 너비에 맞게 설정
+                        child: ElevatedButton(
+                          onPressed: _showAddItemDialog,
+                          child: Text('추가하기'),
                         ),
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  void _showAddItemDialog() {
+    TextEditingController controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('예산 항목 추가'),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(hintText: '항목명을 입력하세요'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('취소'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('추가'),
+              onPressed: () {
+                setState(() {
+                  String newItemLabel = controller.text.trim();
+                  budgetItems.add({'label': newItemLabel, 'amount': ''});
+                  _controllers[newItemLabel] = TextEditingController(text: '원');
+                  _focusNodes[newItemLabel] = FocusNode();
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
