@@ -5,8 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="11742957-3fdc-4257-b625-c75b3070cca4" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/lib/screen/faq_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/screen/inquiryScreen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/screen/terms_and_policies.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/budget_setting.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/budget_setting.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/budget_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/budget_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/my_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/my_page.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

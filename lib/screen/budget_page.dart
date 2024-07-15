@@ -212,10 +212,7 @@ class _BudgetPageState extends State<BudgetPage> {
               SizedBox(width: 18.0),
               GestureDetector(
                 onTap: () {},
-                child: Text(
-                  '>',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+                child: Icon(Icons.chevron_right),
               ),
             ],
           ),

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:smart_wedding/screen/budget_setting.dart';
 import 'package:smart_wedding/screen/d_day_management.dart';
+import 'package:smart_wedding/screen/faq_screen.dart';
+import 'package:smart_wedding/screen/inquiryScreen.dart';
 import 'package:smart_wedding/screen/notice_list.dart';
 import 'package:smart_wedding/screen/profile_edit.dart';
+import 'package:smart_wedding/screen/terms_and_policies.dart';
 
 class MyPage extends StatelessWidget {
   @override
@@ -105,17 +108,32 @@ class MyPage extends StatelessWidget {
                 ListTile(
                   leading: Icon(Icons.policy),
                   title: Text('약관 및 정책'),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => TermsAndPoliciesScreen()),
+                    );
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.help),
                   title: Text('자주 묻는 질문'),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => FAQScreen()),
+                    );
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.mail),
                   title: Text('문의하기'),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => InquiryScreen()),
+                    );
+                  },
                 ),
               ],
             ),
