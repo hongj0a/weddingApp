@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smart_wedding/screen/setting.dart';
+import 'package:smart_wedding/screen/main/setting.dart';
 
 class AlarmListPage extends StatelessWidget {
   @override

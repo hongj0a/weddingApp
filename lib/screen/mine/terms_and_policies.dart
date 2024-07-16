@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_wedding/screen/mine/terms_of_service_page.dart';
 
 
 class TermsAndPoliciesScreen extends StatelessWidget {
@@ -19,7 +20,10 @@ class TermsAndPoliciesScreen extends StatelessWidget {
           ListTile(
             title: Text('서비스 이용약관'),
             onTap: () {
-              // '서비스 이용약관' 클릭 시 동작
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => TermsOfServicePage()),
+              );
             },
           ),
           ListTile(

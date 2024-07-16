@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smart_wedding/screen/d_day_management.dart';
+import 'package:smart_wedding/screen/mine/d_day_management.dart';
 
 class DDayCardWidget extends StatelessWidget {
   final String title;

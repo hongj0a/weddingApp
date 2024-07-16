@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:smart_wedding/screen/add_budget_page.dart';
-import 'package:smart_wedding/screen/add_item_page.dart';
+import 'package:smart_wedding/screen/money/add_budget_page.dart';
+import 'package:smart_wedding/screen/money/add_item_page.dart';
 
 class BudgetPage extends StatefulWidget {
   @override
@@ -22,7 +22,7 @@ class _BudgetPageState extends State<BudgetPage> {
     {'title': '본식 기타', 'price': '0원'},
   ];
 
-  bool _isExpanded = true;
+  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {

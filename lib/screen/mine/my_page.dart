@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:smart_wedding/screen/budget_setting.dart';
-import 'package:smart_wedding/screen/d_day_management.dart';
-import 'package:smart_wedding/screen/faq_screen.dart';
-import 'package:smart_wedding/screen/inquiryScreen.dart';
-import 'package:smart_wedding/screen/notice_list.dart';
-import 'package:smart_wedding/screen/profile_edit.dart';
-import 'package:smart_wedding/screen/terms_and_policies.dart';
+import 'package:smart_wedding/screen/money/budget_setting.dart';
+import 'package:smart_wedding/screen/mine/d_day_management.dart';
+import 'package:smart_wedding/screen/mine/faq_screen.dart';
+import 'package:smart_wedding/screen/mine/inquiryScreen.dart';
+import 'package:smart_wedding/screen/mine/notice_list.dart';
+import 'package:smart_wedding/screen/mine/profile_edit.dart';
+import 'package:smart_wedding/screen/mine/terms_and_policies.dart';
 
 class MyPage extends StatelessWidget {
   @override

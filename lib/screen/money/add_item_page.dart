@@ -1,6 +1,6 @@
 // add_item_page.dart
 import 'package:flutter/material.dart';
-import 'package:smart_wedding/screen/add_budget_page.dart';
+import 'package:smart_wedding/screen/money/add_budget_page.dart';
 
 class AddItemPage extends StatefulWidget {
   @override

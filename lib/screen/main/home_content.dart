@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smart_wedding/screen/d_day_card.dart';
+import 'package:smart_wedding/screen/mine/d_day_card.dart';
 
 class HomeContent extends StatefulWidget {
   @override

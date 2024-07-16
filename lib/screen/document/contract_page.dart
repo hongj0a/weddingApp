@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smart_wedding/screen/document_upload.dart';
+import 'package:smart_wedding/screen/document/document_upload.dart';
 
 class ContractPage extends StatelessWidget {
   @override

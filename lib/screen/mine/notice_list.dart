@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'notice_detail.dart'; // Ensure this import is correct
 
 class NoticeList extends StatelessWidget {
   final List<Map<String, String>> notices = [
@@ -33,6 +33,17 @@ class NoticeList extends StatelessWidget {
               ListTile(
                 title: Text(notice['title'] ?? ''),
                 subtitle: Text(notice['date'] ?? ''),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NoticeDetail(
+                        title: notice['title'] ?? '',
+                        date: notice['date'] ?? '',
+                      ),
+                    ),
+                  );
+                },
               ),
               Divider(),
             ],

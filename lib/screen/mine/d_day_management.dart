@@ -335,8 +335,8 @@ class _DDayCardState extends State<DDayCard> {
               ),
             ),
             Positioned(
-              bottom: 90,
-              left: 330,
+              bottom: 80,
+              left: 320,
               child: IconButton(
                 icon: Icon(Icons.close, color: Colors.black),
                 onPressed: widget.onDelete,

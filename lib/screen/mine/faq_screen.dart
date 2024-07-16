@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:smart_wedding/screen/mine/question_list.dart';
 
 
 class FAQScreen extends StatelessWidget {
   final List<String> faqTitles = [
-    "자주 묻는 질문",
-    "자주 묻는 질문",
-    "자주 묻는 질문",
+    "운영정책",
+    "계정/인증/로그인",
+    "광고",
     "자주 묻는 질문",
   ];
 
@@ -28,7 +29,10 @@ class FAQScreen extends StatelessWidget {
             title: Text(faqTitles[index]),
             trailing: Icon(Icons.chevron_right),
             onTap: () {
-              // Handle FAQ item tap here
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => QuestionList()),
+              );
             },
           );
         },
