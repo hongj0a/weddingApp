@@ -5,28 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="11742957-3fdc-4257-b625-c75b3070cca4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/screen/mine/faq_detail.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/screen/mine/notice_detail.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/screen/mine/profile_edit.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/screen/mine/question_list.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/screen/mine/terms_of_service_page.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/screen/sign/find_account_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/screen/sign/login_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Flutter/Debug.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Flutter/Debug.xcconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Flutter/Release.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Flutter/Release.xcconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner.xcworkspace/contents.xcworkspacedata" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner.xcworkspace/contents.xcworkspacedata" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Info.plist" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/add_budget_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/money/add_budget_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/add_item_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/money/add_item_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/alarm_list_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/main/alarm_list_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/budget_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/money/budget_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/budget_setting.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/money/budget_setting.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/d_day_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/d_day_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/d_day_management.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/d_day_management.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/faq_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/faq_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/home_content.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/main/home_content.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/home_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/main/home_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/inquiryScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/inquiryScreen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/my_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/my_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/notice_list.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/notice_list.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/profile_edit.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/terms_and_policies.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/terms_and_policies.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/document/document_upload.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/document/document_upload.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/linux/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macos/Flutter/Flutter-Debug.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Flutter/Flutter-Debug.xcconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macos/Flutter/Flutter-Release.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Flutter/Flutter-Release.xcconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,33 +55,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Flutter.main.dart.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
-    "io.flutter.reload.alreadyRun": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/hongjin-yeong/StudioProjects/smart_wedding/lib/screen",
-    "settings.editor.selected.configurable": "vcs.Git",
-    "show.migrate.to.gradle.popup": "false"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Flutter.main.dart.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/hongjin-yeong/StudioProjects/smart_wedding/lib/screen&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/lib/screen" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lib/screen/main" />
+      <recent name="$PROJECT_DIR$/lib/screen/document" />
+      <recent name="$PROJECT_DIR$/lib/screen/diary" />
       <recent name="$PROJECT_DIR$/lib/screen/money" />
       <recent name="$PROJECT_DIR$/lib/screen/mine" />
-      <recent name="$PROJECT_DIR$/lib/screen/main" />
-      <recent name="$PROJECT_DIR$/asset/img" />
     </key>
   </component>
   <component name="RunManager">
