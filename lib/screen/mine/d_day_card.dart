@@ -53,7 +53,7 @@ class DDayCardWidget extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(width: 160),
+            SizedBox(width: 140),
             Container(
               width: 100,
               height: 100,

@@ -56,81 +56,83 @@ class DocumentUploadPage extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.all(16.0),
-          child: SingleChildScrollView( // SingleChildScrollView로 변경
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  '계약서 등록하기',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        return Builder(
+          builder: (BuildContext newContext) {
+            return Container(
+              padding: EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      '계약서 등록하기',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.camera_alt),
+                      title: Text('직접 촬영하기'),
+                      onTap: () async {
+                        await _pickImageFromCamera(newContext);
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.photo),
+                      title: Text('갤러리에서 가져오기'),
+                      onTap: () async {
+                        await _pickImageFromGallery(newContext);
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.picture_as_pdf),
+                      title: Text('PDF 문서 가져오기'),
+                      onTap: () async {
+                        await _pickPDF(newContext);
+                      },
+                    ),
+                  ],
                 ),
-                ListTile(
-                  leading: Icon(Icons.camera_alt),
-                  title: Text('직접 촬영하기'),
-                  onTap: () async {
-                    await _pickImageFromCamera(context);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.photo),
-                  title: Text('갤러리에서 가져오기'),
-                  onTap: () async {
-                    await _pickImageFromGallery(context);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.picture_as_pdf),
-                  title: Text('PDF 문서 가져오기'),
-                  onTap: () async {
-                    await _pickPDF(context);
-                  },
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
   }
 
+
   Future<void> _pickImageFromCamera(BuildContext context) async {
-    if (await Permission.camera.request().isGranted) {
+    var status = await Permission.camera.request();
+    if (status.isGranted) {
       final pickedFile = await _picker.pickImage(source: ImageSource.camera);
       if (pickedFile != null) {
         // Handle the picked image
         print('Picked image: ${pickedFile.path}');
       }
     } else {
-      // Handle the permission denied
-      print('Camera permission denied');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('카메라 권한이 필요합니다.'),
-      ));
+      _showPermissionDeniedDialog(context, '카메라');
     }
     Navigator.pop(context);
   }
 
   Future<void> _pickImageFromGallery(BuildContext context) async {
-    if (await Permission.photos.request().isGranted) {
+    var status = await Permission.photos.request();
+    if (status.isGranted) {
+      print('DocumentUploadPage._pickImageFromGallery@@@');
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         // Handle the picked image
         print('Picked image: ${pickedFile.path}');
       }
     } else {
-      // Handle the permission denied
-      print('Gallery permission denied');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('갤러리 권한이 필요합니다.'),
-      ));
+      print('DocumentUploadPage._pickImageFromGallery###');
+      _showPermissionDeniedDialog(context, '갤러리');
     }
     Navigator.pop(context);
   }
 
   Future<void> _pickPDF(BuildContext context) async {
-    if (await Permission.storage.request().isGranted) {
+    var status = await Permission.storage.request();
+    if (status.isGranted) {
       final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
       if (result != null) {
         // Handle the picked PDF file
@@ -140,12 +142,23 @@ class DocumentUploadPage extends StatelessWidget {
         print('User canceled PDF picking');
       }
     } else {
-      // Handle the permission denied
-      print('Storage permission denied');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('저장소 권한이 필요합니다.'),
-      ));
+      _showPermissionDeniedDialog(context, '저장소');
     }
     Navigator.pop(context);
   }
+
+  void _showPermissionDeniedDialog(BuildContext context, String permissionName) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$permissionName 권한이 필요합니다. 설정으로 이동하여 권한을 허용해주세요.'),
+        action: SnackBarAction(
+          label: '설정으로 이동',
+          onPressed: () async {
+            await openAppSettings();
+          },
+        ),
+      ),
+    );
+  }
+
 }

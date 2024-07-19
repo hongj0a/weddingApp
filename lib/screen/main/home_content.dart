@@ -104,8 +104,8 @@ class _HomeContentState extends State<HomeContent> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  '흩어져 있는 결혼 준비... 한 곳에 모아서 관리하세요 😊',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  '흩어져 있는 결혼 준비, 한 곳에 모아서 관리하세요 😊',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 20),
                 Row(
