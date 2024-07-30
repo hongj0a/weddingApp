@@ -12,8 +12,8 @@ class _SchedulePageState extends State<SchedulePage> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   final Map<DateTime, List<String>> _events = {
-    DateTime.utc(2024, 6, 28): ['Event 1'],
-    DateTime.utc(2024, 6, 29): ['Event 2'],
+    DateTime.utc(2024, 6, 28): ['드레스샵 투어 시작 - 11:00'],
+    DateTime.utc(2024, 6, 29): ['Event 2 - 12:00'],
   };
 
   void _addEvent(String event) {
@@ -104,37 +104,17 @@ class _SchedulePageState extends State<SchedulePage> {
             )
                 : SizedBox(),
             SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              margin: const EdgeInsets.symmetric(horizontal: 16.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'am 11:00',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(width: 8),
-                  Text(
-                    '드레스샵 투어 시작',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 5),
+            _selectedDay != null && _events[_selectedDay] != null
+                ? ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: _events[_selectedDay!]!.length,
+              itemBuilder: (context, index) {
+                return _buildEventItem(context, _selectedDay!, _events[_selectedDay!]![index], index);
+              },
+            )
+                : SizedBox(),
+            SizedBox(height: 16),
             GestureDetector(
               onTap: () {
                 _showAddEventDialog(context);
@@ -166,6 +146,79 @@ class _SchedulePageState extends State<SchedulePage> {
                   ],
                 ),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEventItem(BuildContext context, DateTime day, String event, int index) {
+    return Dismissible(
+      key: Key(event),
+      direction: DismissDirection.endToStart,
+      confirmDismiss: (direction) async {
+        return await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("삭제 확인"),
+              content: Text("$event를 삭제하시겠습니까?"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Text("취소"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text("삭제"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      onDismissed: (direction) {
+        setState(() {
+          _events[day]!.removeAt(index);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$event 삭제됨')),
+        );
+      },
+      background: Container(
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Icon(Icons.delete, color: Colors.white),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(Icons.event, size: 24),
+            SizedBox(width: 8),
+            Text(
+              event,
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
           ],
         ),

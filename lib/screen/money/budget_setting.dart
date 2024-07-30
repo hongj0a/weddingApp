@@ -74,7 +74,8 @@ class _BudgetSettingState extends State<BudgetSetting> {
             children: [
               Text(
                 '{총예산}',
-                style: TextStyle(fontSize: 25.0,
+                style: TextStyle(
+                    fontSize: 25.0,
                     color: Colors.grey,
                     fontWeight: FontWeight.w700),
               ),
@@ -89,22 +90,67 @@ class _BudgetSettingState extends State<BudgetSetting> {
                         itemCount: budgetItems.length,
                         itemBuilder: (context, index) {
                           final item = budgetItems[index];
-                          return Card(
-                            child: ListTile(
-                              title: Text(item['label'] ?? ''),
-                              trailing: SizedBox(
-                                width: 100,
-                                child: TextFormField(
-                                  controller: _controllers[item['label']!],
-                                  focusNode: _focusNodes[item['label']!],
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
+                          return Dismissible(
+                            key: Key(item['label']!),
+                            direction: DismissDirection.endToStart,
+                            confirmDismiss: (direction) async {
+                              return await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("삭제 확인"),
+                                    content: Text("${item['label']}을 삭제하시겠습니까?"),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(false);
+                                        },
+                                        child: Text("취소"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(true);
+                                        },
+                                        child: Text("삭제"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            onDismissed: (direction) {
+                              setState(() {
+                                _controllers.remove(item['label']);
+                                _focusNodes.remove(item['label']);
+                                budgetItems.removeAt(index);
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('${item['label']} 삭제됨')),
+                              );
+                            },
+                            background: Container(
+                              color: Colors.red,
+                              alignment: Alignment.centerRight,
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              child: Icon(Icons.delete, color: Colors.white),
+                            ),
+                            child: Card(
+                              child: ListTile(
+                                title: Text(item['label'] ?? ''),
+                                trailing: SizedBox(
+                                  width: 100,
+                                  child: TextFormField(
+                                    controller: _controllers[item['label']!],
+                                    focusNode: _focusNodes[item['label']!],
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    textAlign: TextAlign.end,
+                                    onTap: () {
+                                      _focusNodes[item['label']!]!.requestFocus();
+                                    },
                                   ),
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.end,
-                                  onTap: () {
-                                    _focusNodes[item['label']!]!.requestFocus();
-                                  },
                                 ),
                               ),
                             ),
