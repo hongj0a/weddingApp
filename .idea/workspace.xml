@@ -6,10 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="11742957-3fdc-4257-b625-c75b3070cca4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/diary/schedule_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/diary/schedule_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/document/contract_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/document/contract_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/money/budget_setting.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/money/budget_setting.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/android/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/android/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
