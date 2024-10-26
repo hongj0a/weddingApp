@@ -4,7 +4,9 @@ class TermsOfServicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text('서비스 이용약관'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),

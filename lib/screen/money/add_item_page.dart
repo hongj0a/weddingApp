@@ -1,6 +1,6 @@
 // add_item_page.dart
 import 'package:flutter/material.dart';
-import 'package:smart_wedding/screen/money/add_budget_page.dart';
+import 'package:smart_wedding/screen/money/add_cost_page.dart';
 
 class AddItemPage extends StatefulWidget {
   @override
@@ -11,7 +11,9 @@ class _AddItemPageState extends State<AddItemPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text('체크리스트 항목 추가하기'),
         actions: [
           TextButton(
@@ -63,7 +65,7 @@ class _AddItemPageState extends State<AddItemPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AddBudgetPage(),
+                              builder: (context) => AddCostPage(),
                             ),
                           );
                         },

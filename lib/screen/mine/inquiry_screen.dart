@@ -4,7 +4,9 @@ class InquiryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text("문의하기"),
       ),
       body: SafeArea(
@@ -17,7 +19,7 @@ class InquiryScreen extends StatelessWidget {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: '스마트웨딩 고객센터 전화번호 ',
+                      text: '어썸메리지 고객센터 전화번호 ',
                       style: TextStyle(color: Colors.black),
                     ),
                     TextSpan(

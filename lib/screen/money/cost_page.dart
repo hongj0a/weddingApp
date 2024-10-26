@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:smart_wedding/screen/money/add_budget_page.dart';
+import 'package:smart_wedding/screen/money/add_cost_page.dart';
 import 'package:smart_wedding/screen/money/add_item_page.dart';
 
-class BudgetPage extends StatefulWidget {
+class CostPage extends StatefulWidget {
   @override
-  _BudgetPageState createState() => _BudgetPageState();
+  _CostPageState createState() => _CostPageState();
 }
 
-class _BudgetPageState extends State<BudgetPage> {
+class _CostPageState extends State<CostPage> {
   final List<Map<String, String>> _items = [
     {'title': '로얄파크', 'price': '16,500,000원'},
     {'title': '본식 스냅', 'price': '0원'},
@@ -27,6 +27,7 @@ class _BudgetPageState extends State<BudgetPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: AnimatedContainer(
@@ -169,7 +170,7 @@ class _BudgetPageState extends State<BudgetPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => AddBudgetPage(),
+                                  builder: (context) => AddCostPage(),
                                 ),
                               );
                             },

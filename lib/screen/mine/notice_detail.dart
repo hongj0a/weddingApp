@@ -9,9 +9,10 @@ class NoticeDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('공지사항', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
+        title: Text('공지사항', style: TextStyle(color: Colors.black)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
@@ -61,7 +62,7 @@ class NoticeDetail extends StatelessWidget {
             ),
             SizedBox(height: 20.0),
             Text(
-              '스마트웨딩 팀 드림',
+              '어썸메리지 팀 드림',
               style: TextStyle(fontSize: 16.0, height: 1.5),
             ),
           ],

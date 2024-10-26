@@ -17,6 +17,7 @@ class _ContractPageState extends State<ContractPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: ListView.builder(
         padding: EdgeInsets.all(16.0),
         itemCount: contracts.length,

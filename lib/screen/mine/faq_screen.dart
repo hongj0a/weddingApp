@@ -13,7 +13,9 @@ class FAQScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text('자주 묻는 질문'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),

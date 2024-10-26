@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:smart_wedding/screen/mine/d_day_management.dart';
 
+import '../../config/ApiConstants.dart';
+
 class DDayCardWidget extends StatelessWidget {
   final String title;
   final String subtitle;
   final String date;
-  final String imagePath;
+  final String image;
 
   const DDayCardWidget({
     required this.title,
     required this.subtitle,
     required this.date,
-    required this.imagePath,
+    required this.image,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    String imageUrl = '${ApiConstants.localImagePath}/$image';
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -27,10 +30,12 @@ class DDayCardWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20.0),
         decoration: BoxDecoration(
-          color: Color.fromRGBO(222, 183, 247, 1.0),
-          borderRadius: BorderRadius.circular(15),
+          image: DecorationImage(
+            image: NetworkImage(imageUrl), // 배경 이미지 추가
+            fit: BoxFit.cover,  // 이미지가 컨테이너 전체를 덮도록 설정
+          ),
         ),
-        margin: EdgeInsets.all(12.0),
+        margin: EdgeInsets.all(0.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -39,17 +44,17 @@ class DDayCardWidget extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
                 Text(
                   subtitle,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 4),
                 Text(
                   date,
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -59,19 +64,6 @@ class DDayCardWidget extends StatelessWidget {
               height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-              ),
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    top: 7.0,
-                    child: ClipOval(
-                      child: Image.asset(
-                        imagePath,
-                        fit: BoxFit.fitHeight,
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
           ],

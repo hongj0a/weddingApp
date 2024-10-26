@@ -36,7 +36,9 @@ class _FindAccountScreenState extends State<FindAccountScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {

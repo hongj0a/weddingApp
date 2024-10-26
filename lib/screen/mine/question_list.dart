@@ -6,7 +6,9 @@ class QuestionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text('운영 정책'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),

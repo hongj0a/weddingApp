@@ -1,70 +1,156 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_wedding/screen/mine/setting.dart';
 import 'package:smart_wedding/screen/money/budget_setting.dart';
 import 'package:smart_wedding/screen/mine/d_day_management.dart';
 import 'package:smart_wedding/screen/mine/faq_screen.dart';
-import 'package:smart_wedding/screen/mine/inquiryScreen.dart';
+import 'package:smart_wedding/screen/mine/inquiry_screen.dart';
 import 'package:smart_wedding/screen/mine/notice_list.dart';
 import 'package:smart_wedding/screen/mine/profile_edit.dart';
 import 'package:smart_wedding/screen/mine/terms_and_policies.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class MyPage extends StatelessWidget {
+import '../../config/ApiConstants.dart';
+
+Future<Map<String, dynamic>> fetchUserInfo() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? accessToken = prefs.getString('accessToken');
+
+  var url = Uri.parse(ApiConstants.getUserInfo);
+
+  var response = await http.get(
+    url,
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json', // JSON 형식의 데이터 전송
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body)['data']; // 'data' 부분에서 필요한 정보를 가져옴
+  } else {
+    throw Exception('Failed to load user info');
+  }
+}
+
+class MyPage extends StatefulWidget {
+  @override
+  _MyPageState createState() => _MyPageState();
+}
+
+class _MyPageState extends State<MyPage> {
+  Future<Map<String, dynamic>>? _userInfoFuture;
+  @override
+  void initState() {
+    super.initState();
+    _userInfoFuture = fetchUserInfo(); // API 호출
+  }
+
   @override
   Widget build(BuildContext context) {
+    String imageUrl = '${ApiConstants.localImagePath}/';
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: <Widget>[
           Flexible(
             flex: 2,
-            child: Container(
-              color: Color.fromRGBO(250, 222, 242, 1.0),
-              padding: EdgeInsets.all(16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 30.0,
-                    child: Icon(Icons.person, size: 50.0),
-                  ),
-                  SizedBox(width: 10.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
+            child: FutureBuilder<Map<String, dynamic>>(
+              future: _userInfoFuture, // API 호출
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator()); // 로딩 중
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}')); // 에러 발생 시
+                } else if (snapshot.hasData) {
+                  // 성공적으로 데이터를 받아왔을 때
+                  final userData = snapshot.data!;
+                  return Container(
+                    padding: EdgeInsets.all(16.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Text(
-                          '  {예시니} 님',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 22.0,
-                            fontWeight: FontWeight.w700,
+                        SizedBox(width: 5.0),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                children: [
+                                  Text(
+                                    '${userData['nickName']} 님',
+                                    // API에서 받은 닉네임 사용
+                                    style: TextStyle(
+                                      fontFamily: 'PretendardVariable',
+                                      color: Colors.black,
+                                      fontSize: 25.0,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  SizedBox(width: 20.0), // 아이콘과 텍스트 사이 여백
+                                  GestureDetector(
+                                    onTap: ()  async {
+                                      final result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ProfileEditPage(),
+                                        ),
+                                      );
+                                      if (result == true) {
+                                        setState(() {
+                                          _userInfoFuture = fetchUserInfo(); // 새로 고침
+                                        });
+                                      }
+                                    },
+                                    child: Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 13.0,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10.0),
+                              Text(
+                                '${userData['pairing']}님과 페어링 중',
+                                // API에서 받은 페어링 정보 사용
+                                style: TextStyle(
+                                  fontFamily: 'PretendardVariable',
+                                  color: Colors.black,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
+                        ),
+                        CircleAvatar(
+                          radius: 50.0,
+                          backgroundColor: Colors.grey[100], // Adjust size as needed
+                          backgroundImage: userData['image'] != null && userData['image'].isNotEmpty
+                              ? NetworkImage('$imageUrl${userData['image']}')
+                              : null, // 이미지가 있을 경우에만 NetworkImage 사용
+                          child: userData['image'] == null || userData['image'].isEmpty
+                              ? Icon(Icons.person, size: 50.0) // 이미지가 없으면 기본 아이콘 표시
+                              : null,
                         ),
                         SizedBox(height: 5.0),
-                        Text(
-                          '❤️ {예랑이}님과 페어링 중',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 17.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
                       ],
                     ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.edit, color: Colors.black),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ProfileEditPage()),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                  );
+                } else {
+                  return Center(child: Text('No data available'));
+                }
+              },
             ),
           ),
+          Container(
+            height: 0.5, // 선의 두께
+            color: Colors.grey, // 선의 색상
+          ),
+          SizedBox(height: 10.0),
           Flexible(
             flex: 5,
             child: ListView(
@@ -72,66 +158,98 @@ class MyPage extends StatelessWidget {
               children: <Widget>[
                 ListTile(
                   leading: Icon(Icons.attach_money),
-                  title: Text('예산설정'),
+                  title: Text('예산설정',
+                    style: TextStyle(fontFamily: 'PretendardVariable')),
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => BudgetSetting()),
+                      MaterialPageRoute(
+                        builder: (context) => BudgetSetting(),
+                      ),
                     );
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.calendar_today),
-                  title: Text('D-day 설정'),
+                  leading: Icon(Icons.calendar_month),
+                  title: Text('D-day 설정',
+                      style: TextStyle(fontFamily: 'PretendardVariable')),
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => DDayManagementPage()),
+                      MaterialPageRoute(
+                        builder: (context) => DDayManagementPage(),
+                      ),
                     );
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.event),
-                  title: Text('진행 중인 이벤트'),
+                  title: Text('진행 중인 이벤트',
+                      style: TextStyle(fontFamily: 'PretendardVariable')),
                   onTap: () {},
                 ),
                 ListTile(
                   leading: Icon(Icons.notifications),
-                  title: Text('공지사항'),
+                  title: Text('공지사항',
+                      style: TextStyle(fontFamily: 'PretendardVariable')),
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => NoticeList()),
+                      MaterialPageRoute(
+                        builder: (context) => NoticeList(),
+                      ),
                     );
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.policy),
-                  title: Text('약관 및 정책'),
+                  title: Text('약관 및 정책',
+                      style: TextStyle(fontFamily: 'PretendardVariable')),
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => TermsAndPoliciesScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => TermsAndPoliciesScreen(),
+                      ),
                     );
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.help),
-                  title: Text('자주 묻는 질문'),
+                  title: Text('자주 묻는 질문',
+                      style: TextStyle(fontFamily: 'PretendardVariable')),
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => FAQScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => FAQScreen(),
+                      ),
                     );
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.mail),
-                  title: Text('문의하기'),
+                  title: Text('문의하기',
+                      style: TextStyle(fontFamily: 'PretendardVariable')),
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => InquiryScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => InquiryScreen(),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.settings),
+                  title: Text('설정',
+                      style: TextStyle(fontFamily: 'PretendardVariable')),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Setting(),
+                      ),
                     );
                   },
                 ),

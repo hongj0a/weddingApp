@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
-class AddBudgetPage extends StatefulWidget {
+class AddCostPage extends StatefulWidget {
   @override
-  _AddBudgetPageState createState() => _AddBudgetPageState();
+  _AddCostPageState createState() => _AddCostPageState();
 }
 
-class _AddBudgetPageState extends State<AddBudgetPage> {
+class _AddCostPageState extends State<AddCostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text('항목 추가'),
         actions: [
           TextButton(
@@ -96,6 +98,6 @@ void main() {
         iconTheme: IconThemeData(color: Colors.white),
       ),
     ),
-    home: AddBudgetPage(),
+    home: AddCostPage(),
   ));
 }

@@ -1,36 +1,263 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // intl 패키지 추가
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import '../../config/ApiConstants.dart';
+import 'dart:async';
 
 class BudgetSetting extends StatefulWidget {
   @override
   _BudgetSettingState createState() => _BudgetSettingState();
 }
 
+class BudgetDto {
+  String label;
+  String amount;
+
+  BudgetDto({required this.label, required this.amount});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'label': label,
+      'amount': amount,
+    };
+  }
+}
+
+String totalAmount = '0';
+Timer? _debounce;
+
 class _BudgetSettingState extends State<BudgetSetting> {
   final List<Map<String, String>> budgetItems = [
-    {'label': '상견례', 'amount': '475,918'},
-    {'label': '예식장', 'amount': ''},
-    {'label': '허니문', 'amount': ''},
-    {'label': '스드메', 'amount': ''},
-    {'label': '예단', 'amount': ''},
-    {'label': '예물', 'amount': ''},
-    {'label': '한복/예복', 'amount': ''},
-    {'label': '헬스케어', 'amount': ''},
-    {'label': '인테리어', 'amount': ''},
-    {'label': '혼수', 'amount': ''},
-    {'label': '청첩장', 'amount': ''},
-    {'label': '막바지준비', 'amount': ''},
   ];
 
   final Map<String, TextEditingController> _controllers = {};
+  final Map<String, TextEditingController> _labelControllers = {};
   final Map<String, FocusNode> _focusNodes = {};
 
   @override
   void initState() {
     super.initState();
+    _initializeBudgetData();
     for (var item in budgetItems) {
-      final amount = item['amount'] ?? ''; // null 체크
-      _controllers[item['label']!] = TextEditingController(text: '$amount원');
+      final amount = item['amount'] ?? '0';
+      // 초기에 0이 아닌 API에서 가져온 값으로 초기화, "0"은 텍스트 필드에 나타나지 않도록
+      _controllers[item['label']!] = TextEditingController(text: amount != '0' ? _formatCurrency(amount) : ''); // 기본값을 빈 문자열로 설정
+      _labelControllers[item['label']!] = TextEditingController(text: item['label']!);
       _focusNodes[item['label']!] = FocusNode();
+    }
+  }
+
+
+
+  Future<void> _initializeBudgetData() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final response = await http.get(
+        Uri.parse(ApiConstants.getBudget),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> decodedData = json.decode(response.body);
+        print('response 200.... : ${decodedData['data']['budgets']}');
+        print('response totalAmount...... : ${decodedData['data']['totalAmount']}');
+
+        if (decodedData.containsKey('data') &&
+            decodedData['data']['budgets'] != null) {
+          final budgets = decodedData['data']['budgets'] as List<dynamic>;
+
+          totalAmount = decodedData['data']['totalAmount']?.toString() ?? '0';
+
+          if (budgets.isEmpty) {
+            // 기본 budgetItems를 서버에 저장하고 화면에 보여주기
+            await _initBudgetOnServer();
+            // 기본 budgetItems를 화면에 표시하기 위해 상태 업데이트
+            setState(() {
+              budgetItems.clear(); // 기존 요소 제거
+              budgetItems.addAll([
+                {'label': '상견례', 'amount': '0'},
+                {'label': '예식장', 'amount': '0'},
+                {'label': '허니문', 'amount': '0'},
+                {'label': '스드메', 'amount': '0'},
+                {'label': '예단', 'amount': '0'},
+                {'label': '예물', 'amount': '0'},
+                {'label': '한복/예복', 'amount': '0'},
+                {'label': '헬스케어', 'amount': '0'},
+                {'label': '인테리어', 'amount': '0'},
+                {'label': '혼수', 'amount': '0'},
+                {'label': '청첩장', 'amount': '0'},
+                {'label': '막바지준비', 'amount': '0'},
+              ]);
+            });
+          } else {
+            // API에서 받은 budgetItems로 초기화
+            setState(() {
+              print("Before clear: $budgetItems");
+              budgetItems.clear();
+              print("After clear: $budgetItems"); // 기존 요소 제거
+              budgetItems.addAll(budgets.map((item) {
+                return {
+                  'seq': item['seq']?.toString() ?? '', // seq 추가
+                  'label': item['title'] as String,
+                  'amount': item['budget']?.toString() ?? '0',
+                };
+              }));
+            });
+          }
+        }
+      }
+
+      // TextEditingController와 FocusNode 초기화
+      for (var item in budgetItems) {
+        final amount = item['amount'] ?? '';
+        _controllers[item['label']!] =
+            TextEditingController(text: amount != '0' ? _formatCurrency(amount) : ''); // 기본값을 빈 문자열로 설정
+        _labelControllers[item['label']!] =
+            TextEditingController(text: item['label']!);
+        _focusNodes[item['label']!] = FocusNode();
+      }
+    } catch (e) {
+      // 예외 처리: API 호출 실패 시 사용자에게 알림 등 처리 추가 가능
+      print("Error loading budget data: $e");
+    }
+  }
+
+
+  // 금액을 원화 형식으로 변환
+  String _formatCurrency(String amount) {
+    final number = int.tryParse(amount.replaceAll(',', '')) ?? 0; // 쉼표 제거 후 변환
+    return NumberFormat('#,###').format(number); // 3자리마다 쉼표
+  }
+
+  Future<void> _initBudgetOnServer() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+      final List<BudgetDto> budgetData = budgetItems.map((item) {
+        return BudgetDto(
+          label: item['label'] as String,
+          amount: item['amount'] as String,
+        );
+      }).toList();
+
+      // BudgetDto 리스트를 JSON으로 변환
+      final List<Map<String, dynamic>> jsonData = budgetData.map((item) =>
+          item.toJson()).toList();
+
+      print('accessToken ... $accessToken');
+      print('budgetdata... $jsonData'); // JSON으로 변환된 데이터 출력
+
+      final response = await http.post(
+        Uri.parse(ApiConstants.initBudgets),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(jsonData), // JSON 인코딩하여 전송
+      );
+
+      if (response.statusCode == 200) {
+        print("Initial budget saved successfully.");
+      } else {
+        print("Failed to save initial budget: ${response.statusCode}");
+        print("Failed message ... : ${response.body}");
+      }
+    } catch (e) {
+      print("Error initializing budget on server: $e");
+    }
+  }
+
+  Future<void> _saveBudgetToServer(String label) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final response = await http.post(
+        Uri.parse(ApiConstants.setBudget),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({'label': label, 'amount': '0'}), // Adjust as necessary
+      );
+
+      if (response.statusCode == 200) {
+        print("Budget item saved successfully.");
+
+        final jsonResponse = json.decode(response.body);
+        var data = jsonResponse['data'];
+        var seq = data['seq'];
+
+        return seq;
+
+      } else {
+        print("Failed to save budget item: ${response.statusCode}");
+        print("Failed message ... : ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      print("Error saving budget item to server: $e");
+    }
+  }
+
+  Future<void> _updateBudgetOnServer(String seq, String label, String amount) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final response = await http.post(
+        Uri.parse(ApiConstants.updateBudget),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'seq': seq,
+          'label': label,
+          'amount': amount,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("Budget item updated successfully.");
+      } else {
+        print("Failed to update budget item: ${response.statusCode}");
+        print("Failed message ... : ${response.body}");
+      }
+    } catch (e) {
+      print("Error updating budget item on server: $e");
+    }
+  }
+
+  void _onDismissed(int seq) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accessToken');
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConstants.delBudget}?seq=$seq'), // 쿼리 스트링으로 seq 추가
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // 성공적으로 삭제된 경우
+        print("Budget item removed successfully.");
+      } else {
+        // 오류 처리
+        print('Failed to delete budget item: ${response.statusCode}');
+      }
+    } catch (e) {
+      // 예외 처리
+      print('Error occurred while deleting budget item: $e');
     }
   }
 
@@ -39,9 +266,13 @@ class _BudgetSettingState extends State<BudgetSetting> {
     for (var controller in _controllers.values) {
       controller.dispose();
     }
+    for (var labelController in _labelControllers.values) {
+      labelController.dispose();
+    }
     for (var focusNode in _focusNodes.values) {
       focusNode.dispose();
     }
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -51,10 +282,40 @@ class _BudgetSettingState extends State<BudgetSetting> {
     }
   }
 
+  // onChanged 핸들러 수정
+  void _onAmountChanged(String value, String seq, String label, Map<String, String> item) {
+    String formattedValue = _formatCurrency(value);
+
+    setState(() {
+      if (_controllers[item['label']!] != null) {
+        if (value.isEmpty) {
+          _controllers[item['label']!]?.text = '';
+        } else {
+          _controllers[item['label']!]?.text = formattedValue;
+          _controllers[item['label']!]?.selection = TextSelection.fromPosition(
+            TextPosition(offset: formattedValue.length),
+          );
+        }
+        item['amount'] = value.replaceAll(',', '');
+      }
+    });
+
+    // 타이머가 활성화 중이면 취소
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+
+    // 500ms 지연 후 서버 업데이트
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      await _updateBudgetOnServer(seq, label, item['amount']!);
+      await _initializeBudgetData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text('예산 설정'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -73,95 +334,115 @@ class _BudgetSettingState extends State<BudgetSetting> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '{총예산}',
+                '${_formatCurrency(totalAmount)} 원', // 원화로 변환
                 style: TextStyle(
-                    fontSize: 25.0,
+                    fontSize: 28.0,
                     color: Colors.grey,
                     fontWeight: FontWeight.w700),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 16),
+              Divider(height: 1, color: Colors.grey.shade300),
+              SizedBox(height: 16),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: budgetItems.length,
-                        itemBuilder: (context, index) {
-                          final item = budgetItems[index];
+                      Column(
+                        children: budgetItems.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final item = entry.value;
+
                           return Dismissible(
-                            key: Key(item['label']!),
+                            key: Key(item['seq']?.toString() ?? 'default_key_$index'), // seq가 null일 경우 기본 키 사용
                             direction: DismissDirection.endToStart,
-                            confirmDismiss: (direction) async {
-                              return await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text("삭제 확인"),
-                                    content: Text("${item['label']}을 삭제하시겠습니까?"),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(false);
-                                        },
-                                        child: Text("취소"),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(true);
-                                        },
-                                        child: Text("삭제"),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            onDismissed: (direction) {
-                              setState(() {
-                                _controllers.remove(item['label']);
-                                _focusNodes.remove(item['label']);
-                                budgetItems.removeAt(index);
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('${item['label']} 삭제됨')),
-                              );
-                            },
                             background: Container(
                               color: Colors.red,
                               alignment: Alignment.centerRight,
                               padding: EdgeInsets.symmetric(horizontal: 20),
-                              child: Icon(Icons.delete, color: Colors.white),
+                              child: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
                             ),
-                            child: Card(
-                              child: ListTile(
-                                title: Text(item['label'] ?? ''),
-                                trailing: SizedBox(
-                                  width: 100,
-                                  child: TextFormField(
-                                    controller: _controllers[item['label']!],
-                                    focusNode: _focusNodes[item['label']!],
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
+                            onDismissed: (direction) {
+                              final seqString = item['seq'] as String?; // seq 값을 안전하게 가져옴
+                              if (seqString != null) {
+                                final seq = int.tryParse(seqString) ?? 0;
+                                _onDismissed(seq);
+
+                                // 삭제 완료 알림 표시 (선택 사항)
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('${item['label']} 항목이 삭제되었습니다.')),
+                                );
+                              } else {
+                                // seq가 null일 경우의 처리
+                                print('seq is null for item: $item');
+                              }
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(vertical: 1.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: _labelControllers[item['label']!],
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        isDense: true,
+                                      ),
+                                      style: TextStyle(fontSize: 20),
+                                      onFieldSubmitted: (newValue) {
+                                        setState(() {
+                                          item['label'] = newValue;
+                                        });
+                                        _updateBudgetOnServer(item['seq']!, newValue, item['amount']!);
+                                      },
                                     ),
-                                    keyboardType: TextInputType.number,
-                                    textAlign: TextAlign.end,
-                                    onTap: () {
-                                      _focusNodes[item['label']!]!.requestFocus();
-                                    },
                                   ),
-                                ),
+                                  SizedBox(
+                                    width: 200,
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: TextFormField(
+                                            controller: _controllers[item['label']!],
+                                            onChanged: (value) {
+                                              _onAmountChanged(value, item['seq']!, item['label']!, item);
+                                            },
+                                            decoration: InputDecoration(
+                                              border: InputBorder.none,
+                                              hintText: '0',
+                                              hintStyle: TextStyle(color: Colors.grey),
+                                            ),
+                                            keyboardType: TextInputType.number,
+                                            textAlign: TextAlign.end,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 8.0),
+                                          child: Text('원', style: TextStyle(fontSize: 20)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
-                        },
+                        }).toList(),
                       ),
+
                       SizedBox(height: 10),
                       Container(
-                        width: double.infinity, // ListTile의 너비에 맞게 설정
+                        width: double.infinity,
                         child: ElevatedButton(
                           onPressed: _showAddItemDialog,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black,
+                            shadowColor: Colors.black.withOpacity(0.2),
+                          ),
                           child: Text('추가하기'),
                         ),
                       ),
@@ -197,13 +478,23 @@ class _BudgetSettingState extends State<BudgetSetting> {
             ),
             TextButton(
               child: Text('추가'),
-              onPressed: () {
-                setState(() {
-                  String newItemLabel = controller.text.trim();
-                  budgetItems.add({'label': newItemLabel, 'amount': ''});
-                  _controllers[newItemLabel] = TextEditingController(text: '원');
-                  _focusNodes[newItemLabel] = FocusNode();
-                });
+              onPressed: () async {
+                String newItemLabel = controller.text.trim();
+                if (newItemLabel.isNotEmpty) {
+                  // 예산 항목을 추가
+                  setState(() {
+                    budgetItems.add({'label': newItemLabel, 'amount': '0'}); // 기본값 0으로 설정
+                    _controllers[newItemLabel] = TextEditingController(); // '원' 없이 추가
+                    _labelControllers[newItemLabel] = TextEditingController(text: newItemLabel);
+                    _focusNodes[newItemLabel] = FocusNode();
+                  });
+
+                  // 서버에 예산 항목을 저장
+                  await _saveBudgetToServer(newItemLabel);
+
+
+                }
+                _initializeBudgetData(); // 삭제 후 데이터 새로 고침
                 Navigator.of(context).pop();
               },
             ),
@@ -212,4 +503,5 @@ class _BudgetSettingState extends State<BudgetSetting> {
       },
     );
   }
+
 }

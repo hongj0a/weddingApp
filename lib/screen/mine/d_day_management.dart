@@ -1,84 +1,84 @@
+import 'dart:convert'; // JSON 파싱을 위한 import
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http; // HTTP 요청을 위한 import
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../config/ApiConstants.dart';
+import 'd_day_registration.dart';
 
+// 디데이 카드 모델
+class DDayCardModel {
+  final String dday;
+  final String title;
+  final String date;
+  final String image;
+  final int seq;
+
+  DDayCardModel({
+    required this.dday,
+    required this.title,
+    required this.date,
+    required this.image,
+    required this.seq,
+  });
+
+  factory DDayCardModel.fromJson(Map<String, dynamic> json) {
+    return DDayCardModel(
+      dday: json['dday'] ?? '',
+      title: json['title'] ?? '',
+      date: json['date'] ?? '',
+      image: json['image'] ?? '',
+      seq: json['seq'] ?? '',
+    );
+  }
+}
+
+// 디데이 관리 페이지
 class DDayManagementPage extends StatefulWidget {
   @override
   _DDayManagementPageState createState() => _DDayManagementPageState();
 }
 
 class _DDayManagementPageState extends State<DDayManagementPage> {
-  List<DDayCard> ddayCards = [
-    DDayCard(
-      days: 'D-113',
-      description: '본식',
-      date: '2024.09.01',
-      imagePath: 'asset/img/wed_01.jpg',
-      cardColor: Color.fromRGBO(255, 222, 246, 1.0),
-      onEditDescription: (String newDescription) {},
-      onDateChanged: (String newDate) {},
-      onDelete:() {},
-    ),
-    DDayCard(
-      days: 'D+446',
-      description: '처음 만난날',
-      date: '2024.09.01',
-      imagePath: 'asset/img/wed_01.jpg',
-      cardColor: Color.fromRGBO(192, 249, 252, 1.0),
-      onEditDescription: (String newDescription) {},
-      onDateChanged: (String newDate) {},
-      onDelete:() {},
-    ),
-    DDayCard(
-      days: 'D-23',
-      description: '촬영',
-      date: '2024.09.01',
-      imagePath: 'asset/img/wed_01.jpg',
-      cardColor: Color.fromRGBO(255, 242, 166, 1.0),
-      onEditDescription: (String newDescription) {},
-      onDateChanged: (String newDate) {},
-      onDelete:() {},
-    ),
-  ];
+  List<DDayCardModel> ddayCards = []; // 리스트 타입 수정
 
-  void _addNewDDayCard() {
-    setState(() {
-      ddayCards.add(
-        DDayCard(
-          days: 'D-23',
-          description: '촬영',
-          date: '2024.09.01',
-          imagePath: 'asset/img/wed_01.jpg',
-          cardColor: Color.fromRGBO(255, 242, 166, 1.0),
-          onEditDescription: (String newDescription) {},
-          onDateChanged: (String newDate) {},
-          onDelete:() {},
-        ),
-      );
-    });
-  }
-  void _updateCardDate(int index, String newDate) {
-    setState(() {
-      ddayCards[index].date = newDate;
-
-      // Calculate days difference
-      DateTime pickedDate = DateTime.parse(newDate.replaceAll('.', '-'));
-      DateTime now = DateTime.now();
-      int difference = pickedDate.difference(now).inDays;
-      ddayCards[index].days = difference >= 0 ? 'D+${difference.abs()}' : 'D-${difference.abs()}';
-    });
+  @override
+  void initState() {
+    super.initState();
+    fetchDDays(); // API 호출
   }
 
-  void _deleteDDayCard(int index) {
-    setState(() {
-      ddayCards.removeAt(index);
-    });
+  Future<void> fetchDDays() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accessToken');
+
+    final response = await ApiConstants.getDDay(accessToken!); // API 호출
+
+    print('Response status: ${response.statusCode}'); // 상태 코드 출력
+    print('Response body: ${response.body}'); // 응답 본문 출력
+
+    if (response.statusCode == 200) {
+      // 응답을 JSON으로 디코드
+      final jsonResponse = json.decode(response.body);
+
+      // 'data'에서 'days' 배열을 가져오기
+      List<dynamic> days = jsonResponse['data']['days'];
+
+      // 상태 업데이트
+      setState(() {
+        ddayCards = days.map((data) => DDayCardModel.fromJson(data)).toList();
+      });
+    } else {
+      throw Exception('Failed to load DDays');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Row(
           children: [
             GestureDetector(
@@ -99,29 +99,22 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
       body: ListView(
         padding: EdgeInsets.all(16),
         children: [
-          ...ddayCards.asMap().entries.map((entry) {
-            int index = entry.key;
-            DDayCard card = entry.value;
+          ...ddayCards.map((card) {
             return DDayCard(
-              days: card.days,
-              description: card.description,
+              dday: card.dday,
+              title: card.title,
               date: card.date,
-              imagePath: card.imagePath,
-              cardColor: card.cardColor,
-              onEditDescription: (String newDescription) {
+              image: '${ApiConstants.localImagePath}/${card.image}',
+              seq: card.seq,// 이미지 경로
+              onDelete: () {
                 setState(() {
-                  ddayCards[index].description = newDescription;
+                  ddayCards.remove(card); // 삭제된 카드 제거
                 });
               },
-              onDateChanged: (String newDate) {
-                _updateCardDate(index, newDate);
-              },
-              onDelete: () {
-                _deleteDDayCard(index);
-              },
+              key: UniqueKey(), // 유니크 키 추가
             );
           }).toList(),
-          SizedBox(height: 20),
+          SizedBox(height: 15),
           Center(
             child: Container(
               width: double.infinity,
@@ -134,10 +127,18 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                onPressed: _addNewDDayCard,
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 14.0),
                 ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => DDayRegistrationPage()),
+                  ).then((_) {
+                    // 페이지에서 돌아왔을 때 리스트 갱신
+                    fetchDDays();
+                  });
+                },
               ),
             ),
           ),
@@ -147,199 +148,134 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
   }
 }
 
-class DDayCard extends StatefulWidget {
-  String days;
-  String description;
-  String date;
-  final String imagePath;
-  Color cardColor;
-  final Function(String) onEditDescription;
-  final Function(String) onDateChanged;
-  final VoidCallback onDelete;
+// 디데이 카드 위젯
+class DDayCard extends StatelessWidget {
+  final String dday;
+  final String title;
+  final String date;
+  final String image;
+  final int seq;
+  final Function onDelete; // 삭제 기능을 위한 콜백 추가
 
   DDayCard({
-    required this.days,
-    required this.description,
+    required this.dday,
+    required this.title,
     required this.date,
-    required this.imagePath,
-    required this.cardColor,
-    required this.onEditDescription,
-    required this.onDateChanged,
-    required this.onDelete,
-  });
+    required this.image,
+    required this.seq,
+    required this.onDelete, // 콜백 받기
+    Key? key,
+  }) : super(key: key);
 
-  @override
-  _DDayCardState createState() => _DDayCardState();
-}
+  Future<void> deleteDDay() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accessToken');
 
-class _DDayCardState extends State<DDayCard> {
-  bool _isEditingDescription = false;
-  TextEditingController _descriptionController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _descriptionController.text = widget.description;
-  }
-
-  void _toggleEditing() {
-    setState(() {
-      _isEditingDescription = !_isEditingDescription;
-    });
-  }
-
-  void _finalizeEditing() {
-    setState(() {
-      _isEditingDescription = false;
-      widget.onEditDescription(_descriptionController.text);
-    });
-  }
-
-  void showColorPicker(BuildContext context, Function(Color) onColorChanged) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        Color pickerColor = Colors.white;
-        return AlertDialog(
-          title: Text('배경 색상 변경'),
-          content: SingleChildScrollView(
-            child: ColorPicker(
-              pickerColor: pickerColor,
-              onColorChanged: (Color color) {
-                pickerColor = color;
-              },
-              showLabel: true,
-              pickerAreaHeightPercent: 0.8,
-            ),
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              child: Text('확인'),
-              onPressed: () {
-                onColorChanged(pickerColor);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+    // API 호출
+    final response = await http.post(
+      Uri.parse('${ApiConstants.delDDay}?seq=$seq'),  // 삭제 API URL
+      headers: {
+        'Authorization': 'Bearer $accessToken', // 헤더에 Access Token 추가
       },
     );
+
+    if (response.statusCode == 200) {
+      onDelete(); // 성공적으로 삭제된 경우 콜백 호출
+    } else {
+      // 에러 처리
+      throw Exception('Failed to delete DDay');
+    }
   }
-
-  void _pickDate(BuildContext context) async {
-    DateTime? pickedDate = await showModalBottomSheet(
-      context: context,
-      builder: (BuildContext builder) {
-        return Container(
-          height: MediaQuery
-              .of(context)
-              .size
-              .height / 3,
-          child: CupertinoDatePicker(
-            mode: CupertinoDatePickerMode.date,
-            initialDateTime: DateTime.now(),
-            minimumDate: DateTime(2000),
-            maximumDate: DateTime(2101),
-            onDateTimeChanged: (pickedDate) {
-              if (pickedDate != null) {
-                // Format the pickedDate to 'yyyy.MM.dd' format
-                String formattedDate = '${pickedDate.year}.${pickedDate.month
-                    .toString().padLeft(2, '0')}.${pickedDate.day.toString()
-                    .padLeft(2, '0')}';
-                widget.onDateChanged(formattedDate);
-
-                // Calculate days difference
-                DateTime now = DateTime.now();
-                int difference = pickedDate
-                    .difference(now)
-                    .inDays;
-                String daysLabel = difference >= 0
-                    ? 'D+${difference.abs()}'
-                    : 'D-${difference.abs()}';
-
-                // Update days in the widget state
-                setState(() {
-                  widget.days = daysLabel;
-                });
-              }
-            },
-          ),
-        );
-      },
-    );
-  }
-
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (_isEditingDescription) {
-          _finalizeEditing();
-        }
+        // 클릭 시 아무 동작도 하지 않음
       },
-      child: Card(
-        color: widget.cardColor,
+      child: Container(
+        padding: const EdgeInsets.all(5.0),
+        margin: EdgeInsets.all(0.0),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: FileImage(File(image)), // 로컬 이미지
+            fit: BoxFit.cover,
+          ),
+          borderRadius: BorderRadius.circular(10), // 카드 모서리 둥글게
+        ),
         child: Stack(
           children: [
-            ListTile(
-              leading: CircleAvatar(
-                radius: 60.0,
-                backgroundImage: AssetImage(widget.imagePath),
-              ),
-              title: Text(widget.days,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              subtitle: Column(
+            // 이미지 먼저 배치
+            image.startsWith('http')
+                ? Image.network(
+              image,
+              fit: BoxFit.cover,
+              height: 200,
+              width: double.infinity,
+              errorBuilder: (context, error, stackTrace) {
+                return Center(child: Text('Error loading image')); // 에러 처리
+              },
+            )
+                : Image.file(
+              File(image),
+              fit: BoxFit.cover,
+              height: 200,
+              width: double.infinity,
+              errorBuilder: (context, error, stackTrace) {
+                return Center(child: Text('Error loading image')); // 에러 처리
+              },
+            ),
+
+            // 텍스트 위에 배치
+            Positioned(
+              top: 16, // 적절한 위치로 조정
+              left: 16, // 적절한 위치로 조정
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      _toggleEditing();
-                    },
-                    child: _isEditingDescription
-                        ? TextField(
-                      controller: _descriptionController,
-                      onSubmitted: (newDescription) {
-                        setState(() {
-                          _isEditingDescription = false;
-                          widget.onEditDescription(newDescription);
-                        });
-                      },
-                    )
-                        : Text(widget.description,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(
+                    dday,
+                    style: TextStyle(
+                      fontFamily: 'PretendardVariable',
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white, // 배경에 잘 보이도록 색상 변경
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Text(widget.date),
-                      IconButton(
-                        icon: Icon(Icons.arrow_drop_down, size: 16),
-                        onPressed: () {
-                          _pickDate(context);
-                        },
-                      ),
-                    ],
+                  SizedBox(height: 4),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: 'PretendardVariable',
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white, // 배경에 잘 보이도록 색상 변경
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    date,
+                    style: TextStyle(
+                      fontFamily: 'PretendardVariable',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white, // 배경에 잘 보이도록 색상 변경
+                    ),
                   ),
                 ],
               ),
-              trailing: IconButton(
-                icon: Icon(Icons.edit, color: Colors.black),
-                onPressed: () {
-                  showColorPicker(context, (Color color) {
-                    setState(() {
-                      widget.cardColor = color;
-                    });
-                  });
-                },
-              ),
             ),
+
+            // 삭제 버튼
             Positioned(
-              bottom: 80,
-              left: 320,
+              top: 2,
+              right: 2,
               child: IconButton(
-                icon: Icon(Icons.close, color: Colors.black),
-                onPressed: widget.onDelete,
+                icon: Icon(Icons.delete, color: Colors.white),
+                onPressed: () async {
+                  // 삭제 API 호출
+                  await deleteDDay();
+                },
               ),
             ),
           ],
