@@ -99,9 +99,7 @@ class _BudgetSettingState extends State<BudgetSetting> {
           } else {
             // API에서 받은 budgetItems로 초기화
             setState(() {
-              print("Before clear: $budgetItems");
               budgetItems.clear();
-              print("After clear: $budgetItems"); // 기존 요소 제거
               budgetItems.addAll(budgets.map((item) {
                 return {
                   'seq': item['seq']?.toString() ?? '', // seq 추가
@@ -333,12 +331,16 @@ class _BudgetSettingState extends State<BudgetSetting> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '${_formatCurrency(totalAmount)} 원', // 원화로 변환
-                style: TextStyle(
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  '${_formatCurrency(totalAmount)} 원', // 원화로 변환
+                  style: TextStyle(
                     fontSize: 28.0,
                     color: Colors.grey,
-                    fontWeight: FontWeight.w700),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
               SizedBox(height: 16),
               Divider(height: 1, color: Colors.grey.shade300),
@@ -464,35 +466,34 @@ class _BudgetSettingState extends State<BudgetSetting> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('예산 항목 추가'),
+          backgroundColor: Colors.white, // 배경색을 흰색으로 설정
+          title: Text('예산 항목 추가',style: TextStyle(fontFamily: 'PretendardVariable', color: Colors.black)),
           content: TextField(
             controller: controller,
             decoration: InputDecoration(hintText: '항목명을 입력하세요'),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('취소'),
+              child: Text('취소', style: TextStyle(fontFamily: 'PretendardVariable',color: Colors.black)), // 글씨색 검정색
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('추가'),
+              child: Text('추가', style: TextStyle(fontFamily: 'PretendardVariable',color: Colors.black)), // 글씨색 검정색
               onPressed: () async {
                 String newItemLabel = controller.text.trim();
                 if (newItemLabel.isNotEmpty) {
                   // 예산 항목을 추가
                   setState(() {
                     budgetItems.add({'label': newItemLabel, 'amount': '0'}); // 기본값 0으로 설정
-                    _controllers[newItemLabel] = TextEditingController(); // '원' 없이 추가
+                    _controllers[newItemLabel] = TextEditingController();
                     _labelControllers[newItemLabel] = TextEditingController(text: newItemLabel);
                     _focusNodes[newItemLabel] = FocusNode();
                   });
 
                   // 서버에 예산 항목을 저장
                   await _saveBudgetToServer(newItemLabel);
-
-
                 }
                 _initializeBudgetData(); // 삭제 후 데이터 새로 고침
                 Navigator.of(context).pop();
@@ -503,5 +504,6 @@ class _BudgetSettingState extends State<BudgetSetting> {
       },
     );
   }
+
 
 }

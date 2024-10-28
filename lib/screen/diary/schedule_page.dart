@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
@@ -28,8 +29,11 @@ class _SchedulePageState extends State<SchedulePage> {
     super.initState();
     // 현재 날짜를 기본 선택 날짜로 설정
     _selectedDay = DateTime.now();
-    _fetchSchedule();
-    _fetchSchedulesForDate(DateFormat('yyyy-MM-dd').format(_selectedDay!));
+    initializeDateFormatting('ko_KR').then((_) {
+      // 로케일 초기화 완료 후 _fetchSchedule() 등을 호출
+      _fetchSchedule();
+      _fetchSchedulesForDate(DateFormat('yyyy-MM-dd').format(_selectedDay!));
+    });
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
@@ -247,8 +251,8 @@ class _SchedulePageState extends State<SchedulePage> {
                   cellMargin: EdgeInsets.all(4.0),
                   cellPadding: EdgeInsets.all(10.0),
                 ),
-                locale: 'en_US',
-                startingDayOfWeek: StartingDayOfWeek.monday,
+                locale: 'ko_KR',
+                startingDayOfWeek: StartingDayOfWeek.sunday,
                 daysOfWeekVisible: true,
                 calendarBuilders: CalendarBuilders(
                   markerBuilder: (context, day, events) {

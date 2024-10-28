@@ -47,6 +47,7 @@ class _HomeContentState extends State<HomeContent> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -74,6 +75,7 @@ class _HomeContentState extends State<HomeContent> {
                         subtitle: dday['title'], // D-day 서브 타이틀
                         date: dday['date'],// D-day 날짜
                         image: dday['image'],
+                        onRefresh: fetchDDay,
                       );
                     }).toList()
                         : [
@@ -88,8 +90,8 @@ class _HomeContentState extends State<HomeContent> {
                     return AnimatedContainer(
                       duration: Duration(milliseconds: 300),
                       margin: EdgeInsets.symmetric(horizontal: 4.0),
-                      height: 10.0,
-                      width: _currentPage == index ? 24.0 : 16.0,
+                      height: 11.0,
+                      width: _currentPage == index ? 11.0 : 11.0,
                       decoration: BoxDecoration(
                         color: _currentPage == index ? Color.fromRGBO(250, 15, 156, 1.0) : Colors.grey,
                         borderRadius: BorderRadius.circular(12),
@@ -133,14 +135,14 @@ class _HomeContentState extends State<HomeContent> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "계약서 목록",
+                      "계약서 종류",
                       style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     GestureDetector(
                       onTap: widget.onContractSelected,
                       child: Row(
                         children: [
-                          Text('더보기', style: TextStyle(fontFamily: 'PretendardVariable',color: Colors.black)),
+                          Text('등록하기', style: TextStyle(fontFamily: 'PretendardVariable',color: Colors.black)),
                           Icon(Icons.arrow_forward_ios, size: 12, color: Colors.black),
                         ],
                       ),

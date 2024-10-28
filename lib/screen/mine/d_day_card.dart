@@ -8,14 +8,17 @@ class DDayCardWidget extends StatelessWidget {
   final String subtitle;
   final String date;
   final String image;
+  final VoidCallback onRefresh; // onTap 콜백 추가
 
   const DDayCardWidget({
     required this.title,
     required this.subtitle,
     required this.date,
     required this.image,
+    required this.onRefresh, // onTap을 매개변수로 받음
     Key? key,
   }) : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +28,9 @@ class DDayCardWidget extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => DDayManagementPage()),
-        );
+        ).then((_) {
+          onRefresh();
+        });
       },
       child: Container(
         padding: const EdgeInsets.all(20.0),

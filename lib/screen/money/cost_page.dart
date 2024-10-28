@@ -1,6 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/money/add_cost_page.dart';
-import 'package:smart_wedding/screen/money/add_item_page.dart';
+import 'package:http/http.dart' as http;
+import '../../config/ApiConstants.dart';
+import 'package:intl/intl.dart';
+
+import 'detail_page.dart';
 
 class CostPage extends StatefulWidget {
   @override
@@ -8,21 +14,107 @@ class CostPage extends StatefulWidget {
 }
 
 class _CostPageState extends State<CostPage> {
-  final List<Map<String, String>> _items = [
-    {'title': '로얄파크', 'price': '16,500,000원'},
-    {'title': '본식 스냅', 'price': '0원'},
-    {'title': '서브 스냅', 'price': '0원'},
-    {'title': '본식 영상', 'price': '0원'},
-    {'title': '신랑 예복', 'price': '0원'},
-    {'title': '신랑 구두', 'price': '0원'},
-    {'title': '본식 드레스', 'price': '0원'},
-    {'title': '2부 의상', 'price': '0원'},
-    {'title': '부케, 코사지', 'price': '0원'},
-    {'title': '본식 메이크업', 'price': '0원'},
-    {'title': '본식 기타', 'price': '0원'},
-  ];
+  List<Map<String, dynamic>> categories = [];
+  //Map<int, List<Map<String, String>>> _items = {}; // seq별 데이터를 저장할 Map
+  Map<int, bool> _isExpandedMap = {};
 
-  bool _isExpanded = false;
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategories();
+  }
+
+  Future<void> _fetchCategories() async {
+    var url = Uri.parse(ApiConstants.getCategories);
+
+    var response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    );  // GET 호출
+
+    if(response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      final categoryList = jsonResponse['data']['categoryList'];
+
+      print('categoryList...####  $categoryList');
+      setState(() {
+        categories = categoryList.map<Map<String, dynamic>>((category) {
+          final seq = category['seq'];
+          _isExpandedMap[seq] = false;
+
+          // 각 카테고리의 `items`를 초기화
+          /*_items[seq] = [
+            {'title': 'Sample Item 1', 'price': '5000원'},
+            {'title': 'Sample Item 2', 'price': '10000원'}
+          ];*/
+
+          return {
+            'seq': seq,
+            'name': category['name'],
+            'totalCost': category['totalCost'],
+            'avgCost': category['avgCost']
+          };
+        }).toList();
+      });
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchCheckList(int seq) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accessToken');
+    var url = Uri.parse('${ApiConstants.getCheckLists}?seq=$seq');
+    var response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      final checkList = jsonResponse['data']['checkList'];
+
+      return checkList.map<Map<String, dynamic>>((checklist) {
+        return {
+          'seq': checklist['seq'],
+          'title': checklist['item'] as String,
+          'price': '${NumberFormat('#,###').format(checklist['totalCost'])}원', // 세 자리마다 콤마 추가
+        };
+      }).toList();
+    } else {
+      throw Exception('Failed to load checklist');
+    }
+  }
+
+  Future<Map<String, dynamic>> _fetchCheckListDetail(int seq) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accessToken');
+    var url = Uri.parse('${ApiConstants.getCheckListDetail}?seq=$seq');
+
+    var response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      }
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      print('jsonResponse... $jsonResponse');
+      print('jsonResponseData...  ${jsonResponse['data']}');
+
+      return jsonResponse['data']; // 필요한 데이터를 반환
+    } else {
+      print('response code ... ${response.statusCode}');
+      print('respons.. message ... ${response.body}');
+      throw Exception('Failed to load checklist detail');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +131,7 @@ class _CostPageState extends State<CostPage> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
+                  border: Border.all(color: Colors.grey.shade300, width: 1),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -63,7 +148,7 @@ class _CostPageState extends State<CostPage> {
                                 style: TextStyle(fontSize: 20),
                               ),
                               Text(
-                                '₩ {16,500,000}원',
+                                '₩ 16,500,000원',
                                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ],
@@ -79,7 +164,7 @@ class _CostPageState extends State<CostPage> {
                                 style: TextStyle(fontSize: 20),
                               ),
                               Text(
-                                '₩ {16,500,000}원',
+                                '₩ 16,500,000원',
                                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ],
@@ -102,13 +187,13 @@ class _CostPageState extends State<CostPage> {
                                 style: TextStyle(fontSize: 20),
                               ),
                               Text(
-                                '₩ {18,500,000}원',
+                                '₩ 18,500,000원',
                                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
                         ),
-                        SizedBox(width: 16), // 간격 추가
+                        SizedBox(width: 16),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,7 +203,7 @@ class _CostPageState extends State<CostPage> {
                                 style: TextStyle(fontSize: 20),
                               ),
                               Text(
-                                '♥️{예랑이}님',
+                                '♥️ 예랑이님',
                                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ],
@@ -130,61 +215,86 @@ class _CostPageState extends State<CostPage> {
                 ),
               ),
               SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Icon(Icons.info),
-                    Text(
-                      '본식 16,500,000원',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isExpanded = !_isExpanded;
-                        });
-                      },
-                      child: Icon(_isExpanded ? Icons.expand_less : Icons.expand_more),
-                    ),
-                  ],
-                ),
-              ),
-              Divider(height: 1, color: Colors.grey.shade300),
-              SizedBox(height: 8.0),
               Expanded(
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  height: _isExpanded ? null : 0,
-                  child: _isExpanded
-                      ? ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _items.length + 1, // +1 for the Add button
-                    itemBuilder: (context, index) {
-                      if (index == _items.length) {
-                        return Container(
-                          padding: const EdgeInsets.all(16.0),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AddCostPage(),
-                                ),
-                              );
-                            },
-                            child: Text('추가하기'),
+                child: ListView.builder(
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final category = categories[index];
+                    final seq = category['seq'];
+
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Icon(Icons.info),
+                              Text(
+                                '${category['name']} ${NumberFormat('#,###').format(category['totalCost'])}원', // 콤마로 구분
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _isExpandedMap[seq] = !_isExpandedMap[seq]!;
+                                  });
+                                },
+                                child: Icon(_isExpandedMap[seq]! ? Icons.expand_less : Icons.expand_more),
+                              ),
+                            ],
                           ),
-                        );
-                      }
-                      return _buildListTile(
-                        _items[index]['title'] ?? 'Unknown title',
-                        _items[index]['price'] ?? 'Unknown price',
-                      );
-                    },
-                  )
-                      : SizedBox.shrink(),
+                        ),
+                        Divider(height: 1, color: Colors.grey.shade300),
+                        if (_isExpandedMap[seq]!) // 카테고리가 확장된 경우
+                          FutureBuilder<List<Map<String, dynamic>>>(
+                            future: _fetchCheckList(seq), // Future 반환
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else if (snapshot.hasData && snapshot.data != null) {
+                                // 데이터가 있는 경우
+                                return AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: snapshot.data!.length + 1,
+                                    itemBuilder: (context, itemIndex) {
+                                      if (itemIndex == snapshot.data!.length) {
+                                        return Container(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => AddCostPage(categorySeq: seq),
+                                                ),
+                                              );
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.white, // 버튼 배경색
+                                              foregroundColor: Colors.black, // 글씨 색
+                                            ),
+                                            child: Text('추가하기'),
+                                          ),
+                                        );
+                                      }
+                                      final item = snapshot.data![itemIndex];
+                                      return _buildListTile(item['title']!, item['price']!, item['seq']);
+                                    },
+                                  ),
+                                );
+                              }
+                              return Container(); // 기본적으로 빈 컨테이너
+                            },
+                          ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
@@ -194,25 +304,30 @@ class _CostPageState extends State<CostPage> {
     );
   }
 
-  Widget _buildListTile(String title, String price) {
+  Widget _buildListTile(String title, String price, int seq) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: TextStyle(fontSize: 19),
-          ),
+          Text(title, style: TextStyle(fontSize: 19)),
           Row(
             children: [
-              Text(
-                price,
-                style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
-              ),
+              Text(price, style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
               SizedBox(width: 18.0),
               GestureDetector(
-                onTap: () {},
+                onTap: () async {
+                  // 아이콘 클릭 시 seq를 사용하여 세부 정보를 가져옴
+                  final detailData = await _fetchCheckListDetail(seq);
+                  print('detailData... $detailData');
+                  // 세부 정보를 처리하는 페이지로 이동
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailPage(detailData: detailData), // DetailPage로 데이터를 넘김
+                    ),
+                  );
+                },
                 child: Icon(Icons.chevron_right),
               ),
             ],
@@ -221,4 +336,5 @@ class _CostPageState extends State<CostPage> {
       ),
     );
   }
+
 }
