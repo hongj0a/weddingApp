@@ -13,52 +13,127 @@ class CostPage extends StatefulWidget {
   _CostPageState createState() => _CostPageState();
 }
 
-class _CostPageState extends State<CostPage> {
+class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
   List<Map<String, dynamic>> categories = [];
   //Map<int, List<Map<String, String>>> _items = {}; // seq별 데이터를 저장할 Map
   Map<int, bool> _isExpandedMap = {};
+  int totalBudget = 0;
+  int usedBudget = 0;
+  int balanceBudget =0;
+  String pairMan = "";
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this); // Observer 등록
     _fetchCategories();
+    _getTotalAmount();
+  }
+
+  String _formatCurrency(String amount) {
+    final number = int.tryParse(amount.replaceAll(',', '')) ?? 0; // 쉼표 제거 후 변환
+    return NumberFormat('#,###').format(number); // 3자리마다 쉼표
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // Observer 해제
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      refreshData(); // 앱이 다시 활성화되면 데이터 새로 고침
+    }
+  }
+
+  void refreshData() {
+    _fetchCategories().then((_) {
+      print('Categories refreshed: $categories');
+    }); // 카테고리 목록을 다시 가져옴
+  }
+
+  Future<void> _getTotalAmount() async{
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final response = await http.get(
+        Uri.parse(ApiConstants.getBudget),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> decodedData = json.decode(response.body);
+        totalBudget = decodedData['data']['totalAmount'] ?? 0;
+        usedBudget = decodedData['data']['usedBudget'] ?? 0;
+        balanceBudget = totalBudget - usedBudget;
+        pairMan = decodedData['data']['isPairMan'];
+
+        setState(() {
+          totalBudget = decodedData['data']['totalAmount'] ?? 0;
+          usedBudget = decodedData['data']['usedBudget'] ?? 0;
+          balanceBudget = totalBudget - usedBudget;
+          pairMan = decodedData['data']['pairMan'];
+        });
+      } else {
+        print('총금액 가져오기 실패: ${response.statusCode}');
+        print('실패 메시지 ${response.body}');
+      }
+    }catch (e) {
+      print('요청 실패, $e');
+    }
   }
 
   Future<void> _fetchCategories() async {
-    var url = Uri.parse(ApiConstants.getCategories);
+    try{
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+      var url = Uri.parse(ApiConstants.getCategories);
 
-    var response = await http.get(
-      url,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    );  // GET 호출
+      var response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json'
+        },
+      );  // GET 호출
+      if(response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        final categoryList = jsonResponse['data']['categoryList'];
 
-    if(response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      final categoryList = jsonResponse['data']['categoryList'];
+        print('categoryList...####  $categoryList');
+        setState(() {
+          categories = categoryList.map<Map<String, dynamic>>((category) {
+            final seq = category['seq'];
+            _isExpandedMap[seq] = false;
 
-      print('categoryList...####  $categoryList');
-      setState(() {
-        categories = categoryList.map<Map<String, dynamic>>((category) {
-          final seq = category['seq'];
-          _isExpandedMap[seq] = false;
-
-          // 각 카테고리의 `items`를 초기화
-          /*_items[seq] = [
+            // 각 카테고리의 `items`를 초기화
+            /*_items[seq] = [
             {'title': 'Sample Item 1', 'price': '5000원'},
             {'title': 'Sample Item 2', 'price': '10000원'}
           ];*/
 
-          return {
-            'seq': seq,
-            'name': category['name'],
-            'totalCost': category['totalCost'],
-            'avgCost': category['avgCost']
-          };
-        }).toList();
-      });
+            return {
+              'seq': seq,
+              'name': category['name'],
+              'totalCost': category['totalCost'],
+              'avgCost': category['avgCost']
+            };
+          }).toList();
+        });
+      } else {
+        print('response....msg ... ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("저장 실패: ${response.statusCode}")));
+      }
+    }catch(e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("에러 발생: $e")));
     }
+
   }
 
   Future<List<Map<String, dynamic>>> _fetchCheckList(int seq) async {
@@ -145,11 +220,11 @@ class _CostPageState extends State<CostPage> {
                             children: [
                               Text(
                                 '총예산',
-                                style: TextStyle(fontSize: 20),
+                                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20),
                               ),
                               Text(
-                                '₩ 16,500,000원',
-                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                '${_formatCurrency(totalBudget.toString())} 원',
+                                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -161,11 +236,11 @@ class _CostPageState extends State<CostPage> {
                             children: [
                               Text(
                                 '총지출',
-                                style: TextStyle(fontSize: 20),
+                                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20),
                               ),
                               Text(
-                                '₩ 16,500,000원',
-                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                '${_formatCurrency(usedBudget.toString())} 원',
+                                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -183,12 +258,12 @@ class _CostPageState extends State<CostPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '남은예산',
-                                style: TextStyle(fontSize: 20),
+                                '남은 예산',
+                                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20),
                               ),
                               Text(
-                                '₩ 18,500,000원',
-                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                '${_formatCurrency(balanceBudget.toString())} 원',
+                                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -203,7 +278,7 @@ class _CostPageState extends State<CostPage> {
                                 style: TextStyle(fontSize: 20),
                               ),
                               Text(
-                                '♥️ 예랑이님',
+                                '${pairMan}',
                                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ],
@@ -229,9 +304,12 @@ class _CostPageState extends State<CostPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Icon(Icons.info),
+                              Tooltip(
+                                message: '${category['name']} 평균 : ${NumberFormat('#,###').format(category['avgCost'])} 원',
+                                child: Icon(Icons.info),
+                              ),
                               Text(
-                                '${category['name']} ${NumberFormat('#,###').format(category['totalCost'])}원', // 콤마로 구분
+                                '${category['name']} ${NumberFormat('#,###').format(category['totalCost'])}원',
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                               GestureDetector(
@@ -273,11 +351,15 @@ class _CostPageState extends State<CostPage> {
                                                 MaterialPageRoute(
                                                   builder: (context) => AddCostPage(categorySeq: seq),
                                                 ),
-                                              );
+                                              ).then((value) {
+                                                if (value == true) {
+                                                  refreshData(); // 추가 후 데이터 새로 고침
+                                                }
+                                              });
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.white, // 버튼 배경색
-                                              foregroundColor: Colors.black, // 글씨 색
+                                              backgroundColor: Colors.white,
+                                              foregroundColor: Colors.black,
                                             ),
                                             child: Text('추가하기'),
                                           ),
@@ -294,6 +376,7 @@ class _CostPageState extends State<CostPage> {
                           ),
                       ],
                     );
+
                   },
                 ),
               ),
@@ -316,20 +399,27 @@ class _CostPageState extends State<CostPage> {
               Text(price, style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
               SizedBox(width: 18.0),
               GestureDetector(
-                onTap: () async {
+                onTap: () {
                   // 아이콘 클릭 시 seq를 사용하여 세부 정보를 가져옴
-                  final detailData = await _fetchCheckListDetail(seq);
-                  print('detailData... $detailData');
-                  // 세부 정보를 처리하는 페이지로 이동
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DetailPage(detailData: detailData), // DetailPage로 데이터를 넘김
-                    ),
-                  );
+                  _fetchCheckListDetail(seq).then((detailData) {
+                    print('detailData... $detailData');
+                    // 세부 정보를 처리하는 페이지로 이동
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailPage(detailData: detailData), // DetailPage로 데이터를 넘김
+                      ),
+                    ).then((result) {
+                      print('Result from DetailPage: $result'); // 로그 추가
+                      if (result == true) {
+                        refreshData();
+                      }
+                    });
+                  });
                 },
                 child: Icon(Icons.chevron_right),
               ),
+
             ],
           ),
         ],

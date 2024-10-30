@@ -41,6 +41,8 @@ class MyPage extends StatefulWidget {
 
 class _MyPageState extends State<MyPage> {
   Future<Map<String, dynamic>>? _userInfoFuture;
+  Map<String, dynamic>? _userData; // userData를 상태 변수로 추가
+
   @override
   void initState() {
     super.initState();
@@ -65,7 +67,7 @@ class _MyPageState extends State<MyPage> {
                   return Center(child: Text('Error: ${snapshot.error}')); // 에러 발생 시
                 } else if (snapshot.hasData) {
                   // 성공적으로 데이터를 받아왔을 때
-                  final userData = snapshot.data!;
+                  _userData = snapshot.data!;
                   return Container(
                     padding: EdgeInsets.all(16.0),
                     child: Row(
@@ -80,7 +82,7 @@ class _MyPageState extends State<MyPage> {
                               Row(
                                 children: [
                                   Text(
-                                    '${userData['nickName']} 님',
+                                    '${_userData?['nickName'] ?? "사용자"} 님', // null 체크 및 기본값 설정
                                     // API에서 받은 닉네임 사용
                                     style: TextStyle(
                                       fontFamily: 'PretendardVariable',
@@ -114,7 +116,7 @@ class _MyPageState extends State<MyPage> {
                               ),
                               SizedBox(height: 10.0),
                               Text(
-                                '${userData['pairing']}님과 페어링 중',
+                                '${_userData?['pairing'] ?? "페어링 정보 없음"}님과 페어링 중', // null 체크 및 기본값 설정
                                 // API에서 받은 페어링 정보 사용
                                 style: TextStyle(
                                   fontFamily: 'PretendardVariable',
@@ -128,12 +130,12 @@ class _MyPageState extends State<MyPage> {
                         ),
                         CircleAvatar(
                           radius: 50.0,
-                          backgroundColor: Colors.grey[100], // Adjust size as needed
-                          backgroundImage: userData['image'] != null && userData['image'].isNotEmpty
-                              ? NetworkImage('$imageUrl${userData['image']}')
-                              : null, // 이미지가 있을 경우에만 NetworkImage 사용
-                          child: userData['image'] == null || userData['image'].isEmpty
-                              ? Icon(Icons.person, size: 50.0) // 이미지가 없으면 기본 아이콘 표시
+                          backgroundColor: Colors.grey[100],
+                          backgroundImage: _userData?['image'] != null && _userData!['image'].isNotEmpty
+                              ? NetworkImage('$imageUrl${_userData!['image']}')
+                              : null,
+                          child: _userData?['image'] == null || _userData!['image'].isEmpty
+                              ? Icon(Icons.person, size: 50.0)
                               : null,
                         ),
                         SizedBox(height: 5.0),
@@ -245,10 +247,14 @@ class _MyPageState extends State<MyPage> {
                   title: Text('설정',
                       style: TextStyle(fontFamily: 'PretendardVariable')),
                   onTap: () {
-                    Navigator.push(
-                      context,
+                    Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => Setting(),
+                        builder: (context) {
+                          // 이 곳에서 print를 찍습니다.
+                          print('user... ${_userData}');
+                          print('userId.... ${_userData?['id']}'); // ID 출력
+                          return Setting(userId: _userData?['id']); // ID 전달
+                        },
                       ),
                     );
                   },

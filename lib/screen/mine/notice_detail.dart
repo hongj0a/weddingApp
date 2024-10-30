@@ -62,7 +62,7 @@ class NoticeDetail extends StatelessWidget {
             ),
             SizedBox(height: 20.0),
             Text(
-              '어썸메리지 팀 드림',
+              '엘리트웨딩 팀 드림',
               style: TextStyle(fontSize: 16.0, height: 1.5),
             ),
           ],

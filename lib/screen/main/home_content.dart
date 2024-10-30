@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/mine/d_day_card.dart';
-
+import 'package:http/http.dart' as http;
 import '../../config/ApiConstants.dart';
 
 class HomeContent extends StatefulWidget {
@@ -21,11 +22,19 @@ class _HomeContentState extends State<HomeContent> {
   int _currentPage = 0;
 
   List<Map<String, dynamic>> ddayList = [];
+  int totalBudget = 0;
+  int usedBudget = 0;
+  int balanceBudget =0;
 
   @override
   void initState() {
     super.initState();
+    _getTotalAmount();
     fetchDDay();
+  }
+  String _formatCurrency(String amount) {
+    final number = int.tryParse(amount.replaceAll(',', '')) ?? 0; // 쉼표 제거 후 변환
+    return NumberFormat('#,###').format(number); // 3자리마다 쉼표
   }
 
   Future<void> fetchDDay() async {
@@ -47,6 +56,38 @@ class _HomeContentState extends State<HomeContent> {
     }
   }
 
+  Future<void> _getTotalAmount() async{
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final response = await http.get(
+        Uri.parse(ApiConstants.getBudget),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> decodedData = json.decode(response.body);
+        totalBudget = decodedData['data']['totalAmount'] ?? 0;
+        usedBudget = decodedData['data']['usedBudget'] ?? 0;
+        balanceBudget = totalBudget - usedBudget;
+
+        setState(() {
+          totalBudget = decodedData['data']['totalAmount'] ?? 0;
+          usedBudget = decodedData['data']['usedBudget'] ?? 0;
+          balanceBudget = totalBudget - usedBudget;
+        });
+      } else {
+        print('총금액 가져오기 실패: ${response.statusCode}');
+        print('실패 메시지 ${response.body}');
+      }
+    }catch (e) {
+      print('요청 실패, $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -156,26 +197,7 @@ class _HomeContentState extends State<HomeContent> {
                   crossAxisCount: 4,
                   childAspectRatio: 1,
                   physics: NeverScrollableScrollPhysics(),
-                  /*children: List.generate(8, (index) {
-                    return Container(
-                      margin: EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade300, width: 1), // 테두리 연하게
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'asset/img/icon$index.png', // 아이콘 예시
-                            height: 40,
-                          ),
-                          Text('항목 $index', style: TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                    );
-                  }),*/
+
                   children: [
                     Container(
                       margin: EdgeInsets.all(8.0),
@@ -318,20 +340,29 @@ class _HomeContentState extends State<HomeContent> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  '{예시니}님의 총예산 ₩ {35,000,000}원',
-                  style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '총 예산',
+                      style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      '${_formatCurrency(totalBudget.toString())} 원',
+                      style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '이용금액',
+                      '총 지출',
                       style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.w500),
                     ),
                     Text(
-                      '₩ {16,500,000}원',
+                      '${_formatCurrency(usedBudget.toString())} 원',
                       style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.w500),
                     ),
                   ],
@@ -341,12 +372,12 @@ class _HomeContentState extends State<HomeContent> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '잔여한도',
+                      '남은 예산',
                       style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.w500),
                     ),
                     Text(
-                      '₩ {18,500,000}원',
-                      style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.w500),
+                      '${_formatCurrency(balanceBudget.toString())} 원',
+                      style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 20, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),

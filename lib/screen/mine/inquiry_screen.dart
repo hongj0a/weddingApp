@@ -19,7 +19,7 @@ class InquiryScreen extends StatelessWidget {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: '어썸메리지 고객센터 전화번호 ',
+                      text: '엘리트웨딩 고객센터 전화번호 ',
                       style: TextStyle(color: Colors.black),
                     ),
                     TextSpan(

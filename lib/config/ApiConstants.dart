@@ -18,6 +18,8 @@ class ApiConstants {
   static const String setBudget = '$baseUrl/myPage/setBudget';
   static const String updateBudget = '$baseUrl/myPage/updateBudget';
   static const String delBudget = '$baseUrl/myPage/delBudget';
+  static const String delUser = '$baseUrl/myPage/delUser';
+  static const String delPairing = '$baseUrl/myPage/delPairing';
   static const String getAlarm = '$baseUrl/main/getAlarm';
   static const String alarmNewFlag = '$baseUrl/main/alarmNewFlag';
   static const String getYnList = '$baseUrl/main/getYnList';
@@ -28,6 +30,7 @@ class ApiConstants {
   static const String setChecklist = '$baseUrl/cost/setChecklist';
   static const String updateChecklist = '$baseUrl/cost/updateChecklist';
   static const String deleteChecklist = '$baseUrl/cost/deleteChecklist';
+
 
   static Future<http.Response> getDDay(String accessToken) async {
     final response = await http.get(

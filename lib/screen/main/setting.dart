@@ -201,7 +201,7 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               Expanded(
                 child: Text(
-                  '어썸에서 보내는 소식',
+                  '엘리트웨딩에서 보내는 소식',
                   style: TextStyle(fontSize: 16),
                 ),
               ),

@@ -28,12 +28,14 @@ class WeddingHomePage extends StatefulWidget {
 
 class _WeddingHomePageState extends State<WeddingHomePage> {
   int currentIndex = 2;
+  late PageController _pageController;
   final List<Widget> screens = [];
   late Future<bool> newFlagFuture;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: currentIndex); // 페이지 컨트롤러 초기화
     newFlagFuture = getNewFlag();
     screens.addAll([
       CostPage(),
@@ -44,6 +46,11 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
       SchedulePage(),
       MyPage(),
     ]);
+  }
+  @override
+  void dispose() {
+    _pageController.dispose(); // 페이지 컨트롤러 메모리 해제
+    super.dispose();
   }
 
   void onContractSelected() {
@@ -108,9 +115,9 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
                 height: 30,
                 width: 30,
               ),
-              SizedBox(width: 15),
+              SizedBox(width: 10),
               Text(
-                '어썸메리지',
+                '엘리트웨딩',
                 style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 26, fontWeight: FontWeight.bold),
               ),
             ],
@@ -157,9 +164,22 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
         ],
 
       ),
-      body: IndexedStack(
-        index: currentIndex, // 현재 선택된 인덱스에 따라 화면을 표시
-        children: screens,
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            currentIndex = index; // 페이지가 변경되면 인덱스 업데이트
+          });
+        },
+        children: [
+          CostPage(),
+          ContractPage(),
+          HomeContent(onContractSelected: () {
+            onContractSelected();
+          }),
+          SchedulePage(),
+          MyPage(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
@@ -168,7 +188,9 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
         unselectedItemColor: Colors.grey,
         selectedItemColor: Color.fromRGBO(250, 15, 156, 1.0),
         iconSize: 28,
-        onTap: (index) => setState(() => currentIndex = index),
+        onTap: (index) {
+          _pageController.jumpToPage(index); // 페이지를 직접 이동
+        },
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.attach_money),

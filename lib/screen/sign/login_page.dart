@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,14 +30,14 @@ class LoginScreen extends StatelessWidget {
                     height: 30,
                     width: 30,
                   ),
-                  SizedBox(width: 15),
+                  SizedBox(width: 10),
                   Text(
-                    '어썸메리지',
+                    '엘리트웨딩',
                     style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 26, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-              SizedBox(height: 50),
+              SizedBox(height: 70),
               // 카카오 로그인 버튼
               ElevatedButton.icon(
                 onPressed: () async {
@@ -88,14 +89,14 @@ class LoginScreen extends StatelessWidget {
                     print('카카오 로그인 실패: $e');
                   }
                 },
-                icon: Image.asset(
-                  'asset/img/kakao.png', // 카카오톡 아이콘 경로
+                icon: SvgPicture.asset(
+                  'asset/img/kakao_btn.svg', // 카카오톡 아이콘 경로
                   height: 24,
                 ),
                 label: Container(
                   width: double.infinity,
                   alignment: Alignment.centerLeft,
-                  child: Text('카카오 로그인'),
+                  child: Text('카카오 로그인', style:  TextStyle(fontFamily: 'PretendardVariable')),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFFFFE812), // 카카오 노란색
@@ -157,14 +158,14 @@ class LoginScreen extends StatelessWidget {
                     print('구글 로그인 실패: $e');
                   }
                 },
-                icon: Image.asset(
-                  'asset/img/google.jpeg', // 구글 아이콘 경로
+                icon: SvgPicture.asset(
+                  'asset/img/google_btn.svg', // 구글 아이콘 경로
                   height: 24,
                 ),
                 label: Container(
                   width: double.infinity,
                   alignment: Alignment.centerLeft,
-                  child: Text('구글 로그인'),
+                  child: Text('구글 로그인', style:  TextStyle(fontFamily: 'PretendardVariable')),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white, // 구글 버튼 색상
@@ -173,16 +174,27 @@ class LoginScreen extends StatelessWidget {
                   side: BorderSide(color: Colors.grey), // 버튼 테두리 색상
                 ),
               ),
-              SizedBox(height: 20),
-              // 메인으로 이동 버튼
-              TextButton(
+              SizedBox(height: 10),
+              // 구글 로그인 버튼
+              ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => WeddingHomePage()),
-                  );
+
                 },
-                child: Text('메인으로'),
+                icon: SvgPicture.asset(
+                  'asset/img/apple_btn.svg', // 구글 아이콘 경로
+                  height: 24,
+                ),
+                label: Container(
+                  width: double.infinity,
+                  alignment: Alignment.centerLeft,
+                  child: Text('애플 로그인', style:  TextStyle(fontFamily: 'PretendardVariable')),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black, // 배경 색상 검정
+                  foregroundColor: Colors.white, // 텍스트 색상 흰색
+                  minimumSize: Size(double.infinity, 50), // 버튼 전체 너비
+                  side: BorderSide(color: Colors.black), // 버튼 테두리 색상
+                ),
               ),
             ],
           ),
