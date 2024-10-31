@@ -188,7 +188,8 @@ class _MyPageState extends State<MyPage> {
                   leading: Icon(Icons.event),
                   title: Text('진행 중인 이벤트',
                       style: TextStyle(fontFamily: 'PretendardVariable')),
-                  onTap: () {},
+                  onTap: () { // 디자이너 고용후, 간단한 이벤트 페이지 추가
+                    },
                 ),
                 ListTile(
                   leading: Icon(Icons.notifications),

@@ -28,26 +28,28 @@ class DocumentUploadPage extends StatelessWidget {
               '계약서를 등록해 주세요',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 50.0),
+            SizedBox(height: 40.0),
             Icon(
               Icons.insert_drive_file,
               size: 100.0,
-              color: Colors.blue,
+              color: Color.fromRGBO(250, 15, 156, 1.0),
             ),
-            SizedBox(height: 50.0),
+            SizedBox(height: 40.0),
             Container(
               width: 160, // 원하는 너비를 설정
               child: ElevatedButton.icon(
-                icon: Icon(Icons.add),
+                icon: Icon(Icons.add, color: Colors.black),
                 label: Text('계약서 등록하기', style: TextStyle(color: Colors.black)),
                 onPressed: () {
                   _showBottomSheet(context);
                 },
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white, // 버튼 배경색을 흰색으로 설정
+                  elevation: 4.0, // 약간의 그림자 추가
                   padding: EdgeInsets.symmetric(vertical: 14.0),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -57,6 +59,7 @@ class DocumentUploadPage extends StatelessWidget {
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.white,
       builder: (BuildContext context) {
         return Builder(
           builder: (BuildContext newContext) {
@@ -71,22 +74,25 @@ class DocumentUploadPage extends StatelessWidget {
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     ListTile(
-                      leading: Icon(Icons.camera_alt),
-                      title: Text('직접 촬영하기'),
+                      tileColor: Colors.white, // ListTile의 배경색을 흰색으로 설정
+                      leading: Icon(Icons.camera_alt, color: Colors.black),
+                      title: Text('직접 촬영하기', style: TextStyle(color: Colors.black)), // 글씨 색상 변경
                       onTap: () async {
                         await _pickImageFromCamera(newContext);
                       },
                     ),
                     ListTile(
-                      leading: Icon(Icons.photo),
-                      title: Text('갤러리에서 가져오기'),
+                      tileColor: Colors.white, // ListTile의 배경색을 흰색으로 설정
+                      leading: Icon(Icons.photo, color: Colors.black),
+                      title: Text('갤러리에서 가져오기', style: TextStyle(color: Colors.black)), // 글씨 색상 변경
                       onTap: () async {
                         await _pickImageFromGallery(newContext);
                       },
                     ),
                     ListTile(
-                      leading: Icon(Icons.picture_as_pdf),
-                      title: Text('PDF 문서 가져오기'),
+                      tileColor: Colors.white, // ListTile의 배경색을 흰색으로 설정
+                      leading: Icon(Icons.picture_as_pdf, color: Colors.black),
+                      title: Text('PDF 문서 가져오기', style: TextStyle(color: Colors.black)), // 글씨 색상 변경
                       onTap: () async {
                         await _pickPDF(newContext);
                       },
@@ -100,7 +106,6 @@ class DocumentUploadPage extends StatelessWidget {
       },
     );
   }
-
 
   Future<void> _pickImageFromCamera(BuildContext context) async {
     var status = await Permission.camera.request();
@@ -162,5 +167,4 @@ class DocumentUploadPage extends StatelessWidget {
       ),
     );
   }
-
 }

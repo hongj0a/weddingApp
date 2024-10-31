@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smart_wedding/screen/mine/terms_of_service_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_wedding/screen/sign/login_page.dart';
 import 'package:smart_wedding/screen/sign/pairing_page.dart';
@@ -91,7 +88,7 @@ class _SettingState extends State<Setting> {
           ListTile(
             title: Text('최신 버전 업데이트'),
             onTap: () {
-
+              // 스토어 배포 후 코딩
             },
           ),
           ListTile(

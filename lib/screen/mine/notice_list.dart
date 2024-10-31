@@ -1,16 +1,57 @@
-import 'package:flutter/material.dart';
-import 'notice_detail.dart'; // Ensure this import is correct
+import 'dart:convert';
 
-class NoticeList extends StatelessWidget {
-  final List<Map<String, String>> notices = [
-    {'title': '더 좋은 서비스 제공을 위해 개인정보처리방침이 변경될 예정이에요', 'date': '2024.04.30'},
-    {'title': '계약서 등록 시 유의사항', 'date': '2024.04.23'},
-    {'title': '서버, 엘리트웨딩 서비스 점검 일정 안내드려요. (05월 12일 일요일 02:00 ~ 14:00)', 'date': '2024.04.18'},
-    {'title': '서버, 엘리트웨딩 서비스 점검 일정 안내드려요. (05월 12일 일요일 01:00 ~ 08:00)', 'date': '2024.04.18'},
-    {'title': '이벤트 신청 시 유의사항', 'date': '2024.04.11'},
-    {'title': '[공지] 이벤트 신청 시 유의사항', 'date': '2024.04.11'},
-    {'title': '이벤트 신청 시 유의사항', 'date': '2024.04.11'},
-  ];
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../config/ApiConstants.dart';
+import 'notice_detail.dart';
+import 'package:http/http.dart' as http;
+
+class NoticeList extends StatefulWidget {
+@override
+_NoticeListState createState() => _NoticeListState();
+}
+
+class _NoticeListState extends State<NoticeList> {
+  List<Map<String, dynamic>> notices = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNotices();
+  }
+
+  Future<void> _fetchNotices() async {
+    var url = Uri.parse(ApiConstants.getNotice);
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        }
+      );// Assuming this returns a Future<Response>
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body)['data']['notices'];
+
+        // Map the title and date to the notices list
+        setState(() {
+          notices = List<Map<String, dynamic>>.from(
+            data.map((item) => {
+              'title': item['title'] ?? '',
+              'date': item['date'] ?? '',
+              'seq': item['seq'].toString(),
+            }),
+          );
+        });
+      } else {
+        throw Exception('Failed to load notice info');
+      }
+    } catch (e) {
+      print('Failed to fetch notices: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +83,7 @@ class NoticeList extends StatelessWidget {
                       builder: (context) => NoticeDetail(
                         title: notice['title'] ?? '',
                         date: notice['date'] ?? '',
+                        seq: notice['seq'] ?? '', // seq 추가
                       ),
                     ),
                   );

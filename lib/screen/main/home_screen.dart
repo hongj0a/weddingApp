@@ -57,12 +57,14 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
     setState(() {
       currentIndex = 1; // 계약서 페이지로 전환
     });
+    _pageController.jumpToPage(1); // PageView도 계약서 페이지로 전환
   }
 
   void navigateToMainPage() {
     setState(() {
       currentIndex = 2;
     });
+    _pageController.jumpToPage(2);
   }
 
   Future<void> refreshNewFlag() async {
@@ -106,12 +108,13 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
         title: GestureDetector(
           onTap: navigateToMainPage,
           child: Row(
             children: [
               Image.asset(
-                'asset/img/heartLogo.png',
+                'asset/img/heart_logo.png',
                 height: 30,
                 width: 30,
               ),
@@ -189,6 +192,9 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
         selectedItemColor: Color.fromRGBO(250, 15, 156, 1.0),
         iconSize: 28,
         onTap: (index) {
+          setState(() {
+            currentIndex = index; // currentIndex 업데이트
+          });
           _pageController.jumpToPage(index); // 페이지를 직접 이동
         },
         items: [

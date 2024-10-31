@@ -1,16 +1,23 @@
-import 'package:http/http.dart' as http;
-
 class ApiConstants {
   static const String baseUrl = 'http://192.168.3.50:8888';
   static const String isExistPairingCode = '$baseUrl/api/isExistPairingCode';
   static const String authenticate = '$baseUrl/api/authenticate';
+  static const String refreshTokenValidation = '$baseUrl/api/refreshTokenValidation';
+
   static const String setDDay = '$baseUrl/main/setDDay';
   static const String localImagePath = '$baseUrl/uploads';
   static const String delDDay = '$baseUrl/main/delDDay';
+  static const String getAlarm = '$baseUrl/main/getAlarm';
+  static const String alarmNewFlag = '$baseUrl/main/alarmNewFlag';
+  static const String getYnList = '$baseUrl/main/getYnList';
+  static const String updateYnSetting = '$baseUrl/main/updateYnSetting';
+  static const String getDDay = '$baseUrl/main/getDDay';
+
   static const String setSchedule = '$baseUrl/calendar/setSchedule';
   static const String getScheduleMark = '$baseUrl/calendar/getScheduleMark';
   static const String getSchedules = '$baseUrl/calendar/getSchedules';
   static const String delSchedule = '$baseUrl/calendar/delSchedule';
+
   static const String getUserInfo = '$baseUrl/myPage/getUserInfo';
   static const String setUserInfo = '$baseUrl/myPage/setUserInfo';
   static const String getBudget = '$baseUrl/myPage/getBudget';
@@ -20,10 +27,15 @@ class ApiConstants {
   static const String delBudget = '$baseUrl/myPage/delBudget';
   static const String delUser = '$baseUrl/myPage/delUser';
   static const String delPairing = '$baseUrl/myPage/delPairing';
-  static const String getAlarm = '$baseUrl/main/getAlarm';
-  static const String alarmNewFlag = '$baseUrl/main/alarmNewFlag';
-  static const String getYnList = '$baseUrl/main/getYnList';
-  static const String updateYnSetting = '$baseUrl/main/updateYnSetting';
+  static const String inquiryMailSend = '$baseUrl/myPage/inquiryMailSend';
+  static const String getNotice = '$baseUrl/myPage/getNotice';
+  static const String getNoticeDetail = '$baseUrl/myPage/getNoticeDetail';
+  static const String getTerms = '$baseUrl/myPage/getTerms';
+  static const String getTermsDetail = '$baseUrl/myPage/getTermsDetail';
+  static const String getFaqCategoryList = '$baseUrl/myPage/getFaqCategoryList';
+  static const String getFaqList = '$baseUrl/myPage/getFaqList';
+  static const String getFaqDetail = '$baseUrl/myPage/getFaqDetail';
+
   static const String getCategories = '$baseUrl/cost/getCategories';
   static const String getCheckLists = '$baseUrl/cost/getCheckLists';
   static const String getCheckListDetail = '$baseUrl/cost/getCheckListDetail';
@@ -31,17 +43,6 @@ class ApiConstants {
   static const String updateChecklist = '$baseUrl/cost/updateChecklist';
   static const String deleteChecklist = '$baseUrl/cost/deleteChecklist';
 
-
-  static Future<http.Response> getDDay(String accessToken) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/main/getDDay'),
-      headers: {
-        'Authorization': 'Bearer $accessToken', // accessToken 추가
-      },
-    );
-    return response; // http.Response 객체 반환
-  }
-  static const String refreshTokenValidation = '$baseUrl/api/refreshTokenValidation';
   static const String webSocketUrl = 'ws://192.168.3.50:8888/ws-stomp';
 
 }

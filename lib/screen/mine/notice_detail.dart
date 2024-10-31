@@ -1,10 +1,61 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../config/ApiConstants.dart';
+import 'package:flutter_html/flutter_html.dart';
 
-class NoticeDetail extends StatelessWidget {
+class NoticeDetail extends StatefulWidget {
   final String title;
   final String date;
+  final String seq;
 
-  NoticeDetail({required this.title, required this.date});
+  const NoticeDetail({
+    Key? key,
+    required this.title,
+    required this.date,
+    required this.seq,
+  }) : super(key: key);
+
+  @override
+  _NoticeDetailState createState() => _NoticeDetailState();
+}
+
+class _NoticeDetailState extends State<NoticeDetail> {
+  String content = ''; // 공지 내용을 저장할 변수
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNoticeDetail(); // 페이지가 열리면 API를 통해 세부 정보를 가져옴
+  }
+
+  Future<void> _fetchNoticeDetail() async {
+    var url = Uri.parse(ApiConstants.getNoticeDetail);
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final response = await http.get(
+        url.replace(queryParameters: {'seq': widget.seq}), // seq를 요청 파라미터로 전달
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          content = data['data']['content'] ?? ''; // 데이터에서 내용 가져오기
+        });
+      } else {
+        throw Exception('Failed to load notice detail');
+      }
+    } catch (e) {
+      print('Failed to fetch notice detail: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,44 +78,20 @@ class NoticeDetail extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '오류로 인하여 서비스 이용에 불편을 드려 죄송합니다.',
+              widget.title, // 전달받은 제목 사용
               style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8.0),
             Text(
-              '2022.02.18',
+              widget.date, // 전달받은 날짜 사용
               style: TextStyle(color: Colors.grey),
             ),
             SizedBox(height: 20.0),
-            Text(
-              '금일 02/18(금) 오전 11시 50분 ~ 1시 15분까지 약 1시간 25분 동안 데이터베이스 문제로 앱 전체의 접속 오류가 발생하였습니다.',
-              style: TextStyle(fontSize: 16.0, height: 1.5),
-            ),
-            SizedBox(height: 20.0),
-            Text(
-              '갑작스러운 오류로 인해 많은 사용자분들의 서비스 이용에 불편을 끼쳐드린 점 깊은 사과의 말씀을 드립니다.',
-              style: TextStyle(fontSize: 16.0, height: 1.5),
-            ),
-            SizedBox(height: 20.0),
-            Text(
-              '현재는 정상적으로 서비스 이용이 가능하도록 개선되었습니다.',
-              style: TextStyle(fontSize: 16.0, height: 1.5),
-            ),
-            SizedBox(height: 20.0),
-            Text(
-              '추후에는 동일한 문제가 발생되지 않도록 노력하겠습니다.',
-              style: TextStyle(fontSize: 16.0, height: 1.5),
-            ),
-            SizedBox(height: 20.0),
-            Text(
-              '다시 한 번 서비스 이용에 불편을 드려 진심으로 죄송합니다.',
-              style: TextStyle(fontSize: 16.0, height: 1.5),
-            ),
-            SizedBox(height: 20.0),
-            Text(
-              '엘리트웨딩 팀 드림',
-              style: TextStyle(fontSize: 16.0, height: 1.5),
-            ),
+            // 공지 내용을 표시
+            // HTML 콘텐츠를 표시하기 위해 Html 위젯 사용
+            content.isNotEmpty
+                ? Html(data: content) // HTML 콘텐츠를 파싱하여 표시
+                : Text('로딩 중...'),
           ],
         ),
       ),

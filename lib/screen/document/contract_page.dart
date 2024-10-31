@@ -25,15 +25,21 @@ class _ContractPageState extends State<ContractPage> {
           return _buildContractItem(context, contracts[index], index);
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => DocumentUploadPage()),
-          );
-        },
-        child: Icon(Icons.add),
+      floatingActionButton: Material(
+        elevation: 4.0, // 약간의 그림자 추가
+        borderRadius: BorderRadius.circular(30.0), // 버튼 모서리 둥글게
+        child: FloatingActionButton(
+          backgroundColor: Colors.white, // 배경색을 흰색으로 설정
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DocumentUploadPage()),
+            );
+          },
+          child: Icon(Icons.add, color: Colors.black), // 아이콘 색상 설정
+        ),
       ),
+
     );
   }
 
@@ -75,23 +81,24 @@ class _ContractPageState extends State<ContractPage> {
         );
       },
       background: Container(
-        color: Colors.red,
+        color: Color.fromRGBO(250, 15, 156, 1.0),
         alignment: Alignment.centerRight,
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: Icon(Icons.delete, color: Colors.white),
       ),
-      child: Card(
-        elevation: 3.0,
-        margin: EdgeInsets.symmetric(vertical: 8.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white, // 배경색을 흰색으로 설정
+          border: Border.all(color: Colors.grey.shade300, width: 1), // 얇은 회색 선 테두리
+          borderRadius: BorderRadius.circular(10.0), // 테두리 둥글게
         ),
+        margin: EdgeInsets.symmetric(vertical: 8.0),
         child: ListTile(
           leading: Icon(Icons.description),
           title: Text(contract['title']!, style: TextStyle(fontWeight: FontWeight.bold)),
           subtitle: Row(
             children: [
-              Icon(Icons.location_on, size: 16.0, color: Colors.red),
+              Icon(Icons.location_on, size: 16.0, color: Color.fromRGBO(250, 15, 156, 1.0)),
               SizedBox(width: 4.0),
               Text(contract['subtitle']!),
             ],

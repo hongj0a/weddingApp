@@ -1,6 +1,114 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http; // HTTP 패키지 추가
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert'; // JSON 인코딩을 위해 추가
+import '../../config/ApiConstants.dart';
 
-class InquiryScreen extends StatelessWidget {
+class InquiryScreen extends StatefulWidget {
+  @override
+  _InquiryScreenState createState() => _InquiryScreenState();
+}
+
+class _InquiryScreenState extends State<InquiryScreen> {
+  final TextEditingController _controller = TextEditingController(); // TextField의 값을 제어하기 위한 컨트롤러 추가
+  bool _isLoading = false; // 로딩 상태를 나타내는 변수 추가
+
+  void _submitInquiry() async {
+    String content = _controller.text.trim(); // TextField의 값을 가져오기
+
+    if (content.isEmpty) {
+      // TextField가 빈 경우 AlertDialog 띄우기
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            title: Text('알림',style: TextStyle(color: Colors.black), ),
+            content: Text('내용을 입력해 주세요.',style: TextStyle(color: Colors.black), ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // 다이얼로그 닫기
+                },
+                child: Text('확인',style: TextStyle(color: Colors.black), ),
+              ),
+            ],
+          );
+        },
+      );
+      return; // 빈 값인 경우 함수 종료
+    }
+
+    setState(() {
+      _isLoading = true; // 로딩 시작
+    });
+
+    // POST 요청
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+      var url = Uri.parse(ApiConstants.inquiryMailSend);
+
+      final response = await http.post(
+        url, // ApiConstants의 inquiryMailSend URL
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json', // JSON 형식의 데이터 전송
+        }, // 요청 헤더 설정
+        body: jsonEncode({'content': content}), // body에 content 추가
+      );
+
+      setState(() {
+        _isLoading = false; // 로딩 끝
+      });
+
+      if (response.statusCode == 200) {
+        // 성공 시 뒤로가기
+        Navigator.pop(context);
+      } else {
+        // 실패 시 에러 메시지 출력
+        _showErrorDialog('문의하기에 실패했습니다. 다시 시도해 주세요.');
+      }
+    } catch (e) {
+      // 요청 중 에러 발생 시 에러 메시지 출력
+      _showErrorDialog('서버와의 연결에 실패했습니다. 다시 시도해 주세요.');
+      setState(() {
+        _isLoading = false; // 로딩 끝
+      });
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white, // 배경색을 흰색으로 설정
+          title: Text(
+            '오류',
+            style: TextStyle(color: Colors.black), // 제목 글씨 색상을 검정색으로 설정
+          ),
+          content: Text(
+            message,
+            style: TextStyle(color: Colors.black), // 내용 글씨 색상을 검정색으로 설정
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // 다이얼로그 닫기
+              },
+              child: Text(
+                '확인',
+                style: TextStyle(color: Colors.black), // 버튼 글씨 색상을 검정색으로 설정
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +131,7 @@ class InquiryScreen extends StatelessWidget {
                       style: TextStyle(color: Colors.black),
                     ),
                     TextSpan(
-                      text: '1234-2356',
+                      text: '010-2236-2622',
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
@@ -34,24 +142,16 @@ class InquiryScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               TextField(
-                maxLines: 10,
+                controller: _controller, // TextField에 컨트롤러 연결
+                maxLines: 12,
                 maxLength: 1000,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
                   hintText: '여기에 내용을 적어주세요 :)',
-                ),
-              ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.camera_alt),
-                    onPressed: () {
-                      // Handle camera action
-                    },
+                  border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color.fromRGBO(250, 15, 156, 1.0), width: 1), // 활성화 시 색상 변경
                   ),
-                  Text('0/10'),
-                ],
+                ),
               ),
               SizedBox(height: 10),
               Text(
@@ -63,15 +163,30 @@ class InquiryScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
               SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Handle inquiry submission
-                  },
-                  child: Text('문의하기'),
+              // 로딩 상태에 따라 다른 UI 표시
+              if (_isLoading)
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(), // 로딩 인디케이터
+                      SizedBox(height: 10),
+                      Text('메일을 보내고 있는 중이에요. 잠시만 기다려주세요.'),
+                    ],
+                  ),
+                )
+              else
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: _submitInquiry, // 버튼 클릭 시 _submitInquiry 호출
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.black, // 글씨 색상
+                      side: BorderSide(color: Colors.grey), // 테두리 색상
+                    ),
+                    child: Text('문의하기'),
+                  ),
                 ),
-              ),
             ],
           ),
         ),

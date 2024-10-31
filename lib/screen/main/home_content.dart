@@ -41,7 +41,14 @@ class _HomeContentState extends State<HomeContent> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accessToken');
 
-    final response = await ApiConstants.getDDay(accessToken!); // API 호출
+
+    final response = await http.get(
+      Uri.parse(ApiConstants.getDDay),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
 
     print('Response status: ${response.statusCode}'); // 상태 코드 출력
     print('Response body: ${response.body}'); // 응답 본문 출력

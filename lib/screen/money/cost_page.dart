@@ -219,7 +219,7 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '총예산',
+                                '총 예산',
                                 style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20),
                               ),
                               Text(
@@ -235,7 +235,7 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '총지출',
+                                '총 지출',
                                 style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20),
                               ),
                               Text(

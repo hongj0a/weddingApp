@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
@@ -26,7 +28,7 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset(
-                    'asset/img/heartLogo.png', // 로고 이미지 경로
+                    'asset/img/heart_logo.png', // 로고 이미지 경로
                     height: 30,
                     width: 30,
                   ),
@@ -176,6 +178,7 @@ class LoginScreen extends StatelessWidget {
               ),
               SizedBox(height: 10),
               // 구글 로그인 버튼
+              if (Platform.isIOS)
               ElevatedButton.icon(
                 onPressed: () {
 

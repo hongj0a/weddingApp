@@ -92,7 +92,7 @@ class AlarmListPage extends StatelessWidget {
                 return ListTile(
                   dense: true,
                   leading: Image.asset(
-                    'asset/img/heartLogo.png',
+                    'asset/img/heart_logo.png',
                     height: 20,
                     width: 20,
                   ),
