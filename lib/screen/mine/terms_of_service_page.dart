@@ -17,6 +17,7 @@ class TermsOfServicePage extends StatefulWidget {
 
 class _TermsOfServicePageState extends State<TermsOfServicePage> {
   String htmlFileName = '';
+  String subTitle = '';
   bool isLoading = true;
   String accessToken='';
 
@@ -54,6 +55,7 @@ class _TermsOfServicePageState extends State<TermsOfServicePage> {
 
         setState(() {
           htmlFileName = data['data']['content']; // HTML 파일 이름을 가져옴
+          subTitle = data['data']['title'];
           print('htmlFileName... ???  ${htmlFileName}');
           isLoading = false; // 로딩 상태를 false로 설정
         });
@@ -72,7 +74,7 @@ class _TermsOfServicePageState extends State<TermsOfServicePage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text('서비스 이용약관'),
+        title: Text(subTitle),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {

@@ -29,13 +29,13 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   Image.asset(
                     'asset/img/heart_logo.png', // 로고 이미지 경로
-                    height: 30,
-                    width: 30,
+                    height: 35,
+                    width: 35,
                   ),
                   SizedBox(width: 10),
                   Text(
-                    '엘리트웨딩',
-                    style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 26, fontWeight: FontWeight.bold),
+                    '우월',
+                    style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),

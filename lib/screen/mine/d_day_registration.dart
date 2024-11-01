@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart'; // For setting MediaType
 import 'package:mime/mime.dart'; // For MIME type lookup
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:intl/intl.dart' as intl; // intl 패키지 가져오기
 import '../../config/ApiConstants.dart'; // For accessing shared preferences
 
 class DDayRegistrationPage extends StatefulWidget {
@@ -25,13 +25,40 @@ class _DDayRegistrationPageState extends State<DDayRegistrationPage> {
       initialDate: selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: Color.fromRGBO(250, 15, 156, 1.0), // 선택된 색상
+            colorScheme: ColorScheme.light(primary: Color.fromRGBO(250, 15, 156, 1.0)), // 주요 색상
+            dialogBackgroundColor: Colors.white, // 배경 색상
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // 버튼 텍스트 색상 (primary 대신 foregroundColor 사용)
+              ),
+            ),
+            textTheme: TextTheme(
+              bodyMedium: TextStyle(color: Colors.black), // 일반 텍스트 색상 (bodyText1 대신 bodyMedium 사용)
+              bodyLarge: TextStyle(color: Colors.black), // 일반 텍스트 색상 (bodyText2 대신 bodyLarge 사용)
+              labelLarge: TextStyle(color: Colors.black), // 버튼 텍스트 색상 (button 대신 labelLarge 사용)
+            ),
+          ),
+          child: child ?? Container(),
+        );
+      },
     );
+
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
       });
     }
   }
+
+// 날짜 형식을 한국어로 포맷팅하는 함수
+  String formatDate(DateTime date) {
+    return intl.DateFormat('y년 M월 d일', 'ko_KR').format(date);
+  }
+
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -88,6 +115,7 @@ class _DDayRegistrationPageState extends State<DDayRegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // 배경색을 흰색으로 설정
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -101,7 +129,7 @@ class _DDayRegistrationPageState extends State<DDayRegistrationPage> {
           TextButton(
             onPressed: _saveDday, // 저장 기능 호출
             child: Text(
-              'Save',
+              '저장',
               style: TextStyle(color: Colors.black, fontSize: 16),
             ),
           ),
@@ -120,7 +148,7 @@ class _DDayRegistrationPageState extends State<DDayRegistrationPage> {
                     image: DecorationImage(
                       image: _image != null
                           ? FileImage(_image!) // 선택된 이미지 표시
-                          : AssetImage('asset/img/wed_05.jpg') as ImageProvider,
+                          : AssetImage('asset/img/default_couple.jpg') as ImageProvider,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -133,7 +161,7 @@ class _DDayRegistrationPageState extends State<DDayRegistrationPage> {
                     mini: true,
                     backgroundColor: Colors.transparent,
                     elevation: 0,
-                    child: Icon(Icons.edit, color: Colors.black),
+                    child: Icon(Icons.edit, color: Colors.white),
                   ),
                 ),
               ],
@@ -145,7 +173,7 @@ class _DDayRegistrationPageState extends State<DDayRegistrationPage> {
               child: TextField(
                 controller: eventController,
                 decoration: InputDecoration(
-                  hintText: 'Enter Event Name',
+                  hintText: '이벤트 이름',
                   hintStyle: TextStyle(color: Colors.grey),
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
@@ -159,9 +187,9 @@ class _DDayRegistrationPageState extends State<DDayRegistrationPage> {
             ),
             // 날짜 선택
             ListTile(
-              title: Text("Event Day"),
+              title: Text("이벤트 날짜"),
               trailing: Text(
-                DateFormat.yMMMMd().format(selectedDate),
+                DateFormat('y년 M월 d일').format(selectedDate), // 날짜 포맷 변경
                 style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 13, fontWeight: FontWeight.bold),
               ),
               onTap: () => _selectDate(context),

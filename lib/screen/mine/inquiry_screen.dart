@@ -127,7 +127,7 @@ class _InquiryScreenState extends State<InquiryScreen> {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: '엘리트웨딩 고객센터 전화번호 ',
+                      text: '우월 고객센터 전화번호 ',
                       style: TextStyle(color: Colors.black),
                     ),
                     TextSpan(

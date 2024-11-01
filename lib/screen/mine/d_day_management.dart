@@ -125,16 +125,19 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
             child: Container(
               width: double.infinity,
               child: ElevatedButton.icon(
-                icon: Icon(Icons.add),
+                icon: Icon(Icons.add, color: Colors.black), // 아이콘 색상 변경
                 label: Text(
                   '추가하기',
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.black, // 글자 색상 변경
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white, // 배경 색상 변경
                   padding: EdgeInsets.symmetric(vertical: 14.0),
+                  side: BorderSide(color: Colors.grey, width: 1), // 얇은 회색선 테두리 추가
+                  elevation: 0, // 그림자 제거
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -148,6 +151,7 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
               ),
             ),
           ),
+
         ],
       ),
     );

@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/mine/d_day_card.dart';
 import 'package:http/http.dart' as http;
 import '../../config/ApiConstants.dart';
+import '../mine/d_day_management.dart';
+import '../money/budget_setting.dart';
 
 class HomeContent extends StatefulWidget {
   final VoidCallback onContractSelected;
@@ -127,7 +129,40 @@ class _HomeContentState extends State<HomeContent> {
                       );
                     }).toList()
                         : [
-                      Center(child: CircularProgressIndicator()), // 로딩 중 표시
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => DDayManagementPage()),
+                          ).then((_) {
+                            fetchDDay(); // 돌아왔을 때 onRefresh 호출
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(20.0),
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage('asset/img/default_couple.jpg'), // 기본 이미지 경로
+                              fit: BoxFit.cover, // 이미지가 컨테이너 전체를 덮도록 설정
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                '우리의 기념일을 등록해 주세요 :)',
+                                style: TextStyle(
+                                  fontFamily: 'PretendardVariable',
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -336,61 +371,72 @@ class _HomeContentState extends State<HomeContent> {
           SizedBox(height: 15),
 
           // Budget Info
-          Container(
-            margin: EdgeInsets.all(8.0),
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300, width: 1), // 테두리 연하게
+          // Budget Info
+          GestureDetector(
+            onTap: () {
+              // BudgetSetting 페이지로 이동
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => BudgetSetting()),
+              );
+            },
+            child: Container(
+              margin: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300, width: 1), // 테두리 연하게
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '총 예산',
+                        style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${_formatCurrency(totalBudget.toString())} 원',
+                        style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '총 지출',
+                        style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 20, fontWeight: FontWeight.w500),
+                      ),
+                      Text(
+                        '${_formatCurrency(usedBudget.toString())} 원',
+                        style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 20, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '남은 예산',
+                        style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 20, fontWeight: FontWeight.w500),
+                      ),
+                      Text(
+                        '${_formatCurrency(balanceBudget.toString())} 원',
+                        style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 20, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '총 예산',
-                      style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      '${_formatCurrency(totalBudget.toString())} 원',
-                      style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '총 지출',
-                      style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    Text(
-                      '${_formatCurrency(usedBudget.toString())} 원',
-                      style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '남은 예산',
-                      style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    Text(
-                      '${_formatCurrency(balanceBudget.toString())} 원',
-                      style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          )
+
         ],
       ),
     );

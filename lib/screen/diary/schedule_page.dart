@@ -102,9 +102,10 @@ class _SchedulePageState extends State<SchedulePage> {
       }
 
       // 현재 월의 시작일과 마지막 일 계산
-      DateTime now = DateTime.now();
-      String month = DateFormat('yyyy-MM').format(now); // "2024-10" 형식으로 전달
+      //DateTime now = DateTime.now();
+      String month = DateFormat('yyyy-MM').format(_focusedDay); // "2024-10" 형식으로 전달
 
+      print('month... $month');
       var url = Uri.parse('${ApiConstants.getScheduleMark}?month=$month');
 
 
@@ -125,12 +126,13 @@ class _SchedulePageState extends State<SchedulePage> {
 
         setState(() {
           _events.clear();
+          scheduleDate.clear();
           for (var schedule in scheduleMarks) {
             String date = schedule['date'];
             scheduleDate.add(date);  // scheduleDate 배열에 날짜 추가
 
             // 만약 _events에 특정 날짜 관련 작업을 하고 싶다면
-            DateTime formattedDate = DateTime(now.year, now.month, int.parse(date));
+            DateTime formattedDate = DateTime(_focusedDay.year, _focusedDay.month, int.parse(date));
 
             if (_events[formattedDate] == null) {
               _events[formattedDate] = [];
@@ -162,6 +164,7 @@ class _SchedulePageState extends State<SchedulePage> {
         throw Exception('No access token found');
       }
 
+      print('selectedDate ... $selectedDate');
       // API 호출
       var url = Uri.parse('${ApiConstants.getSchedules}?date=$selectedDate');
       var response = await http.get(
@@ -225,6 +228,12 @@ class _SchedulePageState extends State<SchedulePage> {
                 },
                 onDaySelected: _onDaySelected,  // 날짜 선택 시 호출
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                onPageChanged: (focusedDay) {
+                  setState(() {
+                    _focusedDay = focusedDay;
+                  });
+                  _fetchSchedule();  // 페이지 변경 시마다 스케줄 업데이트
+                },
                 eventLoader: (day) {
                   return _events[day] ?? [];
                 },
@@ -256,13 +265,14 @@ class _SchedulePageState extends State<SchedulePage> {
                 daysOfWeekVisible: true,
                 calendarBuilders: CalendarBuilders(
                   markerBuilder: (context, day, events) {
-                    DateTime now = DateTime.now();
-                    String currentMonth = DateFormat('yyyy-MM').format(now);
+                    // 현재 선택된 월을 가져오기
+                    String currentMonth = DateFormat('yyyy-MM').format(_focusedDay);
                     String dayMonth = DateFormat('yyyy-MM').format(day);
                     String dayString = day.day.toString().padLeft(2, '0');
 
-                    if (currentMonth == dayMonth && scheduleDate.contains(dayString)) {
 
+                    // 선택된 월과 날짜가 일치하며, 해당 날짜가 scheduleDate에 포함되어 있는지 확인
+                    if (currentMonth == dayMonth && scheduleDate.contains(dayString)) {
                       return Positioned(
                         right: 1,
                         bottom: 1,
@@ -276,6 +286,8 @@ class _SchedulePageState extends State<SchedulePage> {
                     return null;
                   },
                 ),
+
+
 
               ),
             ),

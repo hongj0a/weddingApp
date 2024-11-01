@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/document/contract_page.dart';
@@ -15,6 +15,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('ko', ''), // 한국어
+        const Locale('en', ''), // 영어
+      ],
       home: WeddingHomePage(),
     );
   }
@@ -115,13 +124,13 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
             children: [
               Image.asset(
                 'asset/img/heart_logo.png',
-                height: 30,
-                width: 30,
+                height: 35,
+                width: 35,
               ),
               SizedBox(width: 10),
               Text(
-                '엘리트웨딩',
-                style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 26, fontWeight: FontWeight.bold),
+                '우월',
+                style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 30, fontWeight: FontWeight.bold),
               ),
             ],
           ),

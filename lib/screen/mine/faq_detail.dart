@@ -1,13 +1,67 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class FaqDetail extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../config/ApiConstants.dart';
+import 'package:http/http.dart' as http;
+
+class FaqDetail extends StatefulWidget {
+  final int seq; // seq 변수를 선언
+
+  const FaqDetail({Key? key, required this.seq}) : super(key: key);
+
+  @override
+  _FaqDetailState createState() => _FaqDetailState();
+}
+
+
+class _FaqDetailState extends State<FaqDetail> {
+  String content = '';
+  String title= '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchFaqDetail(); // 페이지가 열리면 API를 통해 세부 정보를 가져옴
+  }
+
+  Future<void> _fetchFaqDetail() async {
+    var url = Uri.parse(ApiConstants.getFaqDetail);
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
+
+      final response = await http.get(
+        url.replace(queryParameters: {'seq': widget.seq.toString()}), // seq를 요청 파라미터로 전달
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          title = data['data']['title'] ?? '';
+          content = data['data']['content'] ?? ''; // 데이터에서 내용 가져오기
+        });
+      } else {
+        throw Exception('Failed to load notice detail');
+      }
+    } catch (e) {
+      print('Failed to fetch notice detail: $e');
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text('올바른 앱 사용방법'),
+        title: Text(title),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -16,36 +70,18 @@ class FaqDetail extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            Text(
-              '부적절한 의도와 목적의 서비스 이용',
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
+        padding: const EdgeInsets.all(0.0),
+        child: content.isNotEmpty
+            ? SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height -
+                  AppBar().preferredSize.height, // AppBar 높이를 제외한 높이로 설정
             ),
-            SizedBox(height: 16.0),
-            buildTermItem('1. 잘못된 방법으로 서비스의 제공을 방해하거나 당근이 안내하는 방법 이외의 다른 방법을 사용하여 당근 서비스에 접근하는 행위'),
-            buildTermItem('2. 다른 이용자의 정보를 무단으로 수집, 이용하거나 다른 사람들에게 제공하는 행위'),
-            buildTermItem('3. 서비스를 영리나 홍보 목적적으로 이용하는 행위'),
-            buildTermItem('4. 음란 정보나 저작권 침해 정보 등 공서양속 및 법령에 위반되는 내용의 정보를 발송하거나 게시하는 행위'),
-            buildTermItem('5. 당근의 동의 없이 당근 서비스 또는 이에 포함된 소프트웨어의 일부를 복사, 수정, 배포, 판매, 양도, 대여, 담보제공하거나 타인에게 그 이용을 허락하는 행위'),
-            buildTermItem('6. 소프트웨어를 역설계하거나 소스 코드의 추출을 시도하는 등 당근 서비스를 복제, 분해 또는 모방하거나 기타 변형하는 행위'),
-            buildTermItem('7. 관련 법령, 당근의 모든 약관 또는 운영정책을 준수하지 않는 행위'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildTermItem(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 16.0, height: 1.5),
+            child: Html(data: content), // HTML 콘텐츠 표시
+          ),
+        )
+            : Center(child: Text('로딩 중...')),
       ),
     );
   }
