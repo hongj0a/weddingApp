@@ -42,7 +42,6 @@ class _BudgetSettingState extends State<BudgetSetting> {
     _initializeBudgetData();
     for (var item in budgetItems) {
       final amount = item['amount'] ?? '0';
-      // 초기에 0이 아닌 API에서 가져온 값으로 초기화, "0"은 텍스트 필드에 나타나지 않도록
       _controllers[item['label']!] = TextEditingController(text: amount != '0' ? _formatCurrency(amount) : ''); // 기본값을 빈 문자열로 설정
       _labelControllers[item['label']!] = TextEditingController(text: item['label']!);
       _focusNodes[item['label']!] = FocusNode();
@@ -66,8 +65,6 @@ class _BudgetSettingState extends State<BudgetSetting> {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedData = json.decode(response.body);
-        print('response 200.... : ${decodedData['data']['budgets']}');
-        print('response totalAmount...... : ${decodedData['data']['totalAmount']}');
 
         if (decodedData.containsKey('data') &&
             decodedData['data']['budgets'] != null) {
@@ -77,8 +74,6 @@ class _BudgetSettingState extends State<BudgetSetting> {
 
           if (budgets.isEmpty) {
             // 기본 budgetItems를 서버에 저장하고 화면에 보여주기
-            await _initBudgetOnServer();
-            // 기본 budgetItems를 화면에 표시하기 위해 상태 업데이트
             setState(() {
               budgetItems.clear(); // 기존 요소 제거
               budgetItems.addAll([
@@ -96,10 +91,13 @@ class _BudgetSettingState extends State<BudgetSetting> {
                 {'label': '막바지준비', 'amount': '0'},
               ]);
             });
+            await _initBudgetOnServer();
           } else {
             // API에서 받은 budgetItems로 초기화
             setState(() {
+              print("Before clear: $budgetItems");
               budgetItems.clear();
+              print("After clear: $budgetItems"); // 기존 요소 제거
               budgetItems.addAll(budgets.map((item) {
                 return {
                   'seq': item['seq']?.toString() ?? '', // seq 추가
@@ -114,7 +112,7 @@ class _BudgetSettingState extends State<BudgetSetting> {
 
       // TextEditingController와 FocusNode 초기화
       for (var item in budgetItems) {
-        final amount = item['amount'] ?? '';
+        final amount = item['amount'] ?? '0';
         _controllers[item['label']!] =
             TextEditingController(text: amount != '0' ? _formatCurrency(amount) : ''); // 기본값을 빈 문자열로 설정
         _labelControllers[item['label']!] =
@@ -285,16 +283,16 @@ class _BudgetSettingState extends State<BudgetSetting> {
     String formattedValue = _formatCurrency(value);
 
     setState(() {
-      if (_controllers[item['label']!] != null) {
+      if (_controllers[item['label'] ?? ''] != null) {
         if (value.isEmpty) {
-          _controllers[item['label']!]?.text = '';
+          _controllers[item['label'] ?? '']?.text = '';
         } else {
-          _controllers[item['label']!]?.text = formattedValue;
-          _controllers[item['label']!]?.selection = TextSelection.fromPosition(
+          _controllers[item['label'] ?? '']?.text = formattedValue;
+          _controllers[item['label'] ?? '']?.selection = TextSelection.fromPosition(
             TextPosition(offset: formattedValue.length),
           );
         }
-        item['amount'] = value.replaceAll(',', '');
+        item['amount'] = value.isNotEmpty ? value.replaceAll(',', '') : '0';
       }
     });
 
@@ -408,9 +406,16 @@ class _BudgetSettingState extends State<BudgetSetting> {
                                       children: [
                                         Expanded(
                                           child: TextFormField(
-                                            controller: _controllers[item['label']!],
+                                            controller: item['label'] != null && _controllers.containsKey(item['label']!)
+                                                ? _controllers[item['label']!]
+                                                : TextEditingController(),
                                             onChanged: (value) {
-                                              _onAmountChanged(value, item['seq']!, item['label']!, item);
+                                              if (item['seq'] != null && item['label'] != null) {
+                                                _onAmountChanged(value, item['seq']!, item['label']!, item);
+                                              } else {
+                                                // 오류 처리, 예를 들어 로그 찍거나 기본 값으로 처리
+                                                print('Error: item[seq] or item[label] is null');
+                                              }
                                             },
                                             decoration: InputDecoration(
                                               border: InputBorder.none,
@@ -466,28 +471,40 @@ class _BudgetSettingState extends State<BudgetSetting> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.white, // 배경색을 흰색으로 설정
-          title: Text('예산 항목 추가',style: TextStyle(fontFamily: 'PretendardVariable', color: Colors.black)),
+          title: Text(
+            '예산 항목 추가',
+            style: TextStyle(color: Colors.black), // 제목 글씨 색을 검은색으로 설정
+          ),
           content: TextField(
             controller: controller,
-            decoration: InputDecoration(hintText: '항목명을 입력하세요'),
+            decoration: InputDecoration(
+              hintText: '항목명을 입력하세요',
+              hintStyle: TextStyle(color: Colors.black), // hint 글씨 색을 검은색으로 설정
+            ),
           ),
+          backgroundColor: Colors.white, // 배경색을 흰색으로 설정
           actions: <Widget>[
             TextButton(
-              child: Text('취소', style: TextStyle(fontFamily: 'PretendardVariable',color: Colors.black)), // 글씨색 검정색
+              child: Text(
+                '취소',
+                style: TextStyle(color: Colors.black), // 버튼 글씨 색을 검은색으로 설정
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('추가', style: TextStyle(fontFamily: 'PretendardVariable',color: Colors.black)), // 글씨색 검정색
+              child: Text(
+                '추가',
+                style: TextStyle(color: Colors.black), // 버튼 글씨 색을 검은색으로 설정
+              ),
               onPressed: () async {
                 String newItemLabel = controller.text.trim();
                 if (newItemLabel.isNotEmpty) {
                   // 예산 항목을 추가
                   setState(() {
                     budgetItems.add({'label': newItemLabel, 'amount': '0'}); // 기본값 0으로 설정
-                    _controllers[newItemLabel] = TextEditingController();
+                    _controllers[newItemLabel] = TextEditingController(); // '원' 없이 추가
                     _labelControllers[newItemLabel] = TextEditingController(text: newItemLabel);
                     _focusNodes[newItemLabel] = FocusNode();
                   });

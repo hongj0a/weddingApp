@@ -242,7 +242,7 @@ class _SchedulePageState extends State<SchedulePage> {
                   headerMargin: EdgeInsets.symmetric(vertical: 10.0), // 헤더 여백 조정
                   titleCentered: true, // 제목을 가운데 정렬
                   titleTextStyle: TextStyle(
-                    fontFamily: 'PretendardVariable',
+                     
                     fontWeight: FontWeight.bold, // 폰트 두껍게 설정
                     fontSize: 20, // 폰트 크기 설정
                   ),
@@ -297,7 +297,7 @@ class _SchedulePageState extends State<SchedulePage> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                 '${DateFormat('yyyy년 MM월 dd일').format(_selectedDay!)}',
-                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle( fontSize: 18, fontWeight: FontWeight.bold),
               ),
             )
                 : SizedBox(),
@@ -335,7 +335,7 @@ class _SchedulePageState extends State<SchedulePage> {
                     Text(
                       '새로운 이벤트',
                       style: TextStyle(
-                        fontFamily: 'PretendardVariable',
+                         
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
@@ -475,7 +475,7 @@ class _SchedulePageState extends State<SchedulePage> {
                 Text(
                   event,
                   style: TextStyle(
-                    fontFamily: 'PretendardVariable',
+                     
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -485,7 +485,7 @@ class _SchedulePageState extends State<SchedulePage> {
             Text(
               time,
               style: TextStyle(
-                fontFamily: 'PretendardVariable',
+                 
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -518,7 +518,7 @@ class _SchedulePageState extends State<SchedulePage> {
                     children: <Widget>[
                       Text(
                         '새로운 이벤트',
-                        style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 20.0),
                       TextFormField(
@@ -561,7 +561,7 @@ class _SchedulePageState extends State<SchedulePage> {
                           ),
                           Text(
                             '${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}',
-                            style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(  fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),

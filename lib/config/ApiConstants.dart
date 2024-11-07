@@ -1,6 +1,6 @@
 class ApiConstants {
-  //static const String baseUrl = 'http://192.168.3.50:8888';
-  static const String baseUrl = 'http://112.222.141.78:8888';
+  static const String baseUrl = 'http://192.168.3.35:8888';
+  //static const String baseUrl = 'http://112.222.141.78:8888';
   static const String isExistPairingCode = '$baseUrl/api/isExistPairingCode';
   static const String authenticate = '$baseUrl/api/authenticate';
   static const String refreshTokenValidation = '$baseUrl/api/refreshTokenValidation';
@@ -44,7 +44,12 @@ class ApiConstants {
   static const String updateChecklist = '$baseUrl/cost/updateChecklist';
   static const String deleteChecklist = '$baseUrl/cost/deleteChecklist';
 
-  //static const String webSocketUrl = 'ws://192.168.3.50:8888/ws-stomp';
-  static const String webSocketUrl = 'ws://112.222.141.78:8888/ws-stomp';
+  static const String getContract = '$baseUrl/contract/getContract';
+  static const String setContract = '$baseUrl/contract/setContract';
+  static const String getContractDetail = '$baseUrl/contract/getContractDetail';
+  static const String delContract = '$baseUrl/contract/delContract';
+
+  static const String webSocketUrl = 'ws://192.168.3.35:8888/ws-stomp';
+  //static const String webSocketUrl = 'ws://112.222.141.78:8888/ws-stomp';
 
 }

@@ -163,19 +163,6 @@ class _InquiryScreenState extends State<InquiryScreen> {
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
               SizedBox(height: 10),
-              // 로딩 상태에 따라 다른 UI 표시
-              if (_isLoading)
-                Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircularProgressIndicator(), // 로딩 인디케이터
-                      SizedBox(height: 10),
-                      Text('메일을 보내고 있는 중이에요. 잠시만 기다려주세요.'),
-                    ],
-                  ),
-                )
-              else
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(

@@ -49,17 +49,17 @@ class DDayCardWidget extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(  fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
                 Text(
                   subtitle,
-                  style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(  fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 4),
                 Text(
                   date,
-                  style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(  fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ],
             ),

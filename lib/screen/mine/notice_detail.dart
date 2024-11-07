@@ -72,27 +72,28 @@ class _NoticeDetailState extends State<NoticeDetail> {
         ),
         elevation: 1.0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.title, // 전달받은 제목 사용
-              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8.0),
-            Text(
-              widget.date, // 전달받은 날짜 사용
-              style: TextStyle(color: Colors.grey),
-            ),
-            SizedBox(height: 20.0),
-            // 공지 내용을 표시
-            // HTML 콘텐츠를 표시하기 위해 Html 위젯 사용
-            content.isNotEmpty
-                ? Html(data: content) // HTML 콘텐츠를 파싱하여 표시
-                : Text('로딩 중...'),
-          ],
+      body: SingleChildScrollView( // Enable scrolling for long content
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.title, // 전달받은 제목 사용
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8.0),
+              Text(
+                widget.date, // 전달받은 날짜 사용
+                style: TextStyle(color: Colors.grey),
+              ),
+              SizedBox(height: 20.0),
+              // 공지 내용을 표시
+              content.isNotEmpty
+                  ? Html(data: content) // HTML 콘텐츠를 파싱하여 표시
+                  : Text('로딩 중...'),
+            ],
+          ),
         ),
       ),
     );

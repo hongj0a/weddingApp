@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/money/add_cost_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:smart_wedding/screen/money/budget_setting.dart';
 import '../../config/ApiConstants.dart';
 import 'package:intl/intl.dart';
 
@@ -51,7 +52,9 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
   void refreshData() {
     _fetchCategories().then((_) {
       print('Categories refreshed: $categories');
-    }); // 카테고리 목록을 다시 가져옴
+    });
+    _getTotalAmount().then((_) {
+    });
   }
 
   Future<void> _getTotalAmount() async{
@@ -220,11 +223,11 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                             children: [
                               Text(
                                 '총 예산',
-                                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20),
+                                style: TextStyle( fontSize: 20),
                               ),
                               Text(
                                 '${_formatCurrency(totalBudget.toString())} 원',
-                                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.bold),
+                                style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -236,11 +239,11 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                             children: [
                               Text(
                                 '총 지출',
-                                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20),
+                                style: TextStyle( fontSize: 20),
                               ),
                               Text(
                                 '${_formatCurrency(usedBudget.toString())} 원',
-                                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.bold),
+                                style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -259,11 +262,11 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                             children: [
                               Text(
                                 '남은 예산',
-                                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20),
+                                style: TextStyle( fontSize: 20),
                               ),
                               Text(
                                 '${_formatCurrency(balanceBudget.toString())} 원',
-                                style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 20, fontWeight: FontWeight.bold),
+                                style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),

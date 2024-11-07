@@ -99,13 +99,13 @@ class AlarmListPage extends StatelessWidget {
                   title: Text(
                     alarm.title,
                     style: TextStyle(
-                      fontFamily: 'PretendardVariable',fontWeight: alarm.readYn ? FontWeight.normal : FontWeight.bold, fontSize: 15
+                       fontWeight: alarm.readYn ? FontWeight.normal : FontWeight.bold, fontSize: 15
                     ),
                   ),
                   subtitle: Text(
                     alarm.content,
                     style: TextStyle(
-                        fontFamily: 'PretendardVariable',fontWeight: alarm.readYn ? FontWeight.normal : FontWeight.bold, fontSize: 20
+                         fontWeight: alarm.readYn ? FontWeight.normal : FontWeight.bold, fontSize: 20
                     ),
                   ),
                 );

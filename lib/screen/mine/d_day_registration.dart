@@ -190,7 +190,7 @@ class _DDayRegistrationPageState extends State<DDayRegistrationPage> {
               title: Text("이벤트 날짜"),
               trailing: Text(
                 DateFormat('y년 M월 d일').format(selectedDate), // 날짜 포맷 변경
-                style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 13, fontWeight: FontWeight.bold),
+                style: TextStyle(  fontSize: 13, fontWeight: FontWeight.bold),
               ),
               onTap: () => _selectDate(context),
             ),

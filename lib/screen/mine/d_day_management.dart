@@ -246,7 +246,7 @@ class DDayCard extends StatelessWidget {
                   Text(
                     dday,
                     style: TextStyle(
-                      fontFamily: 'PretendardVariable',
+                       
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white, // 배경에 잘 보이도록 색상 변경
@@ -256,7 +256,7 @@ class DDayCard extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontFamily: 'PretendardVariable',
+                       
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white, // 배경에 잘 보이도록 색상 변경
@@ -266,7 +266,7 @@ class DDayCard extends StatelessWidget {
                   Text(
                     date,
                     style: TextStyle(
-                      fontFamily: 'PretendardVariable',
+                       
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white, // 배경에 잘 보이도록 색상 변경

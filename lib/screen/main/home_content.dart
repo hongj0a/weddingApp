@@ -153,7 +153,7 @@ class _HomeContentState extends State<HomeContent> {
                               Text(
                                 '우리의 기념일을 등록해 주세요 :)',
                                 style: TextStyle(
-                                  fontFamily: 'PretendardVariable',
+                                   
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -219,13 +219,13 @@ class _HomeContentState extends State<HomeContent> {
                   children: [
                     Text(
                       "계약서 종류",
-                      style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle( fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     GestureDetector(
                       onTap: widget.onContractSelected,
                       child: Row(
                         children: [
-                          Text('등록하기', style: TextStyle(fontFamily: 'PretendardVariable',color: Colors.black)),
+                          Text('등록하기', style: TextStyle( color: Colors.black)),
                           Icon(Icons.arrow_forward_ios, size: 12, color: Colors.black),
                         ],
                       ),
@@ -252,7 +252,7 @@ class _HomeContentState extends State<HomeContent> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset('asset/img/wedding-hall.png', height: 40),  // 이미지 아이콘
-                          Text('본식', style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 12)),
+                          Text('본식', style: TextStyle( fontSize: 12)),
                         ],
                       ),
                     ),
@@ -267,7 +267,7 @@ class _HomeContentState extends State<HomeContent> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset('asset/img/wedding-ring.png', height: 40),
-                          Text('예물', style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 12)),
+                          Text('예물', style: TextStyle( fontSize: 12)),
                         ],
                       ),
                     ),
@@ -282,7 +282,7 @@ class _HomeContentState extends State<HomeContent> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset('asset/img/wedding-teoksido.png', height: 40),
-                          Text('예복', style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 12)),
+                          Text('예복', style: TextStyle( fontSize: 12)),
                         ],
                       ),
                     ),
@@ -297,7 +297,7 @@ class _HomeContentState extends State<HomeContent> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset('asset/img/wedding-dress.png', height: 40),
-                          Text('드레스', style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 12)),
+                          Text('드레스', style: TextStyle( fontSize: 12)),
                         ],
                       ),
                     ),
@@ -312,7 +312,7 @@ class _HomeContentState extends State<HomeContent> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset('asset/img/wedding-makeup.png', height: 40),
-                          Text('메이크업', style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 12)),
+                          Text('메이크업', style: TextStyle( fontSize: 12)),
                         ],
                       ),
                     ),
@@ -342,7 +342,7 @@ class _HomeContentState extends State<HomeContent> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset('asset/img/wedding-trip.png', height: 40),
-                          Text('신혼여행', style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 12)),
+                          Text('신혼여행', style: TextStyle( fontSize: 12)),
                         ],
                       ),
                     ),
@@ -357,7 +357,7 @@ class _HomeContentState extends State<HomeContent> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset('asset/img/wedding-house.png', height: 40),
-                          Text('신혼집', style: TextStyle(fontFamily: 'PretendardVariable',fontSize: 12)),
+                          Text('신혼집', style: TextStyle( fontSize: 12)),
                         ],
                       ),
                     ),
@@ -396,11 +396,11 @@ class _HomeContentState extends State<HomeContent> {
                     children: [
                       Text(
                         '총 예산',
-                        style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 22, fontWeight: FontWeight.bold),
+                        style: TextStyle(  fontSize: 22, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         '${_formatCurrency(totalBudget.toString())} 원',
-                        style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 22, fontWeight: FontWeight.bold),
+                        style: TextStyle(  fontSize: 22, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -410,11 +410,11 @@ class _HomeContentState extends State<HomeContent> {
                     children: [
                       Text(
                         '총 지출',
-                        style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 20, fontWeight: FontWeight.w500),
+                        style: TextStyle(  fontSize: 20, fontWeight: FontWeight.w500),
                       ),
                       Text(
                         '${_formatCurrency(usedBudget.toString())} 원',
-                        style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 20, fontWeight: FontWeight.w500),
+                        style: TextStyle(  fontSize: 20, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -424,11 +424,11 @@ class _HomeContentState extends State<HomeContent> {
                     children: [
                       Text(
                         '남은 예산',
-                        style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 20, fontWeight: FontWeight.w500),
+                        style: TextStyle(  fontSize: 20, fontWeight: FontWeight.w500),
                       ),
                       Text(
                         '${_formatCurrency(balanceBudget.toString())} 원',
-                        style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 20, fontWeight: FontWeight.w500),
+                        style: TextStyle(  fontSize: 20, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),

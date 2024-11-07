@@ -35,7 +35,7 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(width: 10),
                   Text(
                     '우월',
-                    style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 30, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),

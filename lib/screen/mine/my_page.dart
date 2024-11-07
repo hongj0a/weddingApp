@@ -85,7 +85,7 @@ class _MyPageState extends State<MyPage> {
                                     '${_userData?['nickName'] ?? "사용자"} 님', // null 체크 및 기본값 설정
                                     // API에서 받은 닉네임 사용
                                     style: TextStyle(
-                                      fontFamily: 'PretendardVariable',
+                                      
                                       color: Colors.black,
                                       fontSize: 25.0,
                                       fontWeight: FontWeight.w700,
@@ -119,7 +119,7 @@ class _MyPageState extends State<MyPage> {
                                 '${_userData?['pairing'] ?? "페어링 정보 없음"}님과 페어링 중', // null 체크 및 기본값 설정
                                 // API에서 받은 페어링 정보 사용
                                 style: TextStyle(
-                                  fontFamily: 'PretendardVariable',
+                                   
                                   color: Colors.black,
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.w500,

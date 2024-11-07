@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../config/ApiConstants.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:http/http.dart' as http;
+import '../../config/ApiConstants.dart';
 
 class TermsOfServicePage extends StatefulWidget {
   final String seq;
-  final String imageUrl = '${ApiConstants.localImagePath}/';
 
   TermsOfServicePage({required this.seq});
 
@@ -16,15 +15,14 @@ class TermsOfServicePage extends StatefulWidget {
 }
 
 class _TermsOfServicePageState extends State<TermsOfServicePage> {
-  String htmlFileName = '';
+  String htmlContent = ''; // HTML content directly from API response
   String subTitle = '';
   bool isLoading = true;
-  String accessToken='';
+  String accessToken = '';
 
   @override
   void initState() {
     super.initState();
-    // WebView 초기화
     _fetchTermsDetail();
   }
 
@@ -42,25 +40,21 @@ class _TermsOfServicePageState extends State<TermsOfServicePage> {
         },
       );
 
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
         if (data['data']['content'] == null) {
           print('Error: content is null in response');
-          // 여기에 적절한 에러 처리 로직 추가
-          return; // 함수를 종료하여 아래 코드가 실행되지 않도록 함
+          return;
         }
 
-
         setState(() {
-          htmlFileName = data['data']['content']; // HTML 파일 이름을 가져옴
+          htmlContent = data['data']['content']; // Load HTML content directly
           subTitle = data['data']['title'];
-          print('htmlFileName... ???  ${htmlFileName}');
-          isLoading = false; // 로딩 상태를 false로 설정
+          isLoading = false;
         });
       } else {
-        print('response... ${response.body}');
+        print('Response error: ${response.body}');
         throw Exception('Failed to load terms detail');
       }
     } catch (e) {
@@ -74,28 +68,22 @@ class _TermsOfServicePageState extends State<TermsOfServicePage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text(subTitle),
+        title: Text(subTitle, style: TextStyle(color: Colors.black)),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator()) // 로딩 중일 때 로딩 인디케이터 표시
-          : InAppWebView(
-            initialUrlRequest: URLRequest(
-            url: Uri.parse('${widget.imageUrl}$htmlFileName'),
-              headers: {
-                'Authorization': 'Bearer $accessToken', // 여기에 토큰을 추가
-                'Content-Type': 'application/json',
-                'Accept-Charset': 'utf-8', // 인코딩 지정
-              },
-            ),initialOptions: InAppWebViewGroupOptions(
-                  android: AndroidInAppWebViewOptions(useHybridComposition: true)),
-              ),
-
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView( // Enable scrolling
+        child: Padding(
+          padding: const EdgeInsets.all(16.0), // Optional padding
+          child: Html(data: htmlContent), // Display parsed HTML content
+        ),
+      ),
     );
   }
 }

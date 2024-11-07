@@ -113,121 +113,123 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return WillPopScope(
+      onWillPop: () async => false, // 뒤로가기 비활성화
+      child: Scaffold(
         backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        title: GestureDetector(
-          onTap: navigateToMainPage,
-          child: Row(
-            children: [
-              Image.asset(
-                'asset/img/heart_logo.png',
-                height: 35,
-                width: 35,
-              ),
-              SizedBox(width: 10),
-              Text(
-                '우월',
-                style: TextStyle(fontFamily: 'PretendardVariable', fontSize: 30, fontWeight: FontWeight.bold),
-              ),
-            ],
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          automaticallyImplyLeading: false,
+          title: GestureDetector(
+            onTap: navigateToMainPage,
+            child: Row(
+              children: [
+                Image.asset(
+                  'asset/img/heart_logo.png',
+                  height: 35,
+                  width: 35,
+                ),
+                SizedBox(width: 10),
+                Text(
+                  '우월',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           ),
-        ),
-        actions: [
-          FutureBuilder<bool>(
-            future: getNewFlag(),
-            builder: (context, snapshot) {
-              bool newFlag = snapshot.data ?? false;
-              return Stack(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.notifications_none_outlined),
-                    iconSize: 28,
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AlarmListPage()),
-                      );
-                      refreshNewFlag(); // 알림 리스트 페이지 닫힌 후 새로고침
-                    },
-                  ),
-                  if (newFlag) // newFlag가 true일 때만 표시
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: Container(
-                        padding: EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(250, 15, 156, 1.0),
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: BoxConstraints(
-                          minWidth: 4,
-                          minHeight: 4,
+          actions: [
+            FutureBuilder<bool>(
+              future: getNewFlag(),
+              builder: (context, snapshot) {
+                bool newFlag = snapshot.data ?? false;
+                return Stack(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.notifications_none_outlined),
+                      iconSize: 28,
+                      onPressed: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AlarmListPage()),
+                        );
+                        refreshNewFlag(); // 알림 리스트 페이지 닫힌 후 새로고침
+                      },
+                    ),
+                    if (newFlag) // newFlag가 true일 때만 표시
+                      Positioned(
+                        right: 8,
+                        top: 8,
+                        child: Container(
+                          padding: EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(250, 15, 156, 1.0),
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 4,
+                            minHeight: 4,
+                          ),
                         ),
                       ),
-                    ),
-                ],
-              );
-            },
-          ),
-        ],
-
-      ),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            currentIndex = index; // 페이지가 변경되면 인덱스 업데이트
-          });
-        },
-        children: [
-          CostPage(),
-          ContractPage(),
-          HomeContent(onContractSelected: () {
-            onContractSelected();
-          }),
-          SchedulePage(),
-          MyPage(),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        unselectedItemColor: Colors.grey,
-        selectedItemColor: Color.fromRGBO(250, 15, 156, 1.0),
-        iconSize: 28,
-        onTap: (index) {
-          setState(() {
-            currentIndex = index; // currentIndex 업데이트
-          });
-          _pageController.jumpToPage(index); // 페이지를 직접 이동
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
-            label: '예산',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.note_add),
-            label: '계약서',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '메인',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: '일정',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '마이페이지',
-          ),
-        ],
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() {
+              currentIndex = index; // 페이지가 변경되면 인덱스 업데이트
+            });
+          },
+          children: [
+            CostPage(),
+            ContractPage(),
+            HomeContent(onContractSelected: () {
+              onContractSelected();
+            }),
+            SchedulePage(),
+            MyPage(),
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: currentIndex,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          unselectedItemColor: Colors.grey,
+          selectedItemColor: Color.fromRGBO(250, 15, 156, 1.0),
+          iconSize: 28,
+          onTap: (index) {
+            setState(() {
+              currentIndex = index; // currentIndex 업데이트
+            });
+            _pageController.jumpToPage(index); // 페이지를 직접 이동
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.attach_money),
+              label: '예산',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.note_add),
+              label: '계약서',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: '메인',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_month),
+              label: '일정',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: '마이페이지',
+            ),
+          ],
+        ),
       ),
     );
   }
