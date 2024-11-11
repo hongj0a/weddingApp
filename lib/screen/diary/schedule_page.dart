@@ -85,7 +85,7 @@ class _SchedulePageState extends State<SchedulePage> {
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Event 저장 실패: $e', style: TextStyle(fontFamily: 'PretendardVariable'))),
+          SnackBar(content: Text('Event 저장 실패: $e', style: TextStyle( ))),
         );
       }
 
@@ -149,7 +149,7 @@ class _SchedulePageState extends State<SchedulePage> {
     } catch (e) {
       print('Error fetching schedule: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('스케줄을 불러오지 못했습니다: $e', style: TextStyle(fontFamily: 'PretendardVariable'))),
+        SnackBar(content: Text('스케줄을 불러오지 못했습니다: $e', style: TextStyle( ))),
       );
     }
   }
@@ -201,7 +201,7 @@ class _SchedulePageState extends State<SchedulePage> {
     } catch (e) {
       print('Error fetching schedule: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('스케줄을 불러오지 못했습니다: $e', style: TextStyle(fontFamily: 'PretendardVariable'))),
+        SnackBar(content: Text('스케줄을 불러오지 못했습니다: $e', style: TextStyle( ))),
       );
     }
   }
@@ -242,7 +242,7 @@ class _SchedulePageState extends State<SchedulePage> {
                   headerMargin: EdgeInsets.symmetric(vertical: 10.0), // 헤더 여백 조정
                   titleCentered: true, // 제목을 가운데 정렬
                   titleTextStyle: TextStyle(
-                     
+
                     fontWeight: FontWeight.bold, // 폰트 두껍게 설정
                     fontSize: 20, // 폰트 크기 설정
                   ),
@@ -335,7 +335,7 @@ class _SchedulePageState extends State<SchedulePage> {
                     Text(
                       '새로운 이벤트',
                       style: TextStyle(
-                         
+
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
@@ -359,20 +359,21 @@ class _SchedulePageState extends State<SchedulePage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("삭제 확인", style: TextStyle(fontFamily: 'PretendardVariable')),
-              content: Text("$event를 삭제하시겠습니까?", style: TextStyle(fontFamily: 'PretendardVariable')),
+              backgroundColor: Colors.white,
+              title: Text("삭제 확인", style: TextStyle( )),
+              content: Text("$event를 삭제하시겠습니까?", style: TextStyle( )),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: Text("취소", style: TextStyle(fontFamily: 'PretendardVariable')),
+                  child: Text("취소", style: TextStyle(color:Colors.black )),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },
-                  child: Text("삭제", style: TextStyle(fontFamily: 'PretendardVariable')),
+                  child: Text("삭제", style: TextStyle(color:Colors.black )),
                 ),
               ],
             );
@@ -402,7 +403,7 @@ class _SchedulePageState extends State<SchedulePage> {
           if (response.statusCode == 200) {
             // 삭제 성공
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('$event가 삭제되었습니다.', style: TextStyle(fontFamily: 'PretendardVariable'))),
+              SnackBar(content: Text('$event가 삭제되었습니다.', style: TextStyle( ))),
             );
 
             // 스케줄 새로고침
@@ -435,12 +436,12 @@ class _SchedulePageState extends State<SchedulePage> {
           } else {
             // 삭제 실패 시 에러 처리
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('삭제 실패: ${response.body}', style: TextStyle(fontFamily: 'PretendardVariable'))),
+              SnackBar(content: Text('삭제 실패: ${response.body}', style: TextStyle( ))),
             );
           }
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('삭제 중 오류 발생: $e', style: TextStyle(fontFamily: 'PretendardVariable'))),
+            SnackBar(content: Text('삭제 중 오류 발생: $e', style: TextStyle( ))),
           );
         }
       },
@@ -475,7 +476,7 @@ class _SchedulePageState extends State<SchedulePage> {
                 Text(
                   event,
                   style: TextStyle(
-                     
+
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -485,7 +486,7 @@ class _SchedulePageState extends State<SchedulePage> {
             Text(
               time,
               style: TextStyle(
-                 
+
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -524,7 +525,7 @@ class _SchedulePageState extends State<SchedulePage> {
                       TextFormField(
                         controller: eventController,
                         decoration: InputDecoration(
-                          hintText: '일정 내용을 입력하세요',
+                          hintText: '일정 내용을 입력하세요.',
                           border: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey[300]!), // 연한 회색 테두리
                             borderRadius: BorderRadius.circular(8.0), // 테두리 모서리 둥글게
@@ -557,7 +558,7 @@ class _SchedulePageState extends State<SchedulePage> {
                                 });
                               }
                             },
-                            child: Text('시간 선택', style: TextStyle(fontFamily: 'PretendardVariable')),
+                            child: Text('시간 선택', style: TextStyle(color: Colors.black)),
                           ),
                           Text(
                             '${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}',
@@ -573,7 +574,7 @@ class _SchedulePageState extends State<SchedulePage> {
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                            child: Text("취소", style: TextStyle(fontFamily: 'PretendardVariable')),
+                            child: Text("취소", style: TextStyle(color: Colors.black)),
                           ),
                           SizedBox(width: 8.0),
                           TextButton(
@@ -583,7 +584,7 @@ class _SchedulePageState extends State<SchedulePage> {
                               _addEvent(event, time);
                               Navigator.of(context).pop();
                             },
-                            child: Text("추가", style: TextStyle(fontFamily: 'PretendardVariable')),
+                            child: Text("추가", style: TextStyle(color: Colors.black)),
                           ),
                         ],
                       ),

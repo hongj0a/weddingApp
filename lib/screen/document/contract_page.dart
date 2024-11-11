@@ -84,7 +84,15 @@ class _ContractPageState extends State<ContractPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: ListView.builder(
+      body: contracts.isEmpty
+          ? Center(
+        child: Text(
+          "아직 등록된 계약서가 없어요.\n계약서를 등록해 보세요!",
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      )
+          : ListView.builder(
         padding: EdgeInsets.all(16.0),
         itemCount: contracts.length,
         itemBuilder: (context, index) {

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/main/home_screen.dart';
@@ -7,7 +8,6 @@ import 'package:smart_wedding/screen/sign/login_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_wedding/screen/sign/pairing_page.dart';
 import 'config/ApiConstants.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,10 +17,41 @@ void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? refreshToken = prefs.getString('refreshToken');
 
+  // refreshToken이 있을 경우 로그인 처리
   if (refreshToken != null) {
     await _extendLogin(refreshToken);
+    runApp(
+      MaterialApp(
+        home: WeddingHomePage(), // 로그인 후 홈 페이지로 이동
+        locale: Locale('ko', 'KR'),
+        supportedLocales: [
+          Locale('en', 'US'), // 영어 지원
+          Locale('ko', 'KR'), // 한국어 지원
+        ],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+      ),
+    );
   } else {
-    runApp(MaterialApp(home: LoginScreen())); // 토큰이 없으면 로그인 화면으로
+    // refreshToken이 없으면 WeddingHomePage로 바로 이동
+    runApp(
+      MaterialApp(
+        home: LoginScreen(),
+        locale: Locale('ko', 'KR'),
+        supportedLocales: [
+          Locale('en', 'US'),
+          Locale('ko', 'KR'),
+        ],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+      ),
+    );
   }
 }
 

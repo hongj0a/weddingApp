@@ -30,6 +30,18 @@ Timer? _debounce;
 
 class _BudgetSettingState extends State<BudgetSetting> {
   final List<Map<String, String>> budgetItems = [
+    {'label': '상견례', 'amount': '0'},
+    {'label': '예식장', 'amount': '0'},
+    {'label': '허니문', 'amount': '0'},
+    {'label': '스드메', 'amount': '0'},
+    {'label': '예단', 'amount': '0'},
+    {'label': '예물', 'amount': '0'},
+    {'label': '한복/예복', 'amount': '0'},
+    {'label': '헬스케어', 'amount': '0'},
+    {'label': '인테리어', 'amount': '0'},
+    {'label': '혼수', 'amount': '0'},
+    {'label': '청첩장', 'amount': '0'},
+    {'label': '막바지준비', 'amount': '0'},
   ];
 
   final Map<String, TextEditingController> _controllers = {};
@@ -92,6 +104,7 @@ class _BudgetSettingState extends State<BudgetSetting> {
               ]);
             });
             await _initBudgetOnServer();
+            _initializeBudgetData();
           } else {
             // API에서 받은 budgetItems로 초기화
             setState(() {

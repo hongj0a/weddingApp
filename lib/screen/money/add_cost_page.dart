@@ -195,7 +195,7 @@ class CurrencyInputFormatter extends TextInputFormatter {
   }
 
 
-  void main() {
+  /*void main() {
     runApp(MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -218,5 +218,5 @@ class CurrencyInputFormatter extends TextInputFormatter {
       ),
       home: AddCostPage(),
     ));
-  }
+  }*/
 }

@@ -161,7 +161,7 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.attach_money),
                   title: Text('예산설정',
-                    style: TextStyle(fontFamily: 'PretendardVariable')),
+                    style: TextStyle( )),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -174,7 +174,7 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.calendar_month),
                   title: Text('D-day 설정',
-                      style: TextStyle(fontFamily: 'PretendardVariable')),
+                      style: TextStyle( )),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -187,14 +187,14 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.event),
                   title: Text('진행 중인 이벤트',
-                      style: TextStyle(fontFamily: 'PretendardVariable')),
+                      style: TextStyle( )),
                   onTap: () { // 디자이너 고용후, 간단한 이벤트 페이지 추가
                     },
                 ),
                 ListTile(
                   leading: Icon(Icons.notifications),
                   title: Text('공지사항',
-                      style: TextStyle(fontFamily: 'PretendardVariable')),
+                      style: TextStyle( )),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -207,7 +207,7 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.policy),
                   title: Text('약관 및 정책',
-                      style: TextStyle(fontFamily: 'PretendardVariable')),
+                      style: TextStyle( )),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -220,7 +220,7 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.help),
                   title: Text('자주 묻는 질문',
-                      style: TextStyle(fontFamily: 'PretendardVariable')),
+                      style: TextStyle( )),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -233,7 +233,7 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.mail),
                   title: Text('문의하기',
-                      style: TextStyle(fontFamily: 'PretendardVariable')),
+                      style: TextStyle( )),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -246,7 +246,7 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.settings),
                   title: Text('설정',
-                      style: TextStyle(fontFamily: 'PretendardVariable')),
+                      style: TextStyle( )),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(

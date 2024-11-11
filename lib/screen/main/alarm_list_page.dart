@@ -57,7 +57,7 @@ class AlarmListPage extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text('알림',style: TextStyle(fontFamily: 'PretendardVariable')),
+        title: Text('알림',style: TextStyle( )),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {

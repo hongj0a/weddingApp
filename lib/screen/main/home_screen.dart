@@ -10,24 +10,25 @@ import 'package:smart_wedding/screen/main/home_content.dart';
 import 'package:smart_wedding/screen/main/alarm_list_page.dart';
 import 'package:http/http.dart' as http;
 import '../../config/ApiConstants.dart';
-
+/*
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+      locale: Locale('ko', 'KR'),
       supportedLocales: [
-        const Locale('ko', ''), // 한국어
-        const Locale('en', ''), // 영어
+        Locale('en', 'US'), // 영어 지원
+        Locale('ko', 'KR'), // 한국어 지원
+      ],
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate, // 이 부분을 꼭 추가해야 합니다.
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate, // iOS 스타일의 로컬라이징 지원
       ],
       home: WeddingHomePage(),
     );
   }
-}
+}*/
 
 class WeddingHomePage extends StatefulWidget {
 
@@ -85,6 +86,7 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
   Future<bool> getNewFlag() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accessToken');
+    String? refreshToken = prefs.getString('refreshToken');
 
     var url = Uri.parse(ApiConstants.alarmNewFlag);
 
