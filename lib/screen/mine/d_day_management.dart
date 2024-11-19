@@ -250,6 +250,7 @@ class DDayCard extends StatelessWidget {
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white, // 배경에 잘 보이도록 색상 변경
+                      fontFamily: 'SejongGeulggot'
                     ),
                   ),
                   SizedBox(height: 4),
@@ -260,6 +261,7 @@ class DDayCard extends StatelessWidget {
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white, // 배경에 잘 보이도록 색상 변경
+                      fontFamily: 'SejongGeulggot'
                     ),
                   ),
                   SizedBox(height: 4),
@@ -270,6 +272,7 @@ class DDayCard extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white, // 배경에 잘 보이도록 색상 변경
+                      fontFamily: 'SejongGeulggot'
                     ),
                   ),
                 ],

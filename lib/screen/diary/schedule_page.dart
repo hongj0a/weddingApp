@@ -361,7 +361,7 @@ class _SchedulePageState extends State<SchedulePage> {
             return AlertDialog(
               backgroundColor: Colors.white,
               title: Text("삭제 확인", style: TextStyle( )),
-              content: Text("$event를 삭제하시겠습니까?", style: TextStyle( )),
+              content: Text("$event를 삭제하시겠어요?", style: TextStyle( )),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {

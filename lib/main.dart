@@ -13,50 +13,37 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   KakaoSdk.init(nativeAppKey: '9a794384618b41b8322fb7fed2baa529');
 
-  // 저장된 refreshToken 확인
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? refreshToken = prefs.getString('refreshToken');
+  String? accessToken = prefs.getString('accessToken');
+  print('refreshToken..!!!!!!!!!! $refreshToken');
+  print('accessToken...!!!!!!!!! $accessToken');
 
-  // refreshToken이 있을 경우 로그인 처리
+  // refreshToken이 있는 경우에만 로그인 연장 시도
   if (refreshToken != null) {
-    await _extendLogin(refreshToken);
-    runApp(
-      MaterialApp(
-        home: WeddingHomePage(), // 로그인 후 홈 페이지로 이동
-        locale: Locale('ko', 'KR'),
-        supportedLocales: [
-          Locale('en', 'US'), // 영어 지원
-          Locale('ko', 'KR'), // 한국어 지원
-        ],
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-      ),
-    );
+    try {
+      Map<String, dynamic> result = await _extendLogin(refreshToken);
+      bool pairingYn = result['pairingYn'];
+      String id = result['id'];
+      // 로그인 연장이 성공하면 홈 화면으로 이동
+      if (pairingYn) {
+        runApp(WeddingApp());
+      } else {
+        runApp(PairingCodeApp(id: id));
+      }
+    } catch (e) {
+      print('토큰 갱신 실패: $e');
+      // refreshToken 만료 등으로 실패 시 로그인 화면으로 이동
+      runApp(LoginApp());
+    }
   } else {
-    // refreshToken이 없으면 WeddingHomePage로 바로 이동
-    runApp(
-      MaterialApp(
-        home: LoginScreen(),
-        locale: Locale('ko', 'KR'),
-        supportedLocales: [
-          Locale('en', 'US'),
-          Locale('ko', 'KR'),
-        ],
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-      ),
-    );
+    // refreshToken이 없으면 바로 로그인 화면으로 이동
+    runApp(LoginApp());
   }
 }
 
-Future<void> _extendLogin(String refreshToken) async {
-  final url = ApiConstants.refreshTokenValidation; // 토큰 갱신 API URL
+Future<Map<String, dynamic>> _extendLogin(String refreshToken) async {
+  final url = ApiConstants.refreshTokenValidation;
 
   try {
     final response = await http.post(
@@ -69,33 +56,140 @@ Future<void> _extendLogin(String refreshToken) async {
       final responseData = jsonDecode(response.body);
       if (responseData['code'] == 'OK') {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-
-        // 새로운 accessToken 및 refreshToken 저장
         await prefs.setString('accessToken', responseData['data']['accessToken']);
         await prefs.setString('refreshToken', responseData['data']['refreshToken']);
-
         print('accessToken :::::: ${prefs.getString('accessToken')}');
-        // pairingYn에 따른 분기 처리
-        bool pairingYn = responseData['data']['pairingYn'];
 
-        if (pairingYn) {
-          // pairing이 완료된 상태라면 WeddingHomePage로 이동
-          runApp(MaterialApp(home: WeddingHomePage()));
-        } else {
-          // pairing이 완료되지 않은 상태라면 PairingCodePage로 이동
-          String id = responseData['data']['id']; // id 값 추출
-          runApp(MaterialApp(home: PairingCodePage(id: id)));
-        }
+        bool pairingYn = responseData['data']['pairingYn'];
+        String id = responseData['data']['id'];
+
+        return {
+          'pairingYn': pairingYn,
+          'id': id,
+        };
       } else {
-        print('토큰 갱신 실패: ${responseData['message']}');
-        runApp(MaterialApp(home: LoginScreen())); // 로그인 화면으로 이동
+        throw Exception('회원을 찾을 수 없습니다');
       }
     } else {
-      print('HTTP 요청 실패: ${response.statusCode}');
-      runApp(MaterialApp(home: LoginScreen())); // 로그인 화면으로 이동
+      throw Exception('HTTP 요청 실패: ${response.statusCode}');
     }
   } catch (e) {
     print('예외 발생: $e');
-    runApp(MaterialApp(home: LoginScreen())); // 예외 발생 시 로그인 화면으로 이동
+    throw e;
   }
 }
+
+class WeddingApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: WeddingHomePage(),
+      locale: Locale('ko', 'KR'),
+      supportedLocales: [
+        Locale('en', 'US'),
+        Locale('ko', 'KR'),
+      ],
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+    );
+  }
+}
+
+class LoginApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: LoginScreen(),
+      locale: Locale('ko', 'KR'),
+      supportedLocales: [
+        Locale('en', 'US'),
+        Locale('ko', 'KR'),
+      ],
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+    );
+  }
+}
+
+class PairingCodeApp extends StatelessWidget {
+  final String id;
+
+  PairingCodeApp({required this.id});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: PairingCodePage(id: id,),
+      locale: Locale('ko', 'KR'),
+      supportedLocales: [
+        Locale('en', 'US'),
+        Locale('ko', 'KR'),
+      ],
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+    );
+  }
+}
+
+
+/*Future<void> _extendLogin(String refreshToken) async {
+  final url = ApiConstants.refreshTokenValidation;
+
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'refreshToken': refreshToken}),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData['code'] == 'OK') {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', responseData['data']['accessToken']);
+        await prefs.setString('refreshToken', responseData['data']['refreshToken']);
+        print('accessToken :::::: ${prefs.getString('accessToken')}');
+
+        bool pairingYn = responseData['data']['pairingYn'];
+
+        print('pairingYn ::::::: $pairingYn');
+        if (pairingYn) {
+          // pairing이 완료된 상태라면 WeddingHomePage로 이동
+          // context가 유효한 곳에서 Navigator로 페이지 이동
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushReplacement(
+              context, // 현재 context 사용
+              MaterialPageRoute(builder: (context) => WeddingHomePage()),
+            );
+          });
+        } else {
+          print('here?!!!!!!!!!!!!!!!!!!!');
+          // pairing이 완료되지 않은 상태라면 PairingCodePage로 이동
+          String id = responseData['data']['id'];
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushReplacement(
+              context, // 현재 context 사용
+              MaterialPageRoute(builder: (context) => PairingCodePage(id: id)),
+            );
+          });
+        }
+      } else {
+        throw Exception('회원을 찾을 수 없습니다');
+      }
+    }else {
+      throw Exception('HTTP 요청 실패: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('예외 발생: $e');
+    throw e;
+  }
+}*/
+

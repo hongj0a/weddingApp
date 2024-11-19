@@ -32,18 +32,19 @@ class LoginScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(
-                      'asset/img/heart_logo.png', // 로고 이미지 경로
+                      'asset/img/heart_ver_2.0.png', // 로고 이미지 경로
                       height: 35,
                       width: 35,
                     ),
                     SizedBox(width: 10),
                     Text(
                       '우월',
-                      style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, fontFamily: 'SejongGeulggot'),
                     ),
                   ],
                 ),
                 SizedBox(height: 70),
+                //Spacer(),
                 // 카카오 로그인 버튼
                 ElevatedButton.icon(
                   onPressed: () async {
@@ -73,6 +74,8 @@ class LoginScreen extends StatelessWidget {
 
                         bool isAuthenticated = response['isAuthenticated'];
                         bool pairingYn = response['pairingYn'];
+
+                        print('pairingYn!!!!!!!!!! $pairingYn');
 
                         // 페어링 여부에 따라 분기 처리
                         if (isAuthenticated) {

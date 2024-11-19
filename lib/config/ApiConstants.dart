@@ -1,5 +1,8 @@
 class ApiConstants {
-  static const String baseUrl = 'http://192.168.3.27:8888';
+  static const String baseUrl = 'http://192.168.3.50:8888';
+  static const String mlUrl = 'http://112.222.141.78:5001';
+  static const String predict = '$mlUrl/predict';
+  static const String feedback = '$mlUrl/feedback';
   //static const String baseUrl = 'http://112.222.141.78:8888';
   static const String isExistPairingCode = '$baseUrl/api/isExistPairingCode';
   static const String authenticate = '$baseUrl/api/authenticate';
@@ -50,7 +53,7 @@ class ApiConstants {
   static const String delContract = '$baseUrl/contract/delContract';
   static const String setOcrCount = '$baseUrl/contract/setOcrCount';
 
-  static const String webSocketUrl = 'ws://192.168.3.27:8888/ws-stomp';
+  static const String webSocketUrl = 'ws://192.168.3.50:8888/ws-stomp';
   //static const String webSocketUrl = 'ws://112.222.141.78:8888/ws-stomp';
 
 }

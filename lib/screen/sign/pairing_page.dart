@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_wedding/screen/sign/login_page.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,9 +10,9 @@ import '../../config/ApiConstants.dart';
 import '../main/home_screen.dart';
 
 class PairingCodePage extends StatefulWidget {
-  final String id;  // 카카오톡 ID를 받을 필드 추가
+  final String id;
 
-  PairingCodePage({required this.id});  // 생성자에 파라미터 추가
+  PairingCodePage({required this.id});
 
   @override
   _PairingCodePageState createState() => _PairingCodePageState();
@@ -19,24 +21,23 @@ class PairingCodePage extends StatefulWidget {
 class _PairingCodePageState extends State<PairingCodePage> {
   String pairingCode = '';
   String enteredPairingCode = '';
-  late StompClient stompClient;  // STOMP 클라이언트
+  late StompClient stompClient;
   final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    print('카카오톡 ID: ${widget.id}');
-    _initializePairing();  // 페어링 코드 생성과 WebSocket 연결 처리
+    _initializePairing();
   }
 
   void _initializePairing() async {
-    await _setPairingCode();  // 페어링 코드를 먼저 설정 (비동기)
-    _connectToWebSocket();    // 페어링 코드 설정 후 WebSocket 연결
+    await _setPairingCode();
+    _connectToWebSocket();
   }
 
   Future<void> _setPairingCode() async {
-    pairingCode = await _generateRandomCode();  // 비동기 함수로 랜덤 코드 설정
-    setState(() {});  // 상태를 갱신하여 UI 업데이트
+    pairingCode = await _generateRandomCode();
+    setState(() {});
   }
 
   Future<String> _generateRandomCode() async {
@@ -48,72 +49,58 @@ class _PairingCodePageState extends State<PairingCodePage> {
 
       print("Generated Code: $codeString");
 
-      // 서버에 페어링 코드 확인 요청
       final response = await http.get(Uri.parse('${ApiConstants.isExistPairingCode}?code=$codeString'));
 
       if (response.statusCode == 200) {
         print("Server Response: ${response.body}");
 
-        // 서버로부터 받은 응답이 "ok"일 경우 코드를 반환
         var jsonResponse = jsonDecode(response.body);
         if (jsonResponse['code'] == 'OK') {
           return codeString;
         }
       }
-
-      // "ok"가 아닐 경우 새로운 코드를 생성하여 다시 시도
       print("Code $codeString is not valid, retrying...");
     }
   }
 
-  // WebSocket 연결 함수
   void _connectToWebSocket() {
     stompClient = StompClient(
       config: StompConfig(
         url: ApiConstants.webSocketUrl,
         onConnect: (StompFrame frame) {
           print('WebSocket 연결 성공');
-          _sendPairingRequest(pairingCode); // 페어링 요청 전송
+          _sendPairingRequest(pairingCode);
 
-          // 서버에서 클라이언트에게 메시지 수신 구독
           stompClient.subscribe(
-            destination: '/sub', // 서버에서 보내는 메시지의 경로
+            destination: '/sub',
             callback: (frame) {
               String? message = frame.body;
 
-              // 메시지가 "FAIL"로 시작하는 경우
               if (message != null && message.startsWith("FAIL")) {
-                // 초대코드가 잘못되었음을 알리는 alert
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text('ERROR'),
-                      content: Text('초대코드가 잘못되었습니다. \n 확인 후 다시 입력해주세요.'),
+                      backgroundColor: Colors.white,
+                      title: Text('ERROR', style: TextStyle(color: Colors.black)),
+                      content: Text('초대코드가 잘못되었어요. \n 확인 후 다시 입력해주세요.', style: TextStyle(color: Colors.black)),
                       actions: [
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).pop(); // 다이얼로그 닫기
+                            Navigator.of(context).pop();
                           },
-                          child: Text('확인'),
+                          child: Text('확인', style: TextStyle(color: Colors.black)),
                         ),
                       ],
                     );
                   },
                 );
-              }
-
-              // 메시지가 "COMPLETE"로 시작하는 경우
-              else if (message != null && message.startsWith("COMPLETE")) {
-                // WeddingHomePage로 리다이렉트
+              } else if (message != null && message.startsWith("COMPLETE")) {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => WeddingHomePage()),
                 );
-              }
-
-              // 그 외 메시지 처리 (필요한 경우)
-              else {
+              } else {
                 print('서버에서 받은 메시지: $message');
               }
             },
@@ -123,10 +110,9 @@ class _PairingCodePageState extends State<PairingCodePage> {
       ),
     );
 
-    stompClient.activate(); // STOMP 클라이언트 활성화
+    stompClient.activate();
   }
 
-  // 페어링 요청 보내기 함수
   void _sendPairingRequest(String pairingCode) {
     final pairingRequest = {
       'pairingCode': pairingCode,
@@ -134,14 +120,12 @@ class _PairingCodePageState extends State<PairingCodePage> {
     };
     print('페어링 요청 전송: $pairingRequest');
     stompClient.send(
-      destination: '/app/requestPairing', // 서버의 STOMP 경로
-      body: jsonEncode(pairingRequest), // 요청 본문
+      destination: '/app/requestPairing',
+      body: jsonEncode(pairingRequest),
     );
   }
 
-  // 페어링 완료 요청 보내기 함수
   void _sendPairingComplete(String pairingCode) {
-    //내 코드면 안되게 막기. 두개 폰 테스트 전에
     final pairingResponse = {
       'pairingCode': pairingCode,
       'email': widget.id,
@@ -149,47 +133,8 @@ class _PairingCodePageState extends State<PairingCodePage> {
     print('페어링 완료 요청 전송: $pairingResponse');
 
     stompClient.send(
-      destination: '/app/pairingComplete', // 페어링 완료 경로
+      destination: '/app/pairingComplete',
       body: jsonEncode(pairingResponse),
-    );
-  }
-
-  // 페어링 요청 다이얼로그 표시
-  void _showPairingRequestDialog(String pairingCode) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('페어링 요청'),
-        content: Text('페어링 요청이 도착했습니다!'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _sendPairingComplete(pairingCode);
-              Navigator.of(context).pop();
-            },
-            child: Text('확인'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 페어링 완료 다이얼로그 표시
-  void _showPairingCompleteDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('페어링 완료'),
-        content: Text('상대방과 페어링이 완료되었습니다!'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('확인'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -200,6 +145,7 @@ class _PairingCodePageState extends State<PairingCodePage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text('초대 코드 입력'),
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -222,8 +168,11 @@ class _PairingCodePageState extends State<PairingCodePage> {
               TextField(
                 controller: _controller,
                 decoration: InputDecoration(
-                  labelText: '전달받은 초대코드 입력',
+                  labelText: '또는 전달받은 초대코드 입력',
                   border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color.fromRGBO(250, 15, 156, 1.0)),
+                  ),
                 ),
                 onChanged: (value) {
                   enteredPairingCode = value;
@@ -233,14 +182,84 @@ class _PairingCodePageState extends State<PairingCodePage> {
               ElevatedButton(
                 onPressed: () {
                   if (enteredPairingCode.isNotEmpty) {
-                    _sendPairingComplete(enteredPairingCode);
+                    if (enteredPairingCode == pairingCode) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: Colors.white,
+                            title: Text('확인 요청', style: TextStyle(color: Colors.black)),
+                            content: Text(
+                              '자기 자신과 페어링은 할 수 없어요. \n상대방의 페어링 코드를 입력해주세요.',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('확인', style: TextStyle(color: Colors.black)),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else {
+                      _sendPairingComplete(enteredPairingCode);
+                    }
                   } else {
                     print('초대 코드를 입력해주세요');
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          backgroundColor: Colors.white,
+                          title: Text('확인 요청', style: TextStyle(color: Colors.black)),
+                          content: Text(
+                            '초대 코드를 입력해주세요.',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('확인', style: TextStyle(color: Colors.black)),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   }
                 },
-                child: Text('연결하기'),
+                child: Text(
+                  '연결하기',
+                  style: TextStyle(color: Colors.black), // 글씨 색 검정
+                ),
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50),
+                  backgroundColor: Colors.white, // 버튼 배경색 흰색
+                  side: BorderSide(color: Colors.grey), // 테두리 회색
+                  minimumSize: Size(double.infinity, 50), // 버튼 크기
+                ),
+              ),
+              SizedBox(height: 50),
+              TextButton(
+                onPressed: () async {
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                  // SharedPreferences에서 accessToken과 refreshToken 삭제
+                  await prefs.remove('accessToken');
+                  await prefs.remove('refreshToken');
+
+                  // 로그인 페이지로 이동
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
+                },
+                child: Text(
+                  '돌아가기',
+                  style: TextStyle(color: Colors.grey, decoration: TextDecoration.underline),
                 ),
               ),
               SizedBox(height: 50),
@@ -251,10 +270,11 @@ class _PairingCodePageState extends State<PairingCodePage> {
     );
   }
 
+
   @override
   void dispose() {
     _controller.dispose();
-    stompClient.deactivate(); // STOMP 클라이언트 비활성화
+    stompClient.deactivate();
     super.dispose();
   }
 }

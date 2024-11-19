@@ -324,7 +324,8 @@ class _BudgetSettingState extends State<BudgetSetting> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.white, // 고정된 배경색
+        elevation: 0,
         title: Text('예산 설정'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -337,143 +338,135 @@ class _BudgetSettingState extends State<BudgetSetting> {
         onTap: () {
           _unfocusAllFields();
         },
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  '${_formatCurrency(totalAmount)} 원', // 원화로 변환
-                  style: TextStyle(
-                    fontSize: 28.0,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w700,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // Column이 자식의 크기에 맞게 축소됨
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    '${_formatCurrency(totalAmount)} 원',
+                    style: TextStyle(
+                      fontSize: 28.0,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 16),
-              Divider(height: 1, color: Colors.grey.shade300),
-              SizedBox(height: 16),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Column(
-                        children: budgetItems.asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final item = entry.value;
+                SizedBox(height: 16),
+                Divider(height: 1, color: Colors.grey.shade300),
+                SizedBox(height: 16),
+                Column(
+                  children: budgetItems.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final item = entry.value;
 
-                          return Dismissible(
-                            key: Key(item['seq']?.toString() ?? 'default_key_$index'), // seq가 null일 경우 기본 키 사용
-                            direction: DismissDirection.endToStart,
-                            background: Container(
-                              color: Colors.red,
-                              alignment: Alignment.centerRight,
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              child: Icon(
-                                Icons.delete,
-                                color: Colors.white,
+                    return Dismissible(
+                      key: Key(item['seq']?.toString() ?? 'default_key_$index'),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerRight,
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
+                      ),
+                      onDismissed: (direction) {
+                        final seqString = item['seq'] as String?;
+                        if (seqString != null) {
+                          final seq = int.tryParse(seqString) ?? 0;
+                          _onDismissed(seq);
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('${item['label']} 항목이 삭제되었습니다.')),
+                          );
+                        } else {
+                          print('seq is null for item: $item');
+                        }
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 1.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _labelControllers[item['label']!],
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                ),
+                                style: TextStyle(fontSize: 20),
+                                onFieldSubmitted: (newValue) {
+                                  setState(() {
+                                    item['label'] = newValue;
+                                  });
+                                  _updateBudgetOnServer(item['seq']!, newValue, item['amount']!);
+                                },
                               ),
                             ),
-                            onDismissed: (direction) {
-                              final seqString = item['seq'] as String?; // seq 값을 안전하게 가져옴
-                              if (seqString != null) {
-                                final seq = int.tryParse(seqString) ?? 0;
-                                _onDismissed(seq);
-
-                                // 삭제 완료 알림 표시 (선택 사항)
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('${item['label']} 항목이 삭제되었습니다.')),
-                                );
-                              } else {
-                                // seq가 null일 경우의 처리
-                                print('seq is null for item: $item');
-                              }
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(vertical: 1.0),
+                            SizedBox(
+                              width: 200,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: TextFormField(
-                                      controller: _labelControllers[item['label']!],
+                                      controller: item['label'] != null && _controllers.containsKey(item['label']!)
+                                          ? _controllers[item['label']!]
+                                          : TextEditingController(),
+                                      onChanged: (value) {
+                                        if (item['seq'] != null && item['label'] != null) {
+                                          _onAmountChanged(value, item['seq']!, item['label']!, item);
+                                        } else {
+                                          print('Error: item[seq] or item[label] is null');
+                                        }
+                                      },
                                       decoration: InputDecoration(
                                         border: InputBorder.none,
-                                        isDense: true,
+                                        hintText: '0',
+                                        hintStyle: TextStyle(color: Colors.grey),
                                       ),
-                                      style: TextStyle(fontSize: 20),
-                                      onFieldSubmitted: (newValue) {
-                                        setState(() {
-                                          item['label'] = newValue;
-                                        });
-                                        _updateBudgetOnServer(item['seq']!, newValue, item['amount']!);
-                                      },
+                                      keyboardType: TextInputType.number,
+                                      textAlign: TextAlign.end,
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: 200,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: TextFormField(
-                                            controller: item['label'] != null && _controllers.containsKey(item['label']!)
-                                                ? _controllers[item['label']!]
-                                                : TextEditingController(),
-                                            onChanged: (value) {
-                                              if (item['seq'] != null && item['label'] != null) {
-                                                _onAmountChanged(value, item['seq']!, item['label']!, item);
-                                              } else {
-                                                // 오류 처리, 예를 들어 로그 찍거나 기본 값으로 처리
-                                                print('Error: item[seq] or item[label] is null');
-                                              }
-                                            },
-                                            decoration: InputDecoration(
-                                              border: InputBorder.none,
-                                              hintText: '0',
-                                              hintStyle: TextStyle(color: Colors.grey),
-                                            ),
-                                            keyboardType: TextInputType.number,
-                                            textAlign: TextAlign.end,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(left: 8.0),
-                                          child: Text('원', style: TextStyle(fontSize: 20)),
-                                        ),
-                                      ],
-                                    ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Text('원', style: TextStyle(fontSize: 20)),
                                   ),
                                 ],
                               ),
                             ),
-                          );
-                        }).toList(),
-                      ),
-
-                      SizedBox(height: 10),
-                      Container(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _showAddItemDialog,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black,
-                            shadowColor: Colors.black.withOpacity(0.2),
-                          ),
-                          child: Text('추가하기'),
+                          ],
                         ),
                       ),
-                    ],
+                    );
+                  }).toList(),
+                ),
+                SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _showAddItemDialog,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      shadowColor: Colors.black.withOpacity(0.2),
+                    ),
+                    child: Text('추가하기'),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
+
     );
   }
 

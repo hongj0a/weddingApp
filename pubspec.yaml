@@ -52,6 +52,7 @@ dependencies:
   image: ^3.0.1
 
 
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
@@ -79,9 +80,9 @@ flutter:
   uses-material-design: true
 
   fonts:
-    - family: PretendardVariable
+    - family: SejongGeulggot
       fonts:
-        - asset: asset/fonts/PretendardVariable.ttf
+        - asset: asset/fonts/SejongGeulggot.ttf
   # To add assets to your application, add an assets section, like this:
   assets:
     - asset/img/

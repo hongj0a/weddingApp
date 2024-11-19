@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../config/ApiConstants.dart';
+import 'contract_detail.dart';
 
 class ContractPage extends StatefulWidget {
   @override
@@ -17,7 +18,15 @@ class _ContractPageState extends State<ContractPage> {
   @override
   void initState() {
     super.initState();
-    getContracts(); // API 호출하여 contracts 업데이트
+    loadData();// API 호출하여 contracts 업데이트
+  }
+
+  // 데이터를 새로 불러오는 함수
+  void loadData() {
+    // API 호출 또는 데이터 새로 고침 로직
+    setState(() {
+      getContracts();
+    });
   }
 
   Future<void> getContracts() async {
@@ -108,7 +117,10 @@ class _ContractPageState extends State<ContractPage> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => DocumentUploadPage()),
-            );
+            ).then((value) {
+              // DocumentUploadPage에서 돌아오면 loadData() 호출
+              loadData();
+            });
           },
           child: Icon(Icons.add, color: Colors.black),
         ),
@@ -131,7 +143,7 @@ class _ContractPageState extends State<ContractPage> {
                 style: TextStyle(color: Colors.black), // 제목 글씨 검정색
               ),
               content: Text(
-                "${contract['title']}를 삭제하시겠습니까?",
+                "${contract['title']}를 삭제하시겠어요?",
                 style: TextStyle(color: Colors.black), // 내용 글씨 검정색
               ),
               actions: <Widget>[
@@ -191,6 +203,14 @@ class _ContractPageState extends State<ContractPage> {
               Text(contract['subtitle']!),
             ],
           ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ContractDetail(seq: contract['seq']),
+              ),
+            );
+          },
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/document/contract_detail.dart';
 import 'dart:typed_data';
@@ -12,6 +13,7 @@ import 'package:image/image.dart' as img;
 import '../../config/ApiConstants.dart';
 
 class DocumentUploadPage extends StatefulWidget {
+
   @override
   _DocumentUploadPageState createState() => _DocumentUploadPageState();
 }
@@ -40,6 +42,8 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
       body: Stack(
         children: [
           Center(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 50.0), // 전체 Column을 위로 이동
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -47,13 +51,13 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                   '계약서를 등록해 주세요',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 40.0),
+                SizedBox(height: 50.0), // 위젯 간의 간격을 조정
                 Icon(
                   Icons.insert_drive_file,
                   size: 100.0,
                   color: Color.fromRGBO(250, 15, 156, 1.0),
                 ),
-                SizedBox(height: 40.0),
+                SizedBox(height: 50.0),
                 Container(
                   width: 160,
                   child: ElevatedButton.icon(
@@ -72,6 +76,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                 SizedBox(height: 20),
               ],
             ),
+           ),
           ),
 
           // 로딩 인디케이터를 표시하는 조건부 위젯
@@ -86,6 +91,74 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
 
 
   void _showBottomSheet(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 2.0, // 너비 설정
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '계약서 등록 시 주의사항',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('• 수기로 작성된 계약서는 글자인식이 되지 않아요.', style: TextStyle(color: Colors.black)),
+                    Text('• 수기로 작성됐어도 수정해서 등록할 수 있어요.', style: TextStyle(color: Colors.black)),
+                    Text('• 빛반사가 없는 환경에서 정확하게 촬영해주세요.', style: TextStyle(color: Colors.black)),
+                    Text('• 글자가 정확한 사진일수록 인식률이 올라가요.', style: TextStyle(color: Colors.black)),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Text(
+                  '등록하러 가볼까요?',
+                  style: TextStyle(color: Colors.black),
+                ),
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); // 다이얼로그 닫기
+                      },
+                      child: Text('취소', style: TextStyle(color: Colors.black)),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); // 다이얼로그 닫기
+                        _showImageSelectionBottomSheet(context); // 이미지 선택 창 띄우기
+                      },
+                      child: Text('확인', style: TextStyle(color: Colors.black)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
+
+
+
+  void _showImageSelectionBottomSheet(BuildContext context) {
+    // 이미지 선택 모달
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -97,9 +170,10 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Text(
-                '계약서 등록하기',
+                '    계약서 등록하기',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
+              SizedBox(height: 10),
               ListTile(
                 leading: Icon(Icons.camera_alt, color: Colors.black),
                 title: Text('직접 촬영하기', style: TextStyle(color: Colors.black)),
@@ -122,7 +196,6 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
       },
     );
   }
-
   /*ListTile(
                 leading: Icon(Icons.picture_as_pdf, color: Colors.black),
                 title: Text('PDF 문서 가져오기', style: TextStyle(color: Colors.black)),
@@ -193,6 +266,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
       "ContractName": null,
       "CompanyName": null,
       "EventDate": null,
+      "EventTime": null,
       "ContractAmount": null,
       "TotalAmount": null,
     };
@@ -216,11 +290,66 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
     }
 
     // 3. 행사 날짜 추출: 행사 날짜 형식 (YYYY년 MM월 DD일)
-    RegExp regExpEventDate = RegExp(r"\d{4}년 \d{2}월 \d{2}일");
+    //RegExp regExpEventDate = RegExp(r"\d{4}년 \d{2}월 \d{2}일");
+    // 정규식: - 또는 .으로 구분된 날짜와 '년', '월', '일'이 포함된 날짜
+    // 정규식: 두 가지 날짜 형식 처리
+    RegExp regExpEventDate = RegExp(r'(\d{4}[-.]\d{2}[-.]\d{2})|(\d{4}년 \s*\d{2}월 \s*\d{2}일)');
+
+    // allMatches로 모든 일치 항목 찾기
+    Iterable<Match> matches = regExpEventDate.allMatches(inputText);
+
+    // 찾은 날짜들을 출력
+    for (var match in matches) {
+      print('@@@@@@@@@@@@@@@@@@@@@@@, ${match.group(0)}');  // 전체 일치 문자열 출력
+    }
+
     var matchEventDate = regExpEventDate.firstMatch(inputText);
     if (matchEventDate != null) {
-      contractInfo["EventDate"] = matchEventDate.group(0);
+      // group(1)이 첫 번째 날짜 형식 (yyyy-mm-dd 또는 yyyy.mm.dd)일 경우
+      var eventDate = matchEventDate.group(1);
+      // group(2)이 두 번째 날짜 형식 (yyyy년 mm월 dd일)일 경우
+      var eventDate2 = matchEventDate.group(2);
+
+      String formattedDate = '';
+
+      // eventDate가 null이 아니면 그 값을 사용하고, null이면 eventDate2 사용
+      if (eventDate != null) {
+        try {
+          // yyyy-MM-dd 형식일 경우
+          DateTime date = DateTime.parse(eventDate.replaceAll(RegExp(r'[.-]'), '-')); // "-"로 변환 후 DateTime 파싱
+          formattedDate = DateFormat('yyyy-MM-dd').format(date); // 원하는 포맷으로 변환
+        } catch (e) {
+          print("Error parsing eventDate: $e");
+        }
+      } else if (eventDate2 != null) {
+        try {
+          // yyyy년 MM월 dd일 형식일 경우
+          DateTime date = DateFormat('yyyy년 MM월 dd일').parse(eventDate2);
+          formattedDate = DateFormat('yyyy-MM-dd').format(date); // 원하는 포맷으로 변환
+        } catch (e) {
+          print("Error parsing eventDate2: $e");
+        }
+      }
+
+      if (formattedDate.isNotEmpty) {
+        contractInfo["EventDate"] = formattedDate;  // 포맷된 날짜를 contractInfo에 저장
+      }
     }
+
+    // 4. 행사 시간 추출: HH:mm 형식
+    RegExp regExpEventTime = RegExp(r'(\d{2}):(\d{2})');
+    var matchEventTime = regExpEventTime.firstMatch(inputText);
+    if (matchEventTime != null) {
+      String hour = matchEventTime.group(1) ?? '';
+      String minute = matchEventTime.group(2) ?? '';
+      String formattedTime = '$hour:$minute';  // HH:mm 형식으로 시간 생성
+
+      contractInfo["EventTime"] = formattedTime;  // 추출된 시간 저장
+      print("행사 시간 추출 성공: $formattedTime");
+    } else {
+      print("행사 시간 추출 실패");
+    }
+
 
 // 계약금 추출
     RegExp regExpDeposit = RegExp(r"(계약금|계약금액|예약금)[\s:]*([\d,\.]+)\s*(만원|원)?");
@@ -283,6 +412,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
     print('총금액: ${contractInfo["TotalAmount"]}');
     print('회사명: ${contractInfo["CompanyName"]}');
     print('행사 날짜: ${contractInfo["EventDate"]}');
+    print('행사 시간: ${contractInfo["EventTime"]}');
 
 
     return contractInfo;

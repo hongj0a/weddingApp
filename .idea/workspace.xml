@@ -12,14 +12,14 @@
       <change beforePath="$PROJECT_DIR$/lib/screen/document/contract_detail.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/document/contract_detail.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screen/document/contract_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/document/contract_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screen/document/document_upload.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/document/document_upload.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/main/alarm_list_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/main/alarm_list_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screen/main/home_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/main/home_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screen/mine/d_day_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/d_day_card.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/mine/my_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/my_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/money/add_cost_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/money/add_cost_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/mine/d_day_management.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/d_day_management.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/mine/inquiry_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/inquiry_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/mine/setting.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/setting.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screen/money/budget_setting.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/money/budget_setting.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/sign/find_account_screen.dart" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screen/sign/login_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/sign/login_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/sign/pairing_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/sign/pairing_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
@@ -110,5 +110,32 @@
         <option value="Default.Subject" />
       </list>
     </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/screen/document/contract_detail.dart</url>
+          <line>614</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/lib/screen/mine/setting.dart</url>
+          <line>152</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

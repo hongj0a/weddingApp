@@ -63,8 +63,35 @@ class _InquiryScreenState extends State<InquiryScreen> {
       });
 
       if (response.statusCode == 200) {
-        // 성공 시 뒤로가기
-        Navigator.pop(context);
+        // 성공 시 알림을 표시하고 뒤로 가기
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Colors.white, // 배경색을 흰색으로 설정
+              title: Text(
+                '알림',
+                style: TextStyle(color: Colors.black), // 제목 글씨 색을 검은색으로 설정
+              ),
+              content: Text(
+                '문의하기가 완료되었습니다.',
+                style: TextStyle(color: Colors.black), // 내용 글씨 색을 검은색으로 설정
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // 다이얼로그 닫기
+                    Navigator.pop(context); // 페이지 뒤로 가기
+                  },
+                  child: Text(
+                    '확인',
+                    style: TextStyle(color: Colors.black), // 버튼 글씨 색을 검은색으로 설정
+                  ),
+                ),
+              ],
+            );
+          },
+        );
       } else {
         // 실패 시 에러 메시지 출력
         _showErrorDialog('문의하기에 실패했습니다. 다시 시도해 주세요.');

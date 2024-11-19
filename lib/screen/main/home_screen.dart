@@ -127,14 +127,14 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
             child: Row(
               children: [
                 Image.asset(
-                  'asset/img/heart_logo.png',
+                  'asset/img/heart_ver_2.0.png',
                   height: 35,
                   width: 35,
                 ),
                 SizedBox(width: 10),
                 Text(
                   '우월',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, fontFamily: 'SejongGeulggot'),
                 ),
               ],
             ),
