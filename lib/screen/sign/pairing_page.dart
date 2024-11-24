@@ -7,6 +7,7 @@ import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:http/http.dart' as http;
 
 import '../../config/ApiConstants.dart';
+import '../../themes/theme.dart';
 import '../main/home_screen.dart';
 
 class PairingCodePage extends StatefulWidget {
@@ -171,7 +172,7 @@ class _PairingCodePageState extends State<PairingCodePage> {
                   labelText: '또는 전달받은 초대코드 입력',
                   border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color.fromRGBO(250, 15, 156, 1.0)),
+                    borderSide: BorderSide(color: AppColors.primaryColor),
                   ),
                 ),
                 onChanged: (value) {

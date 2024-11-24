@@ -11,6 +11,7 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
 import '../../config/ApiConstants.dart';
+import '../../themes/theme.dart';
 
 class DocumentUploadPage extends StatefulWidget {
 
@@ -55,7 +56,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                 Icon(
                   Icons.insert_drive_file,
                   size: 100.0,
-                  color: Color.fromRGBO(250, 15, 156, 1.0),
+                  color: AppColors.primaryColor,
                 ),
                 SizedBox(height: 50.0),
                 Container(
@@ -95,6 +96,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
           child: Container(
             width: MediaQuery.of(context).size.width * 2.0, // 너비 설정
@@ -121,30 +123,48 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                     Text('• 글자가 정확한 사진일수록 인식률이 올라가요.', style: TextStyle(color: Colors.black)),
                   ],
                 ),
-                SizedBox(height: 16),
-                Text(
-                  '등록하러 가볼까요?',
-                  style: TextStyle(color: Colors.black),
-                ),
-                SizedBox(height: 16),
+                SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    // 취소 버튼
                     TextButton(
                       onPressed: () {
                         Navigator.pop(context); // 다이얼로그 닫기
                       },
-                      child: Text('취소', style: TextStyle(color: Colors.black)),
+                      child: Text(
+                        '취소',
+                        style: TextStyle(
+                          color: Colors.black, // 텍스트 색상
+                          fontWeight: FontWeight.bold, // 텍스트 두께
+                        ),
+                      ),
                     ),
-                    TextButton(
+                    SizedBox(width: 8), // 버튼 간 간격
+                    // 확인 버튼
+                    ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context); // 다이얼로그 닫기
                         _showImageSelectionBottomSheet(context); // 이미지 선택 창 띄우기
                       },
-                      child: Text('확인', style: TextStyle(color: Colors.black)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor, // 버튼 배경색
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8), // 둥근 모서리
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // 버튼 내부 패딩
+                      ),
+                      child: Text(
+                        '확인',
+                        style: TextStyle(
+                          color: Colors.white, // 텍스트 색상
+                          fontWeight: FontWeight.bold, // 텍스트 두께
+                        ),
+                      ),
                     ),
                   ],
-                ),
+                )
+
               ],
             ),
           ),

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../config/ApiConstants.dart';
+import '../../themes/theme.dart';
 import 'contract_detail.dart';
 
 class ContractPage extends StatefulWidget {
@@ -102,7 +103,7 @@ class _ContractPageState extends State<ContractPage> {
         ),
       )
           : ListView.builder(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(13.0),
         itemCount: contracts.length,
         itemBuilder: (context, index) {
           return _buildContractItem(context, contracts[index], index);
@@ -137,11 +138,10 @@ class _ContractPageState extends State<ContractPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              backgroundColor: Colors.white,
-              title: Text(
-                "삭제 확인",
-                style: TextStyle(color: Colors.black), // 제목 글씨 검정색
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0), // 약간 직각 모양
               ),
+              backgroundColor: Colors.white,
               content: Text(
                 "${contract['title']}를 삭제하시겠어요?",
                 style: TextStyle(color: Colors.black), // 내용 글씨 검정색
@@ -149,7 +149,7 @@ class _ContractPageState extends State<ContractPage> {
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(false);
+                    Navigator.of(context).pop(false); // 취소
                   },
                   child: Text(
                     "취소",
@@ -157,16 +157,27 @@ class _ContractPageState extends State<ContractPage> {
                   ),
                 ),
                 TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(AppColors.primaryColor), // 보라색 배경
+                    foregroundColor: MaterialStateProperty.all(Colors.white), // 흰색 텍스트
+                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 10)), // 버튼 크기 조정
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4.0), // 약간의 둥글기
+                      ),
+                    ),
+                  ),
                   onPressed: () {
-                    Navigator.of(context).pop(true);
+                    Navigator.of(context).pop(true); // 확인
                   },
                   child: Text(
                     "삭제",
-                    style: TextStyle(color: Colors.black), // 버튼 글씨 검정색
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
             );
+
           },
         );
       },
@@ -181,7 +192,7 @@ class _ContractPageState extends State<ContractPage> {
         );
       },
       background: Container(
-        color: Color.fromRGBO(250, 15, 156, 1.0),
+        color: Colors.red,
         alignment: Alignment.centerRight,
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: Icon(Icons.delete, color: Colors.white),
@@ -198,7 +209,7 @@ class _ContractPageState extends State<ContractPage> {
           title: Text(contract['title']!, style: TextStyle(fontWeight: FontWeight.bold)),
           subtitle: Row(
             children: [
-              Icon(Icons.location_on, size: 16.0, color: Color.fromRGBO(250, 15, 156, 1.0)),
+              Icon(Icons.location_on, size: 16.0, color: AppColors.primaryColor),
               SizedBox(width: 4.0),
               Text(contract['subtitle']!),
             ],

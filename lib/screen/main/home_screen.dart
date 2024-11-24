@@ -9,26 +9,9 @@ import 'package:smart_wedding/screen/diary/schedule_page.dart';
 import 'package:smart_wedding/screen/main/home_content.dart';
 import 'package:smart_wedding/screen/main/alarm_list_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../config/ApiConstants.dart';
-/*
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      locale: Locale('ko', 'KR'),
-      supportedLocales: [
-        Locale('en', 'US'), // 영어 지원
-        Locale('ko', 'KR'), // 한국어 지원
-      ],
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate, // 이 부분을 꼭 추가해야 합니다.
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate, // iOS 스타일의 로컬라이징 지원
-      ],
-      home: WeddingHomePage(),
-    );
-  }
-}*/
+import '../../themes/theme.dart';
 
 class WeddingHomePage extends StatefulWidget {
 
@@ -57,6 +40,7 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
       MyPage(),
     ]);
   }
+
   @override
   void dispose() {
     _pageController.dispose(); // 페이지 컨트롤러 메모리 해제
@@ -118,67 +102,77 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
     return WillPopScope(
       onWillPop: () async => false, // 뒤로가기 비활성화
       child: Scaffold(
-        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Colors.white,
-          automaticallyImplyLeading: false,
+          automaticallyImplyLeading: false, // 기본 왼쪽 아이콘 제거
           title: GestureDetector(
             onTap: navigateToMainPage,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.start, // 왼쪽 정렬
+              crossAxisAlignment: CrossAxisAlignment.center, // 수직 중앙 정렬
               children: [
+                // 로고 이미지 (왼쪽에 배치)
                 Image.asset(
-                  'asset/img/heart_ver_2.0.png',
-                  height: 35,
-                  width: 35,
+                  'asset/img/mini_logo.png', // 로고 이미지 경로
+                  width: 26, // Figma에서 설정된 Width
+                  height: 31, // Figma에서 설정된 Height
                 ),
-                SizedBox(width: 10),
-                Text(
-                  '우월',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, fontFamily: 'SejongGeulggot'),
+                // 로고와 텍스트 사이 간격을 줄이기 위해 SizedBox 추가
+                SizedBox(width: 8), // 간격 조정
+                // 텍스트 로고 이미지
+                SvgPicture.asset(
+                  'asset/img/mini_logo_text.svg', // 텍스트 로고 이미지 경로
+                  width: 39, // Figma에서 설정된 Width
+                  height: 20, // Figma에서 설정된 Height
+                  fit: BoxFit.contain, // 비율 유지
                 ),
               ],
             ),
           ),
           actions: [
-            FutureBuilder<bool>(
-              future: getNewFlag(),
-              builder: (context, snapshot) {
-                bool newFlag = snapshot.data ?? false;
-                return Stack(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.notifications_none_outlined),
-                      iconSize: 28,
-                      onPressed: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => AlarmListPage()),
-                        );
-                        refreshNewFlag(); // 알림 리스트 페이지 닫힌 후 새로고침
-                      },
-                    ),
-                    if (newFlag) // newFlag가 true일 때만 표시
-                      Positioned(
-                        right: 8,
-                        top: 8,
-                        child: Container(
-                          padding: EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            color: Color.fromRGBO(250, 15, 156, 1.0),
-                            shape: BoxShape.circle,
-                          ),
-                          constraints: BoxConstraints(
-                            minWidth: 4,
-                            minHeight: 4,
-                          ),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0), // 오른쪽 여백 추가
+              child: FutureBuilder<bool>(
+                future: getNewFlag(),
+                builder: (context, snapshot) {
+                  bool newFlag = snapshot.data ?? false;
+                  return Stack(
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AlarmListPage()),
+                          );
+                          refreshNewFlag(); // 알림 리스트 페이지 닫힌 후 새로고침
+                        },
+                        child: SvgPicture.asset(
+                          'asset/img/unt.svg', // SVG 아이콘 경로
+                          width: 20,  // 아이콘 크기 조정
+                          height: 18, // 아이콘 크기 조정
                         ),
                       ),
-                  ],
-                );
-              },
+                      if (newFlag) // newFlag가 true일 때만 표시
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: SvgPicture.asset(
+                            'asset/img/unt_red.svg', // 새로운 빨간색 SVG 이미지 경로
+                            width: 5,  // 원하는 크기로 조정
+                            height: 5, // 원하는 크기로 조정
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
             ),
           ],
+          // AppBar 크기 조정
+          toolbarHeight: 56,  // 높이를 56으로 맞춤
+          elevation: 0,  // 그림자 제거
         ),
+
         body: PageView(
           controller: _pageController,
           onPageChanged: (index) {
@@ -196,41 +190,78 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
             MyPage(),
           ],
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: currentIndex,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          unselectedItemColor: Colors.grey,
-          selectedItemColor: Color.fromRGBO(250, 15, 156, 1.0),
-          iconSize: 28,
-          onTap: (index) {
-            setState(() {
-              currentIndex = index; // currentIndex 업데이트
-            });
-            _pageController.jumpToPage(index); // 페이지를 직접 이동
-          },
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.attach_money),
-              label: '예산',
+        bottomNavigationBar: Theme(
+          data: ThemeData(
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.note_add),
-              label: '계약서',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: '메인',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month),
-              label: '일정',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: '마이페이지',
-            ),
-          ],
+            child: BottomNavigationBar(
+          //bottomNavigationBar: BottomNavigationBar(
+            currentIndex: currentIndex,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.white,
+            unselectedItemColor: Colors.black,
+            selectedItemColor: AppColors.primaryColor,
+            iconSize: 28,
+            onTap: (index) {
+              setState(() {
+                currentIndex = index; // currentIndex 업데이트
+              });
+              _pageController.jumpToPage(index); // 페이지를 직접 이동
+            },
+            items: [
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  currentIndex == 0
+                      ? 'asset/img/money_on.svg' // 선택된 상태에서 on 이미지
+                      : 'asset/img/money_off.svg', // 비선택 상태에서 off 이미지
+                  width: 19, // 아이콘 크기 설정
+                  height: 20,
+                ),
+                label: '예산',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  currentIndex == 1
+                      ? 'asset/img/note_on.svg' // 선택된 상태에서 on 이미지
+                      : 'asset/img/note_off.svg', // 비선택 상태에서 off 이미지
+                  width: 19, // 아이콘 크기 설정
+                  height: 20,
+                ),
+                label: '계약서',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  currentIndex == 2
+                      ? 'asset/img/home_on.svg' // 선택된 상태에서 on 이미지
+                      : 'asset/img/home_off.svg', // 비선택 상태에서 off 이미지
+                  width: 19, // 아이콘 크기 설정
+                  height: 20,
+                ),
+                label: '메인',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  currentIndex == 3
+                      ? 'asset/img/calendar_on.svg' // 선택된 상태에서 on 이미지
+                      : 'asset/img/calendar_off.svg', // 비선택 상태에서 off 이미지
+                  width: 19, // 아이콘 크기 설정
+                  height: 20,
+                ),
+                label: '일정',
+              ),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  currentIndex == 4
+                      ? 'asset/img/mypage_on.svg' // 선택된 상태에서 on 이미지
+                      : 'asset/img/mypage_off.svg', // 비선택 상태에서 off 이미지
+                  width: 19, // 아이콘 크기 설정
+                  height: 20,
+                ),
+                label: '마이페이지',
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../config/ApiConstants.dart';
+import '../../themes/theme.dart';
 import 'cost_page.dart';
 
 class AddCostPage extends StatefulWidget {
@@ -86,7 +87,7 @@ class _AddCostPageState extends State<AddCostPage> {
           borderSide: BorderSide(color: Colors.grey[300]!, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(250, 15, 156, 1.0), width: 1),
+          borderSide: BorderSide(color: AppColors.primaryColor, width: 1),
         ),
       ),
       keyboardType: isCost ? TextInputType.numberWithOptions(decimal: true) : TextInputType.text,
@@ -114,7 +115,7 @@ class _AddCostPageState extends State<AddCostPage> {
             hintText: '메모를 남겨보세요(최대 100자)',
             border: OutlineInputBorder(),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Color.fromRGBO(250, 15, 156, 1.0), width: 1), // 활성화 시 색상 변경
+              borderSide: BorderSide(color: AppColors.primaryColor, width: 1), // 활성화 시 색상 변경
             ),
           ),
           maxLength: 100,

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http; // HTTP 패키지 추가
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert'; // JSON 인코딩을 위해 추가
 import '../../config/ApiConstants.dart';
+import '../../themes/theme.dart';
 
 class InquiryScreen extends StatefulWidget {
   @override
@@ -22,18 +23,37 @@ class _InquiryScreenState extends State<InquiryScreen> {
         context: context,
         builder: (context) {
           return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0), // 약간 직각 모양
+            ),
             backgroundColor: Colors.white,
-            title: Text('알림',style: TextStyle(color: Colors.black), ),
-            content: Text('내용을 입력해 주세요.',style: TextStyle(color: Colors.black), ),
+            content: Text(
+              '내용을 입력해 주세요.',
+              style: TextStyle(color: Colors.black, fontSize: 16), // 내용 글씨 검정색
+            ),
             actions: [
               TextButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(AppColors.primaryColor), // 보라색 배경
+                  foregroundColor: MaterialStateProperty.all(Colors.white), // 흰색 텍스트
+                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 10)), // 버튼 크기 조정
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4.0), // 약간의 둥근 테두리
+                    ),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.of(context).pop(); // 다이얼로그 닫기
                 },
-                child: Text('확인',style: TextStyle(color: Colors.black), ),
+                child: Text(
+                  '확인',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           );
+
         },
       );
       return; // 빈 값인 경우 함수 종료
@@ -176,7 +196,7 @@ class _InquiryScreenState extends State<InquiryScreen> {
                   hintText: '여기에 내용을 적어주세요 :)',
                   border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color.fromRGBO(250, 15, 156, 1.0), width: 1), // 활성화 시 색상 변경
+                    borderSide: BorderSide(color: AppColors.primaryColor, width: 1), // 활성화 시 색상 변경
                   ),
                 ),
               ),

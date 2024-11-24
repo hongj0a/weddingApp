@@ -7,6 +7,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import '../../config/ApiConstants.dart';
+import '../../themes/theme.dart';
 
 class SchedulePage extends StatefulWidget {
   @override
@@ -45,6 +46,7 @@ class _SchedulePageState extends State<SchedulePage> {
   }
 
   void _addEvent(String event, String time) async{
+
     if (_selectedDay != null) {
       if (_events[_selectedDay!] == null) {
         _events[_selectedDay!] = [];
@@ -253,7 +255,7 @@ class _SchedulePageState extends State<SchedulePage> {
                     shape: BoxShape.circle,
                   ),
                   selectedDecoration: BoxDecoration(
-                    color: Color.fromRGBO(250, 15, 156, 1.0),
+                    color: AppColors.primaryColor,
                     shape: BoxShape.circle,
                   ),
                   markersMaxCount: 1,
@@ -279,7 +281,7 @@ class _SchedulePageState extends State<SchedulePage> {
                         child: Icon(
                           Icons.favorite,
                           size: 16.0,
-                          color: Color.fromRGBO(250, 15, 156, 1.0),
+                          color: AppColors.primaryColor,
                         ),
                       );
                     }
@@ -359,24 +361,46 @@ class _SchedulePageState extends State<SchedulePage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0), // 약간 직각 모양
+              ),
               backgroundColor: Colors.white,
-              title: Text("삭제 확인", style: TextStyle( )),
-              content: Text("$event를 삭제하시겠어요?", style: TextStyle( )),
+              content: Text(
+                "$event를 삭제하시겠어요?",
+                style: TextStyle(color: Colors.black, fontSize: 16), // 내용 글씨 검정색
+              ),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(false);
+                    Navigator.of(context).pop(false); // 취소
                   },
-                  child: Text("취소", style: TextStyle(color:Colors.black )),
+                  child: Text(
+                    "취소",
+                    style: TextStyle(color: Colors.black), // 검정색 텍스트
+                  ),
                 ),
                 TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(AppColors.primaryColor), // 보라색 배경
+                    foregroundColor: MaterialStateProperty.all(Colors.white), // 흰색 텍스트
+                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 10)), // 버튼 크기 조정
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4.0), // 약간의 둥근 테두리
+                      ),
+                    ),
+                  ),
                   onPressed: () {
-                    Navigator.of(context).pop(true);
+                    Navigator.of(context).pop(true); // 확인
                   },
-                  child: Text("삭제", style: TextStyle(color:Colors.black )),
+                  child: Text(
+                    "삭제",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             );
+
           },
         );
       },
@@ -581,6 +605,17 @@ class _SchedulePageState extends State<SchedulePage> {
                             onPressed: () {
                               final String event = eventController.text;
                               final String time = '${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}';
+                              if (event.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('일정 내용을 입력해주세요.', style: TextStyle(color: Colors.white)),
+                                    backgroundColor: Colors.black,
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                                return; // 추가 동작을 막고 함수 종료
+                              }
+
                               _addEvent(event, time);
                               Navigator.of(context).pop();
                             },

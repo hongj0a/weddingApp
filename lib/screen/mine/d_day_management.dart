@@ -199,101 +199,120 @@ class DDayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // 클릭 시 아무 동작도 하지 않음
+    return Dismissible(
+      key: ValueKey(dday), // 각 항목을 고유하게 식별하기 위한 키
+      direction: DismissDirection.endToStart, // 오른쪽 -> 왼쪽 스와이프
+      onDismissed: (direction) async {
+        // 삭제 동작
+        await deleteDDay();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$title 삭제 되었습니다.')),
+        );
       },
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        color: Colors.red, // 스와이프 시 배경색
+        child: const Icon(Icons.delete, color: Colors.white, size: 30),
+      ),
       child: Container(
-        padding: const EdgeInsets.all(5.0),
-        margin: EdgeInsets.all(0.0),
+        padding: const EdgeInsets.all(10.0),
+        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5.0),
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: FileImage(File(image)), // 로컬 이미지
-            fit: BoxFit.cover,
-          ),
-          borderRadius: BorderRadius.circular(10), // 카드 모서리 둥글게
-        ),
-        child: Stack(
-          children: [
-            // 이미지 먼저 배치
-            image.startsWith('http')
-                ? Image.network(
-              image,
-              fit: BoxFit.cover,
-              height: 200,
-              width: double.infinity,
-              errorBuilder: (context, error, stackTrace) {
-                return Center(child: Text('Error loading image')); // 에러 처리
-              },
-            )
-                : Image.file(
-              File(image),
-              fit: BoxFit.cover,
-              height: 200,
-              width: double.infinity,
-              errorBuilder: (context, error, stackTrace) {
-                return Center(child: Text('Error loading image')); // 에러 처리
-              },
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 2,
+              blurRadius: 6,
+              offset: Offset(0, 3), // 그림자 위치
             ),
-
-            // 텍스트 위에 배치
-            Positioned(
-              top: 16, // 적절한 위치로 조정
-              left: 16, // 적절한 위치로 조정
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 동그란 이미지
+            ClipOval(
+              child: image.startsWith('http')
+                  ? Image.network(
+                image,
+                fit: BoxFit.cover,
+                height: 80,
+                width: 80,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 80,
+                    width: 80,
+                    color: Colors.grey[300],
+                    child: Center(child: Icon(Icons.error, color: Colors.red)),
+                  );
+                },
+              )
+                  : Image.file(
+                File(image),
+                fit: BoxFit.cover,
+                height: 80,
+                width: 80,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 80,
+                    width: 80,
+                    color: Colors.grey[300],
+                    child: Center(child: Icon(Icons.error, color: Colors.red)),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 23), // 이미지와 텍스트 사이 간격
+            // 텍스트들
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     dday,
-                    style: TextStyle(
-                       
-                      fontSize: 24,
+                    style: const TextStyle(
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white, // 배경에 잘 보이도록 색상 변경
-                      fontFamily: 'SejongGeulggot'
+                      color: Colors.black87,
+                      fontFamily: 'Pretendard',
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   Text(
                     title,
-                    style: TextStyle(
-                       
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white, // 배경에 잘 보이도록 색상 변경
-                      fontFamily: 'SejongGeulggot'
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black54,
+                      fontFamily: 'Pretendard',
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     date,
-                    style: TextStyle(
-                       
+                    style: const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white, // 배경에 잘 보이도록 색상 변경
-                      fontFamily: 'SejongGeulggot'
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black38,
+                      fontFamily: 'Pretendard',
                     ),
                   ),
                 ],
               ),
             ),
-
             // 삭제 버튼
-            Positioned(
-              top: 2,
-              right: 2,
-              child: IconButton(
-                icon: Icon(Icons.delete, color: Colors.white),
-                onPressed: () async {
-                  // 삭제 API 호출
-                  await deleteDDay();
-                },
-              ),
-            ),
+            /*IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () async {
+                await deleteDDay();
+              },
+            ),*/
           ],
         ),
       ),
     );
   }
+
 }

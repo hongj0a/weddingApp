@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/money/add_cost_page.dart';
 import 'package:http/http.dart' as http;
@@ -210,6 +211,13 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey.shade300, width: 1),
+                  image: DecorationImage(
+                    image: Image.asset(
+                      'asset/img/budget_card_no_line.png',
+                      fit: BoxFit.cover,
+                    ).image,
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -223,11 +231,11 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                             children: [
                               Text(
                                 '총 예산',
-                                style: TextStyle( fontSize: 20),
+                                style: TextStyle( fontSize: 20, color: Colors.white, fontFamily: 'Pretendard'),
                               ),
                               Text(
                                 '${_formatCurrency(totalBudget.toString())} 원',
-                                style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold),
+                                style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Pretendard'),
                               ),
                             ],
                           ),
@@ -239,20 +247,20 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                             children: [
                               Text(
                                 '총 지출',
-                                style: TextStyle( fontSize: 20),
+                                style: TextStyle( fontSize: 20, color: Colors.white, fontFamily: 'Pretendard'),
                               ),
                               Text(
                                 '${_formatCurrency(usedBudget.toString())} 원',
-                                style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold),
+                                style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Pretendard'),
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 12),
-                    Divider(height: 1, color: Colors.grey.shade300),
-                    SizedBox(height: 12),
+                    SizedBox(height: 20),
+                    Divider(height: 0.1, color: Colors.white),
+                    SizedBox(height: 15),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -262,11 +270,11 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                             children: [
                               Text(
                                 '남은 예산',
-                                style: TextStyle( fontSize: 20),
+                                style: TextStyle( fontSize: 20, color: Colors.white, fontFamily: 'Pretendard'),
                               ),
                               Text(
                                 '${_formatCurrency(balanceBudget.toString())} 원',
-                                style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold),
+                                style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Pretendard'),
                               ),
                             ],
                           ),
@@ -278,11 +286,11 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                             children: [
                               Text(
                                 '반쪽',
-                                style: TextStyle(fontSize: 20),
+                                style: TextStyle(fontSize: 20, color: Colors.white, fontFamily: 'Pretendard'),
                               ),
                               Text(
                                 '${pairMan}',
-                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Pretendard'),
                               ),
                             ],
                           ),
@@ -292,7 +300,7 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 35),
               Expanded(
                 child: ListView.builder(
                   itemCount: categories.length,

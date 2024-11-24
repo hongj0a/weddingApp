@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = 'http://192.168.3.50:8888';
+  static const String baseUrl = 'http://192.168.123.102:8888';
   static const String mlUrl = 'http://112.222.141.78:5001';
   static const String predict = '$mlUrl/predict';
   static const String feedback = '$mlUrl/feedback';
@@ -39,6 +39,8 @@ class ApiConstants {
   static const String getFaqCategoryList = '$baseUrl/myPage/getFaqCategoryList';
   static const String getFaqList = '$baseUrl/myPage/getFaqList';
   static const String getFaqDetail = '$baseUrl/myPage/getFaqDetail';
+  static const String checkPost = '$baseUrl/myPage/checkPost';
+  static const String setEvent = '$baseUrl/myPage/setEvent';
 
   static const String getCategories = '$baseUrl/cost/getCategories';
   static const String getCheckLists = '$baseUrl/cost/getCheckLists';
@@ -53,7 +55,7 @@ class ApiConstants {
   static const String delContract = '$baseUrl/contract/delContract';
   static const String setOcrCount = '$baseUrl/contract/setOcrCount';
 
-  static const String webSocketUrl = 'ws://192.168.3.50:8888/ws-stomp';
+  static const String webSocketUrl = 'ws://192.168.123.102:8888/ws-stomp';
   //static const String webSocketUrl = 'ws://112.222.141.78:8888/ws-stomp';
 
 }

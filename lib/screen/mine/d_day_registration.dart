@@ -1,5 +1,6 @@
 import 'dart:io'; // For File
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart'; // For picking images
 import 'package:intl/intl.dart'; // For date formatting
 import 'package:http/http.dart' as http;
@@ -7,7 +8,8 @@ import 'package:http_parser/http_parser.dart'; // For setting MediaType
 import 'package:mime/mime.dart'; // For MIME type lookup
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart' as intl; // intl 패키지 가져오기
-import '../../config/ApiConstants.dart'; // For accessing shared preferences
+import '../../config/ApiConstants.dart';
+import '../../themes/theme.dart'; // For accessing shared preferences
 
 class DDayRegistrationPage extends StatefulWidget {
   @override
@@ -28,8 +30,8 @@ class _DDayRegistrationPageState extends State<DDayRegistrationPage> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: Color.fromRGBO(250, 15, 156, 1.0), // 선택된 색상
-            colorScheme: ColorScheme.light(primary: Color.fromRGBO(250, 15, 156, 1.0)), // 주요 색상
+            primaryColor: AppColors.primaryColor, // 선택된 색상
+            colorScheme: ColorScheme.light(primary: AppColors.primaryColor), // 주요 색상
             dialogBackgroundColor: Colors.white, // 배경 색상
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
@@ -138,30 +140,47 @@ class _DDayRegistrationPageState extends State<DDayRegistrationPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 이미지 섹션
+            SizedBox(height: 20),
+            // 동그란 이미지 섹션
             Stack(
+              alignment: Alignment.center,
               children: [
-                Container(
-                  width: double.infinity,
-                  height: 400,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: _image != null
-                          ? FileImage(_image!) // 선택된 이미지 표시
-                          : AssetImage('asset/img/default_couple.jpg') as ImageProvider,
+                ClipOval(
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    child: _image != null
+                        ? Image.file(
+                      _image!,
+                      fit: BoxFit.cover,
+                    )
+                        : SvgPicture.asset(
+                      'asset/img/dday_icon.svg',
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
                 Positioned(
-                  bottom: 10,
-                  right: 10,
-                  child: FloatingActionButton(
-                    onPressed: _pickImage,
-                    mini: true,
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    child: Icon(Icons.edit, color: Colors.white),
+                  bottom: 0,
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(Icons.edit, color: Colors.grey[700]),
+                    ),
                   ),
                 ),
               ],

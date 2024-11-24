@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../config/ApiConstants.dart';
+import '../../themes/theme.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -128,7 +129,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 scale: 0.8,
                 child: Switch(
                   value: isScheduleNotificationOn,
-                  activeColor: Color.fromRGBO(250, 15, 156, 1.0),
+                  activeColor: AppColors.primaryColor,
                   onChanged: (bool value) {
                     setState(() {
                       isScheduleNotificationOn = value;
@@ -154,7 +155,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 scale: 0.8,
                 child: Switch(
                   value: isBudgetNotificationOn,
-                  activeColor: Color.fromRGBO(250, 15, 156, 1.0),
+                  activeColor: AppColors.primaryColor,
                   onChanged: (bool value) {
                     setState(() {
                       isBudgetNotificationOn = value;
@@ -183,7 +184,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 scale: 0.8,
                 child: Switch(
                   value: isMarketingAgreementOn,
-                  activeColor: Color.fromRGBO(250, 15, 156, 1.0),
+                  activeColor: AppColors.primaryColor,
                   onChanged: (bool value) {
                     setState(() {
                       isMarketingAgreementOn = value;
@@ -209,7 +210,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 scale: 0.8,
                 child: Switch(
                   value: isAwesomeMessagesOn,
-                  activeColor: Color.fromRGBO(250, 15, 156, 1.0),
+                  activeColor: AppColors.primaryColor,
                   onChanged: (bool value) {
                     setState(() {
                       isAwesomeMessagesOn = value;

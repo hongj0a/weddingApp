@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_wedding/screen/mine/event_screen.dart';
 import 'package:smart_wedding/screen/mine/setting.dart';
 import 'package:smart_wedding/screen/money/budget_setting.dart';
 import 'package:smart_wedding/screen/mine/d_day_management.dart';
@@ -89,6 +90,7 @@ class _MyPageState extends State<MyPage> {
                                       color: Colors.black,
                                       fontSize: 25.0,
                                       fontWeight: FontWeight.w700,
+                                      fontFamily: 'Pretendard'
                                     ),
                                   ),
                                   SizedBox(width: 20.0), // 아이콘과 텍스트 사이 여백
@@ -123,6 +125,7 @@ class _MyPageState extends State<MyPage> {
                                   color: Colors.black,
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.w500,
+                                  fontFamily: 'Pretendard'
                                 ),
                               ),
                             ],
@@ -161,7 +164,7 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.attach_money),
                   title: Text('예산설정',
-                    style: TextStyle( )),
+                    style: TextStyle(fontFamily: 'Pretendard' )),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -174,7 +177,7 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.calendar_month),
                   title: Text('D-day 설정',
-                      style: TextStyle( )),
+                      style: TextStyle(fontFamily: 'Pretendard'  )),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -187,14 +190,20 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.event),
                   title: Text('진행 중인 이벤트',
-                      style: TextStyle( )),
-                  onTap: () { // 디자이너 고용후, 간단한 이벤트 페이지 추가
-                    },
+                      style: TextStyle(fontFamily: 'Pretendard'  )),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EventScreen(),
+                      ),
+                    );
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.notifications),
                   title: Text('공지사항',
-                      style: TextStyle( )),
+                      style: TextStyle(fontFamily: 'Pretendard'  )),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -207,7 +216,7 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.policy),
                   title: Text('약관 및 정책',
-                      style: TextStyle( )),
+                      style: TextStyle(fontFamily: 'Pretendard'  )),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -220,7 +229,7 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.help),
                   title: Text('자주 묻는 질문',
-                      style: TextStyle( )),
+                      style: TextStyle(fontFamily: 'Pretendard'  )),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -233,7 +242,7 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.mail),
                   title: Text('문의하기',
-                      style: TextStyle( )),
+                      style: TextStyle(fontFamily: 'Pretendard'  )),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -246,7 +255,7 @@ class _MyPageState extends State<MyPage> {
                 ListTile(
                   leading: Icon(Icons.settings),
                   title: Text('설정',
-                      style: TextStyle( )),
+                      style: TextStyle(fontFamily: 'Pretendard'  )),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(

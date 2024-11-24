@@ -8,6 +8,7 @@ import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../config/ApiConstants.dart';
+import '../../themes/theme.dart';
 
 // 세자리마다 콤마를 추가하는 Formatter
 class ThousandsSeparatorFormatter extends TextInputFormatter {
@@ -237,26 +238,51 @@ class _ContractDetailState extends State<ContractDetail> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('예측 카테고리'),
+          backgroundColor: Colors.white,
+          title: Text('추천 카테고리'),
           content: Text('예측된 카테고리: $predictedCategory\n이 카테고리가 맞습니까?'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4), // 직각 모서리 (둥근 부분을 4로 설정)
+          ),
           actions: <Widget>[
             TextButton(
-              child: Text('아니요'),
+              child: Text(
+                '아니요',
+                style: TextStyle(
+                  color: Colors.black, // 텍스트 색상
+                  fontWeight: FontWeight.bold, // 텍스트 두께
+                ),
+              ),
               onPressed: () {
                 Navigator.of(context).pop(false); // 틀렸다고 답변
               },
             ),
-            TextButton(
-              child: Text('예'),
+            SizedBox(width: 8), // 버튼 간 간격
+            ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop(true); // 맞다고 답변
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor, // 버튼 배경색
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4), // 직각 모서리
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // 버튼 내부 패딩
+              ),
+              child: Text(
+                '예',
+                style: TextStyle(
+                  color: Colors.white, // 텍스트 색상
+                  fontWeight: FontWeight.bold, // 텍스트 두께
+                ),
+              ),
             ),
           ],
         );
       },
     );
   }
+
 // 계약 정보 저장 요청
   Future<void> _sendContractData(
       String? accessToken,
@@ -370,12 +396,18 @@ class _ContractDetailState extends State<ContractDetail> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: Text('카테고리 선택'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4), // 직각 모서리
+          ),
           content: DropdownButtonFormField<String>(
             value: selectedCategory,
+            hint: Text('선택하세요', style: TextStyle(color: Colors.grey)),
+            dropdownColor: Colors.white, // 드롭다운 배경색을 흰색으로 설정// 힌트 텍스트
             items: categories.asMap().entries.map((entry) {
-              int index = entry.key; // 인덱스
-              String category = entry.value; // 카테고리
+              int index = entry.key;
+              String category = entry.value;
 
               return DropdownMenuItem<String>(
                 value: category,
@@ -384,31 +416,43 @@ class _ContractDetailState extends State<ContractDetail> {
             }).toList(),
             onChanged: (value) {
               selectedCategory = value;
-              selectedIndex = categories.indexOf(value!); // 선택된 카테고리의 인덱스를 구함
+              selectedIndex = categories.indexOf(value!);
             },
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('취소'),
               onPressed: () {
-                Navigator.of(context).pop(null);
+                Navigator.of(context).pop(null); // 취소 버튼
               },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // 텍스트 색상
+              ),
+              child: Text('취소'),
             ),
-            TextButton(
-              child: Text('확인'),
+            SizedBox(width: 8), // 버튼 간 간격
+            ElevatedButton(
               onPressed: () {
-                // 수정된 카테고리와 인덱스를 Map으로 반환
                 Navigator.of(context).pop({
                   'category': selectedCategory,
                   'index': selectedIndex,
-                });
+                }); // 수정된 카테고리와 인덱스를 반환
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor, // 버튼 배경색
+                foregroundColor: Colors.white, // 텍스트 색상
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4), // 직각 모서리
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              ),
+              child: Text('확인'),
             ),
           ],
         );
       },
     );
   }
+
 
 
 // 서버에서 카테고리 데이터 가져오기
@@ -457,8 +501,8 @@ class _ContractDetailState extends State<ContractDetail> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: Color.fromRGBO(250, 15, 156, 1.0), // 선택된 색상
-            colorScheme: ColorScheme.light(primary: Color.fromRGBO(250, 15, 156, 1.0)), // 주요 색상
+            primaryColor: AppColors.primaryColor, // 선택된 색상
+            colorScheme: ColorScheme.light(primary: AppColors.primaryColor), // 주요 색상
             dialogBackgroundColor: Colors.white, // 배경 색상
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
@@ -533,7 +577,7 @@ class _ContractDetailState extends State<ContractDetail> {
                       child: Icon(
                         Icons.info,
                         size: 16,
-                        color: Color.fromRGBO(250, 15, 156, 1.0),
+                        color: AppColors.primaryColor,
                       ),
                     ),
                     TextSpan(
@@ -598,7 +642,7 @@ class _ContractDetailState extends State<ContractDetail> {
           border: OutlineInputBorder(),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: Color.fromRGBO(250, 15, 156, 1.0), // 활성화된 TextField의 테두리 색상
+              color: AppColors.primaryColor, // 활성화된 TextField의 테두리 색상
               width: 2.0,
             ),
           ),
@@ -625,7 +669,7 @@ class _ContractDetailState extends State<ContractDetail> {
               border: OutlineInputBorder(),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Color.fromRGBO(250, 15, 156, 1.0),
+                  color: AppColors.primaryColor,
                   width: 2.0,
                 ),
               ),
@@ -651,7 +695,7 @@ class _ContractDetailState extends State<ContractDetail> {
           border: OutlineInputBorder(),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: Color.fromRGBO(250, 15, 156, 1.0), // 활성화된 TextField의 테두리 색상
+              color: AppColors.primaryColor, // 활성화된 TextField의 테두리 색상
               width: 2.0,
             ),
           ),
@@ -688,7 +732,7 @@ class _ContractDetailState extends State<ContractDetail> {
               border: OutlineInputBorder(),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Color.fromRGBO(250, 15, 156, 1.0),
+                  color: AppColors.primaryColor,
                   width: 2.0,
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/main/setting.dart';
 import 'package:http/http.dart' as http;
@@ -92,20 +93,20 @@ class AlarmListPage extends StatelessWidget {
                 return ListTile(
                   dense: true,
                   leading: Image.asset(
-                    'asset/img/heart_logo.png',
-                    height: 20,
-                    width: 20,
+                    'asset/img/mini_logo.png',
+                    height: 25,
+                    width: 25,
                   ),
                   title: Text(
                     alarm.title,
                     style: TextStyle(
-                       fontWeight: alarm.readYn ? FontWeight.normal : FontWeight.bold, fontSize: 15
+                       fontWeight: alarm.readYn ? FontWeight.normal : FontWeight.bold, fontSize: 15, fontFamily: 'Pretendard'
                     ),
                   ),
                   subtitle: Text(
                     alarm.content,
                     style: TextStyle(
-                         fontWeight: alarm.readYn ? FontWeight.normal : FontWeight.bold, fontSize: 20
+                         fontWeight: alarm.readYn ? FontWeight.normal : FontWeight.bold, fontSize: 20, fontFamily: 'Pretendard'
                     ),
                   ),
                 );

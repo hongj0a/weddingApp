@@ -6,15 +6,17 @@ import '../../config/ApiConstants.dart';
 class DDayCardWidget extends StatelessWidget {
   final String title;
   final String subtitle;
-  final String date;
   final String image;
+  final String afterFlag;
+  final String day;
   final VoidCallback onRefresh; // onTap 콜백 추가
 
   const DDayCardWidget({
     required this.title,
     required this.subtitle,
-    required this.date,
     required this.image,
+    required this.afterFlag,
+    required this.day,
     required this.onRefresh, // onTap을 매개변수로 받음
     Key? key,
   }) : super(key: key);
@@ -33,42 +35,60 @@ class DDayCardWidget extends StatelessWidget {
         });
       },
       child: Container(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(10.0),
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: NetworkImage(imageUrl), // 배경 이미지 추가
-            fit: BoxFit.cover,  // 이미지가 컨테이너 전체를 덮도록 설정
-          ),
+          color: Colors.white,
         ),
-        margin: EdgeInsets.all(0.0),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(  fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'SejongGeulggot'),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  subtitle,
-                  style: TextStyle(  fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'SejongGeulggot'),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  date,
-                  style: TextStyle(  fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'SejongGeulggot'),
-                ),
-              ],
-            ),
-            SizedBox(width: 140),
+            // 왼쪽에 배경 이미지로 쓰이는 영역
             Container(
-              width: 100,
-              height: 100,
+              width: 125,
+              height: 125,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
+                shape: BoxShape.circle, // 동그란 모양
+                image: DecorationImage(
+                  image: NetworkImage(imageUrl), // 프로필 이미지로 설정
+                  fit: BoxFit.cover, // 이미지가 동그란 영역을 채우도록 설정
+                ),
+              ),
+            ),
+            // 오른쪽에 텍스트 내용
+            Expanded( // 여기서 Expanded로 감싸기
+              child: SingleChildScrollView( // Column을 감싸서 스크롤 가능하게 하기
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontFamily: 'Pretendard',
+                      ),
+                    ),
+                    Text(
+                      '$subtitle, $day일 ${afterFlag == "true" ? "지났어요" : "남았어요"}.',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontFamily: 'Pretendard',
+                      ),
+                    ),
+                    /*Text(
+                      date,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontFamily: 'Pretendard',
+                      ),
+                    ),*/
+                    // 필요시 추가 내용
+                  ],
+                ),
               ),
             ),
           ],
@@ -76,4 +96,6 @@ class DDayCardWidget extends StatelessWidget {
       ),
     );
   }
+
+
 }

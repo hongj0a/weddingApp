@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../config/ApiConstants.dart';
+import '../../themes/theme.dart';
 
 
 class DetailPage extends StatefulWidget {
@@ -185,7 +186,7 @@ class _DetailPageState extends State<DetailPage> {
           borderSide: BorderSide(color: Colors.grey[300]!, width: 0.5), // 연한 회색으로 아주 얇게 설정
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(250, 15, 156, 1.0), width: 1), // 포커스 시 테두리 색상
+          borderSide: BorderSide(color: AppColors.primaryColor, width: 1), // 포커스 시 테두리 색상
         ),
       ),
       keyboardType: isCost ? TextInputType.number : TextInputType.text,
@@ -214,7 +215,7 @@ class _DetailPageState extends State<DetailPage> {
             hintText: '메모를 남겨보세요(최대 100자)',
             border: OutlineInputBorder(),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Color.fromRGBO(250, 15, 156, 1.0), width: 1), // 활성화 시 색상 변경
+              borderSide: BorderSide(color: AppColors.primaryColor, width: 1), // 활성화 시 색상 변경
             ),
           ),
           maxLength: 100,
