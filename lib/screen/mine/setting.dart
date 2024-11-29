@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:smart_wedding/screen/sign/login_page.dart';
 import 'package:smart_wedding/screen/sign/pairing_page.dart';
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 
 class Setting extends StatefulWidget {
   final String userId;
@@ -17,6 +18,7 @@ class Setting extends StatefulWidget {
 
 
 class _SettingState extends State<Setting> {
+  ApiService apiService = ApiService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -205,14 +207,9 @@ class _SettingState extends State<Setting> {
   void _setUserDelete(BuildContext context) async{
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
 
-      final response = await http.post(
-        Uri.parse(ApiConstants.delUser),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.post(
+        ApiConstants.delUser,
       );
 
       if (response.statusCode == 200) {
@@ -227,7 +224,7 @@ class _SettingState extends State<Setting> {
         );
       } else {
         print('회원 탈퇴 실패: ${response.statusCode}');
-        print('실패 메시지 ${response.body}');
+        print('실패 메시지 ${response.data}');
       }
     }catch (e) {
       print('요청 실패, $e');
@@ -236,15 +233,8 @@ class _SettingState extends State<Setting> {
 
   void _setPairingDelete(BuildContext context) async{
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      final response = await http.post(
-        Uri.parse(ApiConstants.delPairing),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.post(
+          ApiConstants.delPairing,
       );
 
       if (response.statusCode == 200) {
@@ -255,7 +245,7 @@ class _SettingState extends State<Setting> {
         print('페어링 끊기 성공');
       } else {
         print('페어링 끊기 실패: ${response.statusCode}');
-        print('실패 메시지 ${response.body}');
+        print('실패 메시지 ${response.data}');
       }
     }catch (e) {
       print('요청 실패, $e');

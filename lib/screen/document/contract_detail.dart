@@ -8,6 +8,7 @@ import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 
 // 세자리마다 콤마를 추가하는 Formatter
@@ -50,6 +51,7 @@ class _ContractDetailState extends State<ContractDetail> {
   late TextEditingController _companyNameController;
   late TextEditingController _eventDateController;
   late TextEditingController _eventTimeController;
+  ApiService apiService = ApiService();
 
   String? imageUrlWithFullPath;
   String imageUrl = '${ApiConstants.localImagePath}/';
@@ -95,17 +97,14 @@ class _ContractDetailState extends State<ContractDetail> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? accessToken = prefs.getString('accessToken');
 
-        final response = await http.get(
-          Uri.parse('${ApiConstants.getContractDetail}?seq=${widget.seq}'),
-          headers: {
-            'Authorization': 'Bearer $accessToken',
-            'Content-Type': 'application/json'
-          },
+        final response = await apiService.get(
+          ApiConstants.getContractDetail,
+          queryParameters: {'seq': widget.seq}
         );
 
         if (response.statusCode == 200) {
           // 데이터가 성공적으로 받아졌을 때 컨트롤러에 초기화
-          final data = json.decode(response.body);
+          final data = response.data;
           setState(() {
 
             _contractNameController.text = data['data']['name'];
@@ -118,7 +117,7 @@ class _ContractDetailState extends State<ContractDetail> {
             print('imageUrl.... $imageUrlWithFullPath}');// 이미지 URL이 null일 경우 빈 문자열 처리
           });
         } else {
-          print('response...message... ${response.body}');
+          print('response...message... ${response.data}');
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('계약서 정보를 불러올 수 없습니다.')));
         }
@@ -170,7 +169,7 @@ class _ContractDetailState extends State<ContractDetail> {
       String? accessToken = prefs.getString('accessToken');
       Uri predictUrl = Uri.parse(ApiConstants.predict); // 서버 URL로 변경
 
-      var predictResponse = await http.post(
+      var predictResponse = await http.post (
         predictUrl,
         headers: {
           'Content-Type': 'application/json',
@@ -328,7 +327,7 @@ class _ContractDetailState extends State<ContractDetail> {
 // 예측 결과 피드백 전송
   Future<void> _sendCategoryFeedback(String? accessToken, String contractName, bool isCorrect, int correctedIndex) async {
     Uri feedbackUrl = Uri.parse(ApiConstants.predict);
-    var response = await http.post(
+    var response = await http.post (
       feedbackUrl,
       headers: {
         'Content-Type': 'application/json',
@@ -457,20 +456,12 @@ class _ContractDetailState extends State<ContractDetail> {
 
 // 서버에서 카테고리 데이터 가져오기
   Future<List<String>> _fetchCategories() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-    Uri categoryUrl = Uri.parse(ApiConstants.getCategories);
-
-    var response = await http.get(
-      categoryUrl,
-      headers: {
-        if (accessToken != null) 'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json'
-      },
+    var response = await apiService.get(
+      ApiConstants.getCategories
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
+      final jsonResponse = response.data;
       final categoryList = jsonResponse['data']['categoryList'];
       // name 키로부터 리스트 생성
       return List<String>.from(categoryList.map((item) => item['name'] as String));
@@ -478,8 +469,6 @@ class _ContractDetailState extends State<ContractDetail> {
       throw Exception('카테고리 목록을 가져오는데 실패했습니다. 상태 코드: ${response.statusCode}');
     }
   }
-
-
 
   // 날짜 선택기 표시 함수
   Future<void> _selectDate(BuildContext context) async {
@@ -534,7 +523,13 @@ class _ContractDetailState extends State<ContractDetail> {
     );
 
     if (picked != null && picked != TimeOfDay.now()) {
-      final String formattedTime = picked.format(context);
+      final now = DateTime.now();
+      final DateTime dateTime = DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
+
+      // 24-hour 형식으로 시간 포맷
+      final String formattedTime = DateFormat('HH:mm').format(dateTime);
+
+      // 텍스트 필드에 포맷된 시간 설정
       _eventTimeController.text = formattedTime;
     }
   }
@@ -590,32 +585,40 @@ class _ContractDetailState extends State<ContractDetail> {
               ),
               SizedBox(height: 10),
               Center(
-                child: widget.imageFile != null
-                    ? (() {
-                  // widget.imageFile이 null이 아니면 Image.file을 실행
-                  print("이미지 파일 로딩");
-                  return Image.file(widget.imageFile!);
-                })()
-                    : (() {
-                  // widget.imageFile이 null이면 Image.network를 실행
-                  print("이미지 URL: $imageUrlWithFullPath"); // 이미지 URL 로그
-
-                  return Image.network(
-                    imageUrlWithFullPath ?? '', // imageUrlWithFullPath가 null일 경우 빈 문자열
-                    errorBuilder: (context, error, stackTrace) {
-                      print("이미지 로드 실패: $error");
-                      print("스택 트레이스: $stackTrace");
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.error, color: Colors.red), // 이미지 로드 실패 시 에러 아이콘 표시
-                          Text("이미지 로드 실패: $error"), // 추가적인 에러 메시지 출력
-                        ],
+                child: Builder(
+                  builder: (context) {
+                    // 파일이 존재하면 로컬 이미지 사용
+                    if (widget.imageFile != null) {
+                      return Image.file(widget.imageFile!);
+                    }
+                    // URL이 유효하면 네트워크 이미지 사용
+                    if (imageUrlWithFullPath != null && imageUrlWithFullPath!.isNotEmpty) {
+                      return Image.network(
+                        imageUrlWithFullPath!,
+                        errorBuilder: (context, error, stackTrace) {
+                          print("이미지 로드 실패: $error");
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.error, color: Colors.red),
+                              Text("이미지를 불러오지 못했습니다."),
+                            ],
+                          );
+                        },
                       );
-                    },
-                  );
-                })(),
+                    }
+                    // 둘 다 없는 경우 기본 메시지 출력
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.image_not_supported, color: Colors.grey),
+                        Text("이미지가 없습니다."),
+                      ],
+                    );
+                  },
+                ),
               ),
+
 
 
               SizedBox(height: 25),

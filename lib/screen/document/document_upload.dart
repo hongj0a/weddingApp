@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/document/contract_detail.dart';
@@ -11,6 +10,7 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 
 class DocumentUploadPage extends StatefulWidget {
@@ -25,6 +25,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
   String parsedText = ''; // 추출된 텍스트를 저장할 String 변수
   String filepath = '';
   bool isLoading = false;
+  ApiService apiService = ApiService();
 
   @override
   Widget build(BuildContext context) {
@@ -465,7 +466,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
       };
 
       // GET 요청 보내기
-      var ocrCountResponse = await http.get(Uri.parse(ocrCountUrl), headers: authHeader);
+      var ocrCountResponse = await apiService.get(ocrCountUrl);
       if (ocrCountResponse.statusCode == 200) {
         print("OCR count incremented successfully.");
       } else {

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -7,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/mine/d_day_card.dart';
 import 'package:http/http.dart' as http;
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 import '../mine/d_day_management.dart';
 import '../mine/event_screen.dart';
@@ -22,6 +24,7 @@ class HomeContent extends StatefulWidget {
   _HomeContentState createState() => _HomeContentState();
 }
 
+
 class _HomeContentState extends State<HomeContent> {
   final PageController _pageController = PageController(viewportFraction: 1.0);
   int _currentPage = 0;
@@ -30,37 +33,249 @@ class _HomeContentState extends State<HomeContent> {
   int totalBudget = 0;
   int usedBudget = 0;
   int balanceBudget =0;
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
     _getTotalAmount();
     fetchDDay();
+    _checkIfFirstTimeUser();
+  }
+
+  Future<void> _checkIfFirstTimeUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool isFirstTime = prefs.getBool('isFirstYn') ?? true;
+
+    if (isFirstTime) {
+      // 최초 실행이라면 알림 동의 팝업을 순차적으로 띄운다.
+      _showMarketingConsentDialog();
+    }
+  }
+
+  // 마케팅 알림 동의 팝업
+  // 마케팅 알림 동의 팝업
+  Future<void> _showMarketingConsentDialog() async {
+    final isConsented = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0), // 약간 각진 모서리
+          ),
+          backgroundColor: Colors.white, // 하얀 배경
+          title: Text(
+            '마케팅 알림',
+            style: TextStyle(color: Colors.black), // 검정색 글씨
+          ),
+          content: Text(
+            '우월에서 광고성 정보 알림을 보내고자 합니다. \n해당 기기로 이벤트, 혜택 등을 \n푸시알림으로 보내드리겠습니다. \n'
+                '앱 푸시알림에 수신 동의하시겠습니까? \n알림설정은 알림 > 설정 > 알림설정 화면에서 재설정 가능합니다.',
+            style: TextStyle(color: Colors.black), // 검정색 글씨
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('허용 안 함'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // 검정색 글씨
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('허용'),
+              style: TextButton.styleFrom(
+                backgroundColor: AppColors.primaryColor, // 보라색 배경
+                foregroundColor: Colors.white,
+
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    if (isConsented != null) {
+      // 서버에 동의 상태 저장
+      await _sendConsentToServer('marketingYn', isConsented);
+    }
+    // 일정 알림 동의 팝업
+    await _showScheduleNotificationDialog();
+  }
+
+// 일정 알림 동의 팝업
+  Future<void> _showScheduleNotificationDialog() async {
+    final isConsented = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0), // 약간 각진 모서리
+          ),
+          backgroundColor: Colors.white, // 하얀 배경
+          title: Text(
+            '일정 알림',
+            style: TextStyle(color: Colors.black), // 검정색 글씨
+          ),
+          content: Text(
+            '우월에서 고객님의 향후 일정에 대해 \n푸시알림으로 보내드리겠습니다. \n'
+                '앱 푸시알림에 수신 동의하시겠습니까?\n알림설정은 알림 > 설정 > 알림설정 화면에서 재설정 가능합니다.',
+            style: TextStyle(color: Colors.black), // 검정색 글씨
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('허용 안 함'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // 검정색 글씨
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('허용'),
+              style: TextButton.styleFrom(
+                backgroundColor:  AppColors.primaryColor, // 보라색 배경
+                foregroundColor: Colors.white,
+
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    if (isConsented != null) {
+      // 서버에 동의 상태 저장
+      await _sendConsentToServer('scheduleYn', isConsented);
+    }
+    // 예산 알림 동의 팝업
+    await _showBudgetNotificationDialog();
+  }
+
+// 예산 알림 동의 팝업
+  Future<void> _showBudgetNotificationDialog() async {
+    final isConsented = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0), // 약간 각진 모서리
+          ),
+          backgroundColor: Colors.white, // 하얀 배경
+          title: Text(
+            '예산 알림 동의',
+            style: TextStyle(color: Colors.black), // 검정색 글씨
+          ),
+          content: Text(
+            '우월에서 고객님이 설정한 예산 초과 시 \n푸시알림으로 보내드리겠습니다. \n'
+                '앱 푸시알림에 수신 동의하시겠습니까?\n알림설정은 알림 > 설정 > 알림설정 화면에서 재설정 가능합니다.',
+            style: TextStyle(color: Colors.black), // 검정색 글씨
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('허용 안 함'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // 검정색 글씨
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('허용'),
+              style: TextButton.styleFrom(
+                backgroundColor: AppColors.primaryColor, // 보라색 배경
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    if (isConsented != null) {
+      // 서버에 동의 상태 저장
+      await _sendConsentToServer('budgetYn', isConsented);
+    }
+    // 시스템 알림 동의 팝업
+    await _showSystemNotificationDialog();
+  }
+
+// 시스템 알림 동의 팝업
+  Future<void> _showSystemNotificationDialog() async {
+    final isConsented = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0), // 약간 각진 모서리
+          ),
+          backgroundColor: Colors.white, // 하얀 배경
+          title: Text(
+            '시스템 알림 동의',
+            style: TextStyle(color: Colors.black), // 검정색 글씨
+          ),
+          content: Text(
+            '우월에서 새로운 소식이 있을 때 \n푸시알림으로 보내드리겠습니다. \n'
+                '앱 푸시알림에 수신 동의하시겠습니까?\n알림설정은 알림 > 설정 > 알림설정 화면에서 재설정 가능합니다.',
+            style: TextStyle(color: Colors.black), // 검정색 글씨
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('허용 안 함'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // 검정색 글씨
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('허용'),
+              style: TextButton.styleFrom(
+                backgroundColor:  AppColors.primaryColor, // 보라색 배경
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    if (isConsented != null) {
+      // 서버에 동의 상태 저장
+      await _sendConsentToServer('systemYn', isConsented);
+    }
+    // 동의 여부를 SharedPreferences에 저장
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isFirstYn', false);  // 알림 동의 후 첫 실행 상태를 false로 변경
+  }
+
+  Future<void> _sendConsentToServer(String key, bool value) async {
+    var response = await apiService.post(
+      ApiConstants.updateYnSetting,
+      data: {
+        "key": key, // 문자열 "key"로 수정
+        "value": value.toString(), // boolean 값을 문자열로 변환
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('설정이 성공적으로 업데이트되었습니다.');
+    } else {
+      print('설정 업데이트 실패: ${response.statusCode}');
+      print('reason... : ${response.data}');
+    }
   }
 
   String _formatCurrency(String amount) {
     final number = int.tryParse(amount.replaceAll(',', '')) ?? 0; // 쉼표 제거 후 변환
     return NumberFormat('#,###').format(number); // 3자리마다 쉼표
   }
-
   Future<void> fetchDDay() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-
-
-    final response = await http.get(
-      Uri.parse(ApiConstants.getDDay),
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
+    final response = await apiService.get(
+      ApiConstants.getDDay
     );
 
     print('Response status: ${response.statusCode}'); // 상태 코드 출력
-    print('Response body: ${response.body}'); // 응답 본문 출력
+    print('Response body: ${response.data}'); // 응답 본문 출력
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+      final data = response.data;
       setState(() {
         ddayList = List<Map<String, dynamic>>.from(data['data']['days']);
       });
@@ -71,19 +286,12 @@ class _HomeContentState extends State<HomeContent> {
 
   Future<void> _getTotalAmount() async{
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      final response = await http.get(
-        Uri.parse(ApiConstants.getBudget),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.get(
+        ApiConstants.getBudget,
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> decodedData = json.decode(response.body);
+        final Map<String, dynamic> decodedData = response.data;
         totalBudget = decodedData['data']['totalAmount'] ?? 0;
         usedBudget = decodedData['data']['usedBudget'] ?? 0;
         balanceBudget = totalBudget - usedBudget;
@@ -95,7 +303,7 @@ class _HomeContentState extends State<HomeContent> {
         });
       } else {
         print('총금액 가져오기 실패: ${response.statusCode}');
-        print('실패 메시지 ${response.body}');
+        print('실패 메시지 ${response.data}');
       }
     }catch (e) {
       print('요청 실패, $e');
@@ -134,8 +342,8 @@ class _HomeContentState extends State<HomeContent> {
                   // 디데이 카드 (배너 위에 반쯤 겹치도록 배치)
                   Positioned(
                     top: 140,  // 배너의 하단 부분에 카드가 반쯤 겹치도록 설정
-                    left: 0,
-                    right: 0,
+                    left: 20,
+                    right: 20,
                     child: Container(
                       padding: const EdgeInsets.all(0.0),
                       child: Stack(
@@ -160,6 +368,7 @@ class _HomeContentState extends State<HomeContent> {
                                       return
                                         Container(
                                           padding: const EdgeInsets.all(20.0),
+
                                           child: Stack(
                                             children: [
                                               // 배경 이미지
@@ -374,7 +583,7 @@ class _HomeContentState extends State<HomeContent> {
                       borderRadius: BorderRadius.circular(12), // 모서리 둥글게 설정
                       child: SizedBox(
                         width: 395, // 가로 크기 늘림
-                        height: 205, // 세로 크기는 그대로 유지
+                        height: 200, // 세로 크기는 그대로 유지
                         child: SvgPicture.asset(
                           'asset/img/budget_card_no_line.svg', // 배경 이미지 경로
                           fit: BoxFit.cover, // 이미지를 컨테이너에 맞게 조정

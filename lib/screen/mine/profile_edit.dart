@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import 'my_page.dart';
 
 
@@ -21,6 +22,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   final TextEditingController _nicknameController = TextEditingController();
   String? _imagePath;
   String? _defaultImage;
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -139,21 +141,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   }
 
   Future<void> _fetchUserInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-
-    var url = Uri.parse(ApiConstants.getUserInfo);
-
-    var response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json', // JSON 형식의 데이터 전송
-      },
+    var response = await apiService.get(
+      ApiConstants.getUserInfo,
     );
 
     if (response.statusCode == 200) {
-      var data = json.decode(response.body)['data'];
+      var data = response.data['data'];
       setState(() {
         _nicknameController.text = data['nickName'];
         _defaultImage = '$imageUrl${data['image']}';

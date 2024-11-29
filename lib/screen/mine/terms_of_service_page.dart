@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:http/http.dart' as http;
+import 'package:smart_wedding/interceptor/api_service.dart';
 import '../../config/ApiConstants.dart';
 
 class TermsOfServicePage extends StatefulWidget {
@@ -19,6 +20,7 @@ class _TermsOfServicePageState extends State<TermsOfServicePage> {
   String subTitle = '';
   bool isLoading = true;
   String accessToken = '';
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -27,21 +29,15 @@ class _TermsOfServicePageState extends State<TermsOfServicePage> {
   }
 
   Future<void> _fetchTermsDetail() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    accessToken = prefs.getString('accessToken')!;
-    var url = Uri.parse(ApiConstants.getTermsDetail);
 
     try {
-      final response = await http.get(
-        url.replace(queryParameters: {'seq': widget.seq}),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.get(
+        ApiConstants.getTermsDetail,
+        queryParameters: {'seq': widget.seq},
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
 
         if (data['data']['content'] == null) {
           print('Error: content is null in response');
@@ -54,7 +50,7 @@ class _TermsOfServicePageState extends State<TermsOfServicePage> {
           isLoading = false;
         });
       } else {
-        print('Response error: ${response.body}');
+        print('Response error: ${response.data}');
         throw Exception('Failed to load terms detail');
       }
     } catch (e) {

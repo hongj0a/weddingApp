@@ -6,12 +6,13 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 
 
 class DetailPage extends StatefulWidget {
   final Map<String, dynamic> detailData; // detailData를 Map으로 받음
-
+  final ApiService apiService = ApiService();
   DetailPage({Key? key, required this.detailData}) : super(key: key);
 
   @override
@@ -19,6 +20,7 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  final ApiService apiService = ApiService();
   late TextEditingController _titleController;
   late TextEditingController _totalCostController;
   late TextEditingController _depositController;
@@ -47,8 +49,6 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Future<void> _saveData() async {
-    final url = Uri.parse(ApiConstants.updateChecklist);
-
     // 서버로 보낼 데이터를 Map으로 준비합니다.
     final data = {
       'seq': widget.detailData['seq'],
@@ -63,13 +63,10 @@ class _DetailPageState extends State<DetailPage> {
     };
 
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
       // POST 요청을 통해 서버로 데이터를 전송합니다.
-      final response = await http.post(
-        url,
-        headers: {'Authorization': 'Bearer $accessToken', 'Content-Type': 'application/json'},
-        body: jsonEncode(data),
+      final response = await apiService.post(
+        ApiConstants.updateChecklist,
+        data: data,
       );
 
       if (response.statusCode == 200) {
@@ -78,7 +75,7 @@ class _DetailPageState extends State<DetailPage> {
           Navigator.pop(context, true);
         }
       } else {
-        print('데이터 저장 실패: ${response.body}');
+        print('데이터 저장 실패: ${response.data}');
       }
     } catch (e) {
       print('서버 요청 오류: $e');
@@ -86,15 +83,11 @@ class _DetailPageState extends State<DetailPage> {
   }
   Future<void> _deleteData() async {
     final seq = widget.detailData['seq'];
-    final url = Uri.parse('${ApiConstants.deleteChecklist}?seq=$seq');
 
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      final response = await http.post(
-        url,
-        headers: {'Authorization': 'Bearer $accessToken', 'Content-Type': 'application/json'},
+      final response = await apiService.get(
+        ApiConstants.deleteChecklist,
+        queryParameters: {'seq': seq},
       );
 
       if (response.statusCode == 200) {
@@ -103,7 +96,7 @@ class _DetailPageState extends State<DetailPage> {
           Navigator.pop(context, true); // 삭제 후 이전 화면으로 돌아감
         }
       } else {
-        print('데이터 삭제 실패: ${response.body}');
+        print('데이터 삭제 실패: ${response.data}');
       }
     } catch (e) {
       print('서버 요청 오류: $e');

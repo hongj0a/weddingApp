@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 
 class Alarm {
   final String title;
@@ -24,21 +25,14 @@ class Alarm {
 }
 
 class AlarmListPage extends StatelessWidget {
-
+  ApiService apiService = ApiService();
   Future<List<Alarm>> fetchAlarms() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-
-    final response = await http.get(
-      Uri.parse(ApiConstants.getAlarm),
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
+    final response = await apiService.get(
+      ApiConstants.getAlarm,
     );
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> decodedData = json.decode(response.body);
+      final Map<String, dynamic> decodedData = response.data;
       if (decodedData.containsKey('data') && decodedData['data']['alarms'] != null) {
         final alarms = decodedData['data']['alarms'] as List<dynamic>;
 

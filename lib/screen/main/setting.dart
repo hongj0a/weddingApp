@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -15,6 +16,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool isBudgetNotificationOn = false;
   bool isMarketingAgreementOn = false;
   bool isAwesomeMessagesOn = false;
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -23,49 +25,32 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> updateNotificationSetting(String key, bool value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-
-    var url = Uri.parse(ApiConstants.updateYnSetting); // 업데이트할 API 엔드포인트
-    var response = await http.post(
-      url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
+    var response = await apiService.post(
+      ApiConstants.updateYnSetting,
+      data: {
         "key": key, // 문자열 "key"로 수정
         "value": value.toString(), // boolean 값을 문자열로 변환
-      }),
+      },
     );
 
     if (response.statusCode == 200) {
       print('설정이 성공적으로 업데이트되었습니다.');
     } else {
       print('설정 업데이트 실패: ${response.statusCode}');
-      print('reason... : ${response.body}');
+      print('reason... : ${response.data}');
     }
   }
 
 
   Future<void> _fetchNotificationSettings() async {
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-
     try {
-      var url = Uri.parse(ApiConstants.getYnList);
-
-      var response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json', // JSON 형식의 데이터 전송
-        },
+      var response = await apiService.get(
+        ApiConstants.getYnList,
       );
 
       if (response.statusCode == 200) {
-        var jsonResponse = json.decode(response.body);
+        var jsonResponse = response.data;
         var data = jsonResponse['data']; // 'data' 부분을 따로 분리
 
         print('data ....... $data');

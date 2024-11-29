@@ -7,6 +7,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 
 class SchedulePage extends StatefulWidget {
@@ -19,6 +20,7 @@ class _SchedulePageState extends State<SchedulePage> {
   DateTime _focusedDay = DateTime.now().toLocal(); // 현재 로컬 시간
   DateTime? _selectedDay;
   List<String> scheduleDate = [];
+  ApiService apiService = ApiService();
 
 
   final Map<DateTime, List<Map<String, String>>> _events = {};
@@ -58,26 +60,13 @@ class _SchedulePageState extends State<SchedulePage> {
       // 선택된 날짜, 메모(event), 시간(time)을 API에 저장
       final String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDay!);
       try {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        String? accessToken = prefs.getString('accessToken');
-
-        if (accessToken == null) {
-          throw Exception('No access token found');
-        }
-
-        var url = Uri.parse(ApiConstants.setSchedule);
-
-        var response = await http.post(
-          url,
-          headers: {
-            'Authorization': 'Bearer $accessToken',
-            'Content-Type': 'application/json', // JSON 형식의 데이터 전송
-          },
-          body: jsonEncode({
+        var response = await apiService.post(
+          ApiConstants.setSchedule,
+          data: {
             'date': formattedDate,
             'memo': event,
             'time': time,
-          }),
+          },
         );
 
         if (response.statusCode == 200) {
@@ -96,32 +85,17 @@ class _SchedulePageState extends State<SchedulePage> {
 
   Future<void> _fetchSchedule() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      if (accessToken == null) {
-        throw Exception('No access token found');
-      }
-
-      // 현재 월의 시작일과 마지막 일 계산
-      //DateTime now = DateTime.now();
       String month = DateFormat('yyyy-MM').format(_focusedDay); // "2024-10" 형식으로 전달
 
-      print('month... $month');
-      var url = Uri.parse('${ApiConstants.getScheduleMark}?month=$month');
+      var response = await apiService.get(
+        ApiConstants.getScheduleMark,
+        queryParameters: {'month': month },
 
-
-      var response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
       );
 
       if (response.statusCode == 200) {
         // 응답이 List인지 확인
-        var responseBody = jsonDecode(response.body);
+        var responseBody = response.data;
 
         // responseBody가 List인지 체크하고 null인 경우 빈 리스트로 초기화
         List<dynamic> scheduleMarks = responseBody['data']['scheduleMarks'] ?? [];
@@ -159,27 +133,16 @@ class _SchedulePageState extends State<SchedulePage> {
   // 해당 날짜에 대해 API 호출하여 데이터를 가져오는 함수
   Future<void> _fetchSchedulesForDate(String selectedDate) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      if (accessToken == null) {
-        throw Exception('No access token found');
-      }
-
       print('selectedDate ... $selectedDate');
       // API 호출
-      var url = Uri.parse('${ApiConstants.getSchedules}?date=$selectedDate');
-      var response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      var response = await apiService.get(
+        ApiConstants.getSchedules,
+        queryParameters: {'date': selectedDate}
       );
 
       if (response.statusCode == 200) {
         // 응답에서 스케줄 리스트 추출
-        var responseBody = jsonDecode(response.body);
+        var responseBody = response.data;
         List<dynamic> schedules = responseBody['data']['schedules'] ?? [];
 
         setState(() {
@@ -407,21 +370,9 @@ class _SchedulePageState extends State<SchedulePage> {
       onDismissed: (direction) async {
         try {
           // API 호출
-          var url = Uri.parse(ApiConstants.delSchedule);
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          String? accessToken = prefs.getString('accessToken');
-
-          if (accessToken == null) {
-            throw Exception('No access token found');
-          }
-
-          var response = await http.post(
-            url,
-            headers: {
-              'Authorization': 'Bearer $accessToken',
-              'Content-Type': 'application/json',
-            },
-            body: jsonEncode({'seq': seq}),
+          var response = await apiService.post(
+          ApiConstants.delSchedule,
+            data: {'seq': seq},
           );
 
           if (response.statusCode == 200) {
@@ -460,7 +411,7 @@ class _SchedulePageState extends State<SchedulePage> {
           } else {
             // 삭제 실패 시 에러 처리
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('삭제 실패: ${response.body}', style: TextStyle( ))),
+              SnackBar(content: Text('삭제 실패: ${response.data}', style: TextStyle( ))),
             );
           }
         } catch (e) {

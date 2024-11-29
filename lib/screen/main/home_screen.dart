@@ -11,6 +11,7 @@ import 'package:smart_wedding/screen/main/alarm_list_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 
 class WeddingHomePage extends StatefulWidget {
@@ -24,6 +25,7 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
   late PageController _pageController;
   final List<Widget> screens = [];
   late Future<bool> newFlagFuture;
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -68,23 +70,14 @@ class _WeddingHomePageState extends State<WeddingHomePage> {
   }
 
   Future<bool> getNewFlag() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-    String? refreshToken = prefs.getString('refreshToken');
 
-    var url = Uri.parse(ApiConstants.alarmNewFlag);
-
-    var response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json', // JSON 형식의 데이터 전송
-      },
+    var response = await apiService.get(
+      ApiConstants.alarmNewFlag,
     );
 
     if (response.statusCode == 200) {
-      print('response body: ${response.body}'); // JSON 응답 본문을 출력
-      var responseData = json.decode(response.body)['data']['newFlag'];
+      print('response body: ${response.data}'); // JSON 응답 본문을 출력
+      var responseData = response.data['data']['newFlag'];
 
       if (responseData == "true") { // 문자열 비교 시 == 사용
         return true;

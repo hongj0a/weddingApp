@@ -8,6 +8,7 @@ import 'package:smart_wedding/screen/money/budget_setting.dart';
 import '../../config/ApiConstants.dart';
 import 'package:intl/intl.dart';
 
+import '../../interceptor/api_service.dart';
 import 'detail_page.dart';
 
 class CostPage extends StatefulWidget {
@@ -23,6 +24,7 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
   int usedBudget = 0;
   int balanceBudget =0;
   String pairMan = "";
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -60,19 +62,13 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
 
   Future<void> _getTotalAmount() async{
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
 
-      final response = await http.get(
-        Uri.parse(ApiConstants.getBudget),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.get(
+        ApiConstants.getBudget
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> decodedData = json.decode(response.body);
+        final Map<String, dynamic> decodedData = response.data;
         totalBudget = decodedData['data']['totalAmount'] ?? 0;
         usedBudget = decodedData['data']['usedBudget'] ?? 0;
         balanceBudget = totalBudget - usedBudget;
@@ -86,7 +82,7 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
         });
       } else {
         print('총금액 가져오기 실패: ${response.statusCode}');
-        print('실패 메시지 ${response.body}');
+        print('실패 메시지 ${response.data}');
       }
     }catch (e) {
       print('요청 실패, $e');
@@ -95,19 +91,11 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
 
   Future<void> _fetchCategories() async {
     try{
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-      var url = Uri.parse(ApiConstants.getCategories);
-
-      var response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json'
-        },
+      var response = await apiService.get(
+        ApiConstants.getCategories,
       );  // GET 호출
       if(response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
+        final jsonResponse = response.data;
         final categoryList = jsonResponse['data']['categoryList'];
 
         print('categoryList...####  $categoryList');
@@ -131,7 +119,7 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
           }).toList();
         });
       } else {
-        print('response....msg ... ${response.body}');
+        print('response....msg ... ${response.data}');
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("저장 실패: ${response.statusCode}")));
       }
     }catch(e) {
@@ -141,19 +129,13 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
   }
 
   Future<List<Map<String, dynamic>>> _fetchCheckList(int seq) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-    var url = Uri.parse('${ApiConstants.getCheckLists}?seq=$seq');
-    var response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
+    var response = await apiService.get(
+      ApiConstants.getCheckLists,
+      queryParameters: {'seq':seq},
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
+      final jsonResponse = response.data;
       final checkList = jsonResponse['data']['checkList'];
 
       return checkList.map<Map<String, dynamic>>((checklist) {
@@ -169,27 +151,20 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
   }
 
   Future<Map<String, dynamic>> _fetchCheckListDetail(int seq) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-    var url = Uri.parse('${ApiConstants.getCheckListDetail}?seq=$seq');
-
-    var response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      }
+    var response = await apiService.get(
+      ApiConstants.getCheckListDetail,
+      queryParameters: {'seq': seq},
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
+      final jsonResponse = response.data;
       print('jsonResponse... $jsonResponse');
       print('jsonResponseData...  ${jsonResponse['data']}');
 
       return jsonResponse['data']; // 필요한 데이터를 반환
     } else {
       print('response code ... ${response.statusCode}');
-      print('respons.. message ... ${response.body}');
+      print('respons.. message ... ${response.data}');
       throw Exception('Failed to load checklist detail');
     }
   }

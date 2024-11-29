@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 import 'contract_detail.dart';
 
@@ -15,6 +16,7 @@ class ContractPage extends StatefulWidget {
 
 class _ContractPageState extends State<ContractPage> {
   List<Map<String, String>> contracts = [];
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -33,21 +35,12 @@ class _ContractPageState extends State<ContractPage> {
   Future<void> getContracts() async {
 
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      var url = Uri.parse(ApiConstants.getContract);
-
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        }
+      final response = await apiService.get(
+        ApiConstants.getContract,
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body)['data']['contracts']; // 서버의 데이터 형식에 맞게 수정
+        final data = response.data['data']['contracts']; // 서버의 데이터 형식에 맞게 수정
         setState(() {
           contracts = [
             for (var item in data)
@@ -69,15 +62,9 @@ class _ContractPageState extends State<ContractPage> {
 
   Future<void> deleteContract(String seq) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-      var url = Uri.parse('${ApiConstants.delContract}?seq=$seq');
-      final response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json'
-        },
+      final response = await apiService.get(
+        ApiConstants.delContract,
+        queryParameters: {'seq': seq}
       );
 
       if (response.statusCode == 200) {

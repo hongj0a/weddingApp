@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http; // HTTP 패키지 추가
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert'; // JSON 인코딩을 위해 추가
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 
 class InquiryScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class InquiryScreen extends StatefulWidget {
 class _InquiryScreenState extends State<InquiryScreen> {
   final TextEditingController _controller = TextEditingController(); // TextField의 값을 제어하기 위한 컨트롤러 추가
   bool _isLoading = false; // 로딩 상태를 나타내는 변수 추가
+  ApiService apiService = ApiService();
 
   void _submitInquiry() async {
     String content = _controller.text.trim(); // TextField의 값을 가져오기
@@ -69,13 +71,9 @@ class _InquiryScreenState extends State<InquiryScreen> {
       String? accessToken = prefs.getString('accessToken');
       var url = Uri.parse(ApiConstants.inquiryMailSend);
 
-      final response = await http.post(
-        url, // ApiConstants의 inquiryMailSend URL
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json', // JSON 형식의 데이터 전송
-        }, // 요청 헤더 설정
-        body: jsonEncode({'content': content}), // body에 content 추가
+      final response = await apiService.post(
+        ApiConstants.inquiryMailSend, // ApiConstants의 inquiryMailSend URL // 요청 헤더 설정
+        data: {'content': content}, // body에 content 추가
       );
 
       setState(() {

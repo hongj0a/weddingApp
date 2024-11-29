@@ -4,7 +4,8 @@ import 'package:smart_wedding/screen/mine/question_list.dart';
 import 'package:http/http.dart' as http; // HTTP 패키지 임포트
 import 'dart:convert';
 
-import '../../config/ApiConstants.dart'; // JSON 디코딩을 위해 임포트
+import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart'; // JSON 디코딩을 위해 임포트
 
 class FAQScreen extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class FAQScreen extends StatefulWidget {
 class _FAQScreenState extends State<FAQScreen> {
   List<String> faqTitles = [];
   List<int> faqSeqs = []; // seq를 저장할 리스트
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -23,21 +25,12 @@ class _FAQScreenState extends State<FAQScreen> {
 
   Future<void> _fetchFAQList() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      var url =Uri.parse(ApiConstants.getFaqCategoryList);
-
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.get(
+        ApiConstants.getFaqCategoryList
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         if (data['data'] != null && data['data']['faqCategories'] != null) {
           setState(() {
             // data['terms']에서 title과 seq를 가져옵니다.

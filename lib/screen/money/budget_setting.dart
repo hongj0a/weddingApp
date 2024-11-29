@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import '../../config/ApiConstants.dart';
 import 'dart:async';
 
+import '../../interceptor/api_service.dart';
+
 class BudgetSetting extends StatefulWidget {
   @override
   _BudgetSettingState createState() => _BudgetSettingState();
@@ -47,6 +49,7 @@ class _BudgetSettingState extends State<BudgetSetting> {
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, TextEditingController> _labelControllers = {};
   final Map<String, FocusNode> _focusNodes = {};
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -64,19 +67,12 @@ class _BudgetSettingState extends State<BudgetSetting> {
 
   Future<void> _initializeBudgetData() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      final response = await http.get(
-        Uri.parse(ApiConstants.getBudget),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.get(
+          ApiConstants.getBudget,
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> decodedData = json.decode(response.body);
+        final Map<String, dynamic> decodedData = response.data;
 
         if (decodedData.containsKey('data') &&
             decodedData['data']['budgets'] != null) {
@@ -147,8 +143,6 @@ class _BudgetSettingState extends State<BudgetSetting> {
 
   Future<void> _initBudgetOnServer() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
       final List<BudgetDto> budgetData = budgetItems.map((item) {
         return BudgetDto(
           label: item['label'] as String,
@@ -157,26 +151,20 @@ class _BudgetSettingState extends State<BudgetSetting> {
       }).toList();
 
       // BudgetDto 리스트를 JSON으로 변환
-      final List<Map<String, dynamic>> jsonData = budgetData.map((item) =>
-          item.toJson()).toList();
+      final List<Map<String, dynamic>> jsonData = budgetData.map((item) => item.toJson()).toList();
 
-      print('accessToken ... $accessToken');
       print('budgetdata... $jsonData'); // JSON으로 변환된 데이터 출력
 
-      final response = await http.post(
-        Uri.parse(ApiConstants.initBudgets),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(jsonData), // JSON 인코딩하여 전송
+      final response = await apiService.post(
+        ApiConstants.initBudgets,
+        data: jsonData, // JSON 인코딩하여 전송
       );
 
       if (response.statusCode == 200) {
         print("Initial budget saved successfully.");
       } else {
         print("Failed to save initial budget: ${response.statusCode}");
-        print("Failed message ... : ${response.body}");
+        print("Failed message ... : ${response.data}");
       }
     } catch (e) {
       print("Error initializing budget on server: $e");
@@ -185,22 +173,15 @@ class _BudgetSettingState extends State<BudgetSetting> {
 
   Future<void> _saveBudgetToServer(String label) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      final response = await http.post(
-        Uri.parse(ApiConstants.setBudget),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({'label': label, 'amount': '0'}), // Adjust as necessary
+      final response = await apiService.post(
+        ApiConstants.setBudget,
+        data: {'label': label, 'amount': '0'}, // Adjust as necessary
       );
 
       if (response.statusCode == 200) {
         print("Budget item saved successfully.");
 
-        final jsonResponse = json.decode(response.body);
+        final jsonResponse = json.decode(response.data);
         var data = jsonResponse['data'];
         var seq = data['seq'];
 
@@ -208,7 +189,7 @@ class _BudgetSettingState extends State<BudgetSetting> {
 
       } else {
         print("Failed to save budget item: ${response.statusCode}");
-        print("Failed message ... : ${response.body}");
+        print("Failed message ... : ${response.data}");
         return null;
       }
     } catch (e) {
@@ -221,24 +202,20 @@ class _BudgetSettingState extends State<BudgetSetting> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
 
-      final response = await http.post(
-        Uri.parse(ApiConstants.updateBudget),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({
+      final response = await apiService.post(
+        ApiConstants.updateBudget,
+        data: {
           'seq': seq,
           'label': label,
           'amount': amount,
-        }),
+        },
       );
 
       if (response.statusCode == 200) {
         print("Budget item updated successfully.");
       } else {
         print("Failed to update budget item: ${response.statusCode}");
-        print("Failed message ... : ${response.body}");
+        print("Failed message ... : ${response.data}");
       }
     } catch (e) {
       print("Error updating budget item on server: $e");
@@ -246,15 +223,10 @@ class _BudgetSettingState extends State<BudgetSetting> {
   }
 
   void _onDismissed(int seq) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
     try {
-      final response = await http.post(
-        Uri.parse('${ApiConstants.delBudget}?seq=$seq'), // 쿼리 스트링으로 seq 추가
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.get(
+        ApiConstants.delBudget,
+        queryParameters: {'seq': seq},
       );
 
       if (response.statusCode == 200) {

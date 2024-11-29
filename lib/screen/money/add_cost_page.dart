@@ -6,12 +6,13 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 import 'cost_page.dart';
 
 class AddCostPage extends StatefulWidget {
   final int? categorySeq; // 카테고리 시퀀스를 추가
-
+  final ApiService apiService = ApiService(); // ApiService 인스턴스 추가
   AddCostPage({Key? key, this.categorySeq}) : super(key: key);
 
 
@@ -20,6 +21,7 @@ class AddCostPage extends StatefulWidget {
 }
 
 class _AddCostPageState extends State<AddCostPage> {
+  final ApiService apiServer = ApiService();
   final TextEditingController itemController = TextEditingController();
   final TextEditingController totalCostController = TextEditingController();
   final TextEditingController contractCostController = TextEditingController();
@@ -28,6 +30,7 @@ class _AddCostPageState extends State<AddCostPage> {
   final TextEditingController groomCostController = TextEditingController();
   final TextEditingController brideCostController = TextEditingController();
   final TextEditingController memoController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     print('카테고리 시퀀스: ${widget.categorySeq}'); // 여기서 출력
@@ -72,9 +75,6 @@ class _AddCostPageState extends State<AddCostPage> {
       ),
     );
   }
-
-
-
 
   Widget buildTextField(String label, TextEditingController controller, bool isCost) {
     return TextField(
@@ -146,21 +146,12 @@ class _AddCostPageState extends State<AddCostPage> {
     };
 
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-      var url = Uri.parse(ApiConstants.setChecklist);
-
       print('data... $data');
-
-      var response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json', // JSON 형식의 데이터 전송
-        },
-        body: jsonEncode(data),
+      var response = await apiServer.post(
+        ApiConstants.setChecklist,
+        data: data,
       );
-      print('response....msg ... ${response.body}');
+      print('response....msg ... ${response.data}');
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("저장되었습니다.")));
         Navigator.pop(context, true);  // 뒤로 가면서 true 반환

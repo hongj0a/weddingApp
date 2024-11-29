@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import 'terms_of_service_page.dart';
 
 class TermsAndPoliciesScreen extends StatefulWidget {
@@ -12,6 +13,7 @@ class TermsAndPoliciesScreen extends StatefulWidget {
 
 class _TermsAndPoliciesScreenState extends State<TermsAndPoliciesScreen> {
   List<Map<String, dynamic>> terms = [];
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -20,20 +22,13 @@ class _TermsAndPoliciesScreenState extends State<TermsAndPoliciesScreen> {
   }
 
   Future<void> _fetchTerms() async {
-    var url = Uri.parse(ApiConstants.getTerms);
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.get(
+        ApiConstants.getTerms,
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body)['data']['terms'];
+        final data = response.data['data']['terms'];
 
         setState(() {
           terms = List<Map<String, dynamic>>.from(data);

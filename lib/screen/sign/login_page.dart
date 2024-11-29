@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
@@ -10,7 +11,9 @@ import 'package:smart_wedding/screen/sign/pairing_page.dart';
 import '../../config/ApiConstants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+
 class LoginScreen extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -32,7 +35,7 @@ class LoginScreen extends StatelessWidget {
             ),
             // 로그인 버튼 세 개 하단 배치
             Positioned(
-              bottom: 30, // 버튼이 화면 아래쪽에 위치하도록 설정
+              bottom: 40, // 버튼이 화면 아래쪽에 위치하도록 설정
               left: 15,  // 양쪽 패딩
               right: 15,
               child: Column(
@@ -47,7 +50,7 @@ class LoginScreen extends StatelessWidget {
                       height: 48,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage('asset/img/k_login.png'),
+                          image: AssetImage('asset/img/k_btn.png'),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -63,7 +66,7 @@ class LoginScreen extends StatelessWidget {
                       height: 48,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage('asset/img/g_login.png'),
+                          image: AssetImage('asset/img/g_btn.png'),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -78,7 +81,7 @@ class LoginScreen extends StatelessWidget {
                         height: 48,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: AssetImage('asset/img/a_login.png'),
+                            image: AssetImage('asset/img/a_btn.png'),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -91,6 +94,13 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<String?> _getFCM() async{
+    String? fcmToken = await FirebaseMessaging.instance.getToken();
+    print('_fcmToken... $fcmToken');
+
+    return fcmToken;
   }
 
   Future<void> _kakaoLogin(BuildContext context) async {
@@ -133,7 +143,9 @@ class LoginScreen extends StatelessWidget {
       await googleSignIn.signOut();
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
+      print('google login...... start.......');
       if (googleUser != null) {
+        print('googleUSer... $googleUser');
         String id = googleUser.id;
         String name = googleUser.displayName ?? '사용자';
         String snsType = 'GOOGLE';
@@ -158,14 +170,17 @@ class LoginScreen extends StatelessWidget {
   Future<Map<String, dynamic>> _sendAuthenticateRequest(
       String snsId, String name, String snsType) async {
     final url = ApiConstants.authenticate;
+    String? token = await _getFCM();
+    print('token.. $token');
     final loginDto = {
       'email': snsId,
       'snsType': snsType,
       'name': name,
+      'fcmToken': token,
     };
 
     try {
-      final response = await http.post(
+      final response = await http.post (
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(loginDto),
@@ -176,7 +191,9 @@ class LoginScreen extends StatelessWidget {
         if (responseData['code'] == 'OK') {
           String accessToken = responseData['data']['accessToken'];
           String refreshToken = responseData['data']['refreshToken'];
-          await _saveTokens(accessToken, refreshToken);
+          bool isFirstYn = responseData['data']['isFirstYn'];
+          print('isFirstYn... $isFirstYn');
+          await _saveTokens(accessToken, refreshToken, isFirstYn);
           return {
             'isAuthenticated': true,
             'pairingYn': responseData['data']['pairingYn']
@@ -189,9 +206,10 @@ class LoginScreen extends StatelessWidget {
     }
   }
 
-  Future<void> _saveTokens(String accessToken, String refreshToken) async {
+  Future<void> _saveTokens(String accessToken, String refreshToken, bool isFirstYn) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('accessToken', accessToken);
     await prefs.setString('refreshToken', refreshToken);
+    await prefs.setBool('isFirstYn', isFirstYn);
   }
 }

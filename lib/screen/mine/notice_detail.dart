@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../config/ApiConstants.dart';
 import 'package:flutter_html/flutter_html.dart';
 
+import '../../interceptor/api_service.dart';
+
 class NoticeDetail extends StatefulWidget {
   final String title;
   final String date;
@@ -23,6 +25,7 @@ class NoticeDetail extends StatefulWidget {
 
 class _NoticeDetailState extends State<NoticeDetail> {
   String content = ''; // 공지 내용을 저장할 변수
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -31,21 +34,15 @@ class _NoticeDetailState extends State<NoticeDetail> {
   }
 
   Future<void> _fetchNoticeDetail() async {
-    var url = Uri.parse(ApiConstants.getNoticeDetail);
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
 
-      final response = await http.get(
-        url.replace(queryParameters: {'seq': widget.seq}), // seq를 요청 파라미터로 전달
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.get(
+        ApiConstants.getNoticeDetail,
+        queryParameters: {'seq': widget.seq}, // seq를 요청 파라미터로 전달
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         setState(() {
           content = data['data']['content'] ?? ''; // 데이터에서 내용 가져오기
         });

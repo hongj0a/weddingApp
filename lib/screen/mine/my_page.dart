@@ -13,27 +13,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 
-Future<Map<String, dynamic>> fetchUserInfo() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? accessToken = prefs.getString('accessToken');
 
-  var url = Uri.parse(ApiConstants.getUserInfo);
-
-  var response = await http.get(
-    url,
-    headers: {
-      'Authorization': 'Bearer $accessToken',
-      'Content-Type': 'application/json', // JSON 형식의 데이터 전송
-    },
-  );
-
-  if (response.statusCode == 200) {
-    return json.decode(response.body)['data']; // 'data' 부분에서 필요한 정보를 가져옴
-  } else {
-    throw Exception('Failed to load user info');
-  }
-}
 
 class MyPage extends StatefulWidget {
   @override
@@ -42,12 +24,28 @@ class MyPage extends StatefulWidget {
 
 class _MyPageState extends State<MyPage> {
   Future<Map<String, dynamic>>? _userInfoFuture;
-  Map<String, dynamic>? _userData; // userData를 상태 변수로 추가
+  Map<String, dynamic>? _userData;
+  ApiService apiService = ApiService();// userData를 상태 변수로 추가
 
   @override
   void initState() {
     super.initState();
     _userInfoFuture = fetchUserInfo(); // API 호출
+  }
+
+  Future<Map<String, dynamic>> fetchUserInfo() async {
+
+
+    var response = await apiService.get(
+      ApiConstants.getUserInfo,
+
+    );
+
+    if (response.statusCode == 200) {
+      return response.data['data']; // 'data' 부분에서 필요한 정보를 가져옴
+    } else {
+      throw Exception('Failed to load user info');
+    }
   }
 
   @override

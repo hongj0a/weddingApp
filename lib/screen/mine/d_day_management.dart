@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http; // HTTP 요청을 위한 import
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import 'd_day_registration.dart';
 
 // 디데이 카드 모델
@@ -41,6 +42,7 @@ class DDayManagementPage extends StatefulWidget {
 
 class _DDayManagementPageState extends State<DDayManagementPage> {
   List<DDayCardModel> ddayCards = []; // 리스트 타입 수정
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -49,23 +51,16 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
   }
 
   Future<void> fetchDDays() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-
-    final response = await http.get(
-      Uri.parse(ApiConstants.getDDay),
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
+    final response = await apiService.get(
+      ApiConstants.getDDay,
     );
 
     print('Response status: ${response.statusCode}'); // 상태 코드 출력
-    print('Response body: ${response.body}'); // 응답 본문 출력
+    print('Response body: ${ response.data}'); // 응답 본문 출력
 
     if (response.statusCode == 200) {
       // 응답을 JSON으로 디코드
-      final jsonResponse = json.decode(response.body);
+      final jsonResponse = response.data;
 
       // 'data'에서 'days' 배열을 가져오기
       List<dynamic> days = jsonResponse['data']['days'];
@@ -160,6 +155,7 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
 
 // 디데이 카드 위젯
 class DDayCard extends StatelessWidget {
+  ApiService apiService = ApiService();
   final String dday;
   final String title;
   final String date;
@@ -178,15 +174,10 @@ class DDayCard extends StatelessWidget {
   }) : super(key: key);
 
   Future<void> deleteDDay() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
-
     // API 호출
-    final response = await http.post(
-      Uri.parse('${ApiConstants.delDDay}?seq=$seq'),  // 삭제 API URL
-      headers: {
-        'Authorization': 'Bearer $accessToken', // 헤더에 Access Token 추가
-      },
+    final response = await apiService.get(
+      ApiConstants.delDDay,
+      queryParameters: {'seq': seq},// 삭제 API URL
     );
 
     if (response.statusCode == 200) {

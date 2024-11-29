@@ -7,6 +7,8 @@ import 'package:smart_wedding/screen/mine/faq_detail.dart';
 import '../../config/ApiConstants.dart';
 import 'package:http/http.dart' as http;
 
+import '../../interceptor/api_service.dart';
+
 class QuestionList extends StatefulWidget {
   final int seq; // seq 변수를 선언
 
@@ -17,9 +19,10 @@ class QuestionList extends StatefulWidget {
 }
 
 class _QuestionListState extends State<QuestionList> {
-
   List<String> faqTitles = [];
   List<int> faqSeqs = []; // seq를 저장할 리스트
+  ApiService apiService = ApiService();
+
 
   @override
   void initState() {
@@ -29,21 +32,13 @@ class _QuestionListState extends State<QuestionList> {
 
   Future<void> _fetchFAQDetailList() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
-      var url =Uri.parse(ApiConstants.getFaqList);
-
-      final response = await http.get(
-        url.replace(queryParameters: {'seq': widget.seq.toString()}),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.get(
+        ApiConstants.getFaqList,
+        queryParameters: {'seq': widget.seq.toString()}
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         if (data['data'] != null && data['data']['terms'] != null) {
           setState(() {
             // data['terms']에서 title과 seq를 가져옵니다.

@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../config/ApiConstants.dart';
 import 'package:http/http.dart' as http;
 
+import '../../interceptor/api_service.dart';
+
 class FaqDetail extends StatefulWidget {
   final int seq; // seq 변수를 선언
 
@@ -19,6 +21,7 @@ class FaqDetail extends StatefulWidget {
 class _FaqDetailState extends State<FaqDetail> {
   String content = '';
   String title= '';
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -27,21 +30,15 @@ class _FaqDetailState extends State<FaqDetail> {
   }
 
   Future<void> _fetchFaqDetail() async {
-    var url = Uri.parse(ApiConstants.getFaqDetail);
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
 
-      final response = await http.get(
-        url.replace(queryParameters: {'seq': widget.seq.toString()}), // seq를 요청 파라미터로 전달
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json',
-        },
+      final response = await apiService.get(
+        ApiConstants.getFaqDetail,
+        queryParameters: {'seq': widget.seq.toString()}, // seq를 요청 파라미터로 전달
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         setState(() {
           title = data['data']['title'] ?? '';
           content = data['data']['content'] ?? ''; // 데이터에서 내용 가져오기

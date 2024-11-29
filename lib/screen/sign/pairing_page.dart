@@ -7,6 +7,7 @@ import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:http/http.dart' as http;
 
 import '../../config/ApiConstants.dart';
+import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 import '../main/home_screen.dart';
 
@@ -24,6 +25,7 @@ class _PairingCodePageState extends State<PairingCodePage> {
   String enteredPairingCode = '';
   late StompClient stompClient;
   final TextEditingController _controller = TextEditingController();
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -48,14 +50,15 @@ class _PairingCodePageState extends State<PairingCodePage> {
       int code = random.nextInt(900000) + 100000;
       String codeString = code.toString();
 
-      print("Generated Code: $codeString");
-
-      final response = await http.get(Uri.parse('${ApiConstants.isExistPairingCode}?code=$codeString'));
+      final response = await apiService.get(
+          ApiConstants.isExistPairingCode,
+          queryParameters: {'code': codeString},
+      );
 
       if (response.statusCode == 200) {
-        print("Server Response: ${response.body}");
+        print("Server Response: ${response.data}");
 
-        var jsonResponse = jsonDecode(response.body);
+        var jsonResponse = jsonDecode(response.data);
         if (jsonResponse['code'] == 'OK') {
           return codeString;
         }
