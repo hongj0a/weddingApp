@@ -99,5 +99,14 @@
     <string>애플 로그인 인증을 위해 사용됩니다.</string>
     <key>ASAuthorizationAppleIDRequest</key>
     <true/>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.238980737763-ipk6me084inrrpgmil95dm5bqob5n1ib</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>
