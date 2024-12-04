@@ -7,7 +7,6 @@ import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:http/http.dart' as http;
 
 import '../../config/ApiConstants.dart';
-import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 import '../main/home_screen.dart';
 
@@ -25,7 +24,6 @@ class _PairingCodePageState extends State<PairingCodePage> {
   String enteredPairingCode = '';
   late StompClient stompClient;
   final TextEditingController _controller = TextEditingController();
-  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -50,15 +48,14 @@ class _PairingCodePageState extends State<PairingCodePage> {
       int code = random.nextInt(900000) + 100000;
       String codeString = code.toString();
 
-      final response = await apiService.get(
-          ApiConstants.isExistPairingCode,
-          queryParameters: {'code': codeString},
-      );
+      print("Generated Code: $codeString");
+
+      final response = await http.get(Uri.parse('${ApiConstants.isExistPairingCode}?code=$codeString'));
 
       if (response.statusCode == 200) {
-        print("Server Response: ${response.data}");
+        print("Server Response: ${response.body}");
 
-        var jsonResponse = jsonDecode(response.data);
+        var jsonResponse = jsonDecode(response.body);
         if (jsonResponse['code'] == 'OK') {
           return codeString;
         }
@@ -72,7 +69,6 @@ class _PairingCodePageState extends State<PairingCodePage> {
       config: StompConfig(
         url: ApiConstants.webSocketUrl,
         onConnect: (StompFrame frame) {
-          print('WebSocket 연결 성공');
           _sendPairingRequest(pairingCode);
 
           stompClient.subscribe(
@@ -110,7 +106,7 @@ class _PairingCodePageState extends State<PairingCodePage> {
             },
           );
         },
-        onWebSocketError: (dynamic error) => print('WebSocket 에러: $error'),
+        onWebSocketError: (dynamic error) => print('WebSocket 에러: $error, ${ApiConstants.webSocketUrl}'),
       ),
     );
 

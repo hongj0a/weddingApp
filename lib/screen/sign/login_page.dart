@@ -10,6 +10,7 @@ import 'package:smart_wedding/screen/main/home_screen.dart';
 import 'package:smart_wedding/screen/sign/pairing_page.dart';
 import '../../config/ApiConstants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 
 class LoginScreen extends StatelessWidget {
@@ -75,7 +76,9 @@ class LoginScreen extends StatelessWidget {
                   if (Platform.isIOS) SizedBox(height: 10),
                   if (Platform.isIOS)
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () async {
+                        await _appleLogin(context);
+                      },
                       child: Container(
                         width: double.infinity,
                         height: 48,
@@ -167,6 +170,45 @@ class LoginScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _appleLogin(BuildContext context) async {
+    try {
+      // Apple 로그인 인증 요청
+      final AuthorizationCredentialAppleID credential =
+      await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      // Apple ID 정보 확인
+      final String id = credential.userIdentifier ?? '';
+      if (id.isEmpty) {
+        throw Exception('User identifier is missing');
+      }
+      final String name = credential.givenName ?? '사용자';
+      const String snsType = 'APPLE';
+
+      // 서버로 인증 요청 전송
+      Map<String, dynamic> response = await _sendAuthenticateRequest(id, name, snsType);
+
+      if (response['isAuthenticated']) {
+        bool pairingYn = response['pairingYn'];
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+            pairingYn ? WeddingHomePage() : PairingCodePage(id: id),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Apple 로그인 실패: $e');
+    }
+  }
+
+
+
   Future<Map<String, dynamic>> _sendAuthenticateRequest(
       String snsId, String name, String snsType) async {
     final url = ApiConstants.authenticate;
@@ -191,9 +233,7 @@ class LoginScreen extends StatelessWidget {
         if (responseData['code'] == 'OK') {
           String accessToken = responseData['data']['accessToken'];
           String refreshToken = responseData['data']['refreshToken'];
-          bool isFirstYn = responseData['data']['isFirstYn'];
-          print('isFirstYn... $isFirstYn');
-          await _saveTokens(accessToken, refreshToken, isFirstYn);
+          await _saveTokens(accessToken, refreshToken);
           return {
             'isAuthenticated': true,
             'pairingYn': responseData['data']['pairingYn']
@@ -206,10 +246,15 @@ class LoginScreen extends StatelessWidget {
     }
   }
 
-  Future<void> _saveTokens(String accessToken, String refreshToken, bool isFirstYn) async {
+  Future<void> _saveTokens(String accessToken, String refreshToken) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? isFirstYn = prefs.getBool('isFirstYn');
+
+    print('isFirstYn... $isFirstYn');
     await prefs.setString('accessToken', accessToken);
     await prefs.setString('refreshToken', refreshToken);
-    await prefs.setBool('isFirstYn', isFirstYn);
+    if (isFirstYn =="" || isFirstYn == null) {
+      await prefs.setBool('isFirstYn', true);
+    }
   }
 }

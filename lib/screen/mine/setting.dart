@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_wedding/screen/sign/login_page.dart';
 import 'package:smart_wedding/screen/sign/pairing_page.dart';
+import 'package:smart_wedding/themes/theme.dart';
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 
@@ -43,26 +44,46 @@ class _SettingState extends State<Setting> {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       backgroundColor: Colors.white,
-                      title: Text('캐시 데이터 삭제', style: TextStyle(color: Colors.black),),
+                      title: Text('캐시 데이터 삭제', style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold, fontFamily: 'Pretendard'),),
                       content: Text(
                         '앱 내 모든 데이터를 삭제해요.\n미리 내려받지 않았거나, 기기에 저장되지 않은 \n데이터는 저장기간이 만료된 이후 \n다시 불러올 수 없어요.',
-                        style: TextStyle(color: Colors.black),
+                        style: TextStyle(color: Colors.black, fontFamily: 'Pretendard'),
                         textAlign: TextAlign.justify, // 텍스트 정렬 설정
                         softWrap: true,
-                      ),actions: <Widget>[
-                        TextButton(
-                          child: Text('취소', style: TextStyle(color: Colors.black),),
-                          onPressed: () {
-                            Navigator.of(context).pop(false);  // false 반환
-                          },
+                      ),actions: <Widget> [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(false); // 다이얼로그 닫기
+                        },
+                        child: Text(
+                          '취소',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Pretendard'// 검은색 취소 버튼 텍스트
+                          ),
                         ),
-                        TextButton(
-                          child: Text('확인', style: TextStyle(color: Colors.black),),
-                          onPressed: () {
-                            Navigator.of(context).pop(true);  // true 반환
-                          },
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(true); // 다이얼로그 닫기
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor, // 보라색 배경
+                            borderRadius: BorderRadius.circular(8.0), // 둥근 모서리
+                          ),
+                          child: Text(
+                            '확인',
+                            style: TextStyle(
+                              color: Colors.white, // 흰색 텍스트
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Pretendard'// 확인 텍스트를 두껍게
+                            ),
+                          ),
                         ),
-                      ],
+                      ),
+                    ],
                     );
                   },
                 );
@@ -103,30 +124,51 @@ class _SettingState extends State<Setting> {
                     backgroundColor: Colors.white, // 하얀색 배경 설정
                     title: Text(
                       '페어링 해제',
-                      style: TextStyle(color: Colors.black), // 검은색 제목 텍스트
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontFamily: 'Pretendard'), // 검은색 제목 텍스트
                     ),
                     content: Text(
                       '페어링을 해제하면 페어링 코드에 엮인 \n데이터가 모두 삭제돼요. \n정말로 페어링을 해제 하시겠어요?',
-                      style: TextStyle(color: Colors.black), // 검은색 내용 텍스트
+                      style: TextStyle(
+                        color: Colors.black, // 검은색 내용 텍스트
+                        fontSize: 16.0,
+                        fontFamily: 'Pretendard'// 내용 텍스트 크기 조정
+                      ), // 검은색 내용 텍스트
+                    ),
+                    shape: RoundedRectangleBorder( //
+                      borderRadius: BorderRadius.circular(12.0), // 각지게 처리 (모서리 둥글게)
                     ),
                     actions: [
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pop(); // 취소 버튼: 다이얼로그 닫기
+                          Navigator.of(context).pop(); // 다이얼로그 닫기
                         },
                         child: Text(
                           '취소',
-                          style: TextStyle(color: Colors.black), // 검은색 버튼 텍스트
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Pretendard'// 검은색 취소 버튼 텍스트
+                          ),
                         ),
                       ),
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop(); // 다이얼로그 닫기
-                          _setPairingDelete(context); // 페어링 해제 함수 호출
+                          _setPairingDelete(context);
                         },
-                        child: Text(
-                          '확인',
-                          style: TextStyle(color: Colors.black), // 검은색 버튼 텍스트
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor, // 보라색 배경
+                            borderRadius: BorderRadius.circular(8.0), // 둥근 모서리
+                          ),
+                          child: Text(
+                            '확인',
+                            style: TextStyle(
+                              color: Colors.white, // 흰색 텍스트
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Pretendard'// 확인 텍스트를 두껍게
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -151,11 +193,22 @@ class _SettingState extends State<Setting> {
                     backgroundColor: Colors.white, // 하얀색 배경
                     title: Text(
                       '탈퇴 확인',
-                      style: TextStyle(color: Colors.black), // 검은색 제목 텍스트
+                      style: TextStyle(
+                        color: Colors.black, // 검은색 제목 텍스트
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Pretendard'// 제목 텍스트를 두껍게
+                      ),
                     ),
                     content: Text(
                       '탈퇴하시면 모든 데이터가 삭제되며, \n삭제된 데이터는 복구할 수 없어요. \n정말로 탈퇴하시겠어요?',
-                      style: TextStyle(color: Colors.black), // 검은색 내용 텍스트
+                      style: TextStyle(
+                        color: Colors.black, // 검은색 내용 텍스트
+                        fontSize: 16.0,
+                        fontFamily: 'Pretendard'// 내용 텍스트 크기 조정
+                      ),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0), // 각지게 처리 (모서리 둥글게)
                     ),
                     actions: [
                       TextButton(
@@ -164,7 +217,10 @@ class _SettingState extends State<Setting> {
                         },
                         child: Text(
                           '취소',
-                          style: TextStyle(color: Colors.black), // 검은색 취소 버튼 텍스트
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Pretendard'// 검은색 취소 버튼 텍스트
+                          ),
                         ),
                       ),
                       TextButton(
@@ -172,13 +228,25 @@ class _SettingState extends State<Setting> {
                           Navigator.of(context).pop(); // 다이얼로그 닫기
                           _setUserDelete(context); // 탈퇴 함수 호출
                         },
-                        child: Text(
-                          '확인',
-                          style: TextStyle(color: Colors.black), // 검은색 확인 버튼 텍스트
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor, // 보라색 배경
+                            borderRadius: BorderRadius.circular(8.0), // 둥근 모서리
+                          ),
+                          child: Text(
+                            '확인',
+                            style: TextStyle(
+                              color: Colors.white, // 흰색 텍스트
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Pretendard'// 확인 텍스트를 두껍게
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   );
+
                 },
               );
             },

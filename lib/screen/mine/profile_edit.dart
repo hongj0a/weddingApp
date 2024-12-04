@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -22,6 +23,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   final TextEditingController _nicknameController = TextEditingController();
   String? _imagePath;
   String? _defaultImage;
+  String? _imageInfo;
   ApiService apiService = ApiService();
 
   @override
@@ -32,7 +34,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   @override
   Widget build(BuildContext context) {
-
+print('imagepath.......$_imagePath');
+print('defaultPath....... $_defaultImage');
+print('imageinfo......$_imageInfo');
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -62,10 +66,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 children: [
                   CircleAvatar(
                     radius: 50.0,
+                    backgroundColor: Colors.grey[100],
                     backgroundImage: _imagePath != null
                         ? FileImage(File(_imagePath!)) // 새로 선택한 이미지가 있을 경우
                         : _defaultImage != null ? NetworkImage(_defaultImage!) : null, // 서버에서 불러온 이미지가 있을 경우
-                    child: _imagePath == null && _defaultImage == null
+                    child: _imagePath == null && _imageInfo == null
                         ? Icon(Icons.person, size: 50.0) // 이미지가 선택되지 않은 경우
                         : null,
                   ),
@@ -149,6 +154,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       var data = response.data['data'];
       setState(() {
         _nicknameController.text = data['nickName'];
+        _imageInfo = data['image'];
         _defaultImage = '$imageUrl${data['image']}';
       });
     } else {

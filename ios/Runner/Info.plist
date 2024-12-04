@@ -30,13 +30,6 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.238980737763-ipk6me084inrrpgmil95dm5bqob5n1ib</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
 				<string>kakao9a794384618b41b8322fb7fed2baa529</string>
 			</array>
 		</dict>
@@ -86,6 +79,25 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
+	<true/>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Apple 계정으로 로그인 시 사용됩니다.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Face ID를 사용하여 계정을 보호합니다.</string>
+	<key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.example.smartWedding</string>
+            </array>
+        </dict>
+    </array>
+    <key>NSUserTrackingUsageDescription</key>
+    <string>애플 로그인 인증을 위해 사용됩니다.</string>
+    <key>ASAuthorizationAppleIDRequest</key>
+    <true/>
 </dict>
 </plist>

@@ -28,8 +28,11 @@ void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? refreshToken = prefs.getString('refreshToken');
   String? accessToken = prefs.getString('accessToken');
+  bool? isFirstYn = prefs.getBool('isFirstYn');
+
   print('refreshToken..!!!!!!!!!! $refreshToken');
   print('accessToken...!!!!!!!!! $accessToken');
+  print('isFirstYn...!!!!!!!!!!! $isFirstYn');
 
   /*String? _fcmToken = await FirebaseMessaging.instance.getToken();
   print('_fcmToken... $_fcmToken');

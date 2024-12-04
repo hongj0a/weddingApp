@@ -199,9 +199,6 @@ class _BudgetSettingState extends State<BudgetSetting> {
 
   Future<void> _updateBudgetOnServer(String seq, String label, String amount) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-
       final response = await apiService.post(
         ApiConstants.updateBudget,
         data: {
