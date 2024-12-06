@@ -6,7 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-
+import 'package:mime/mime.dart'; // For MIME type lookup
+import 'package:http_parser/http_parser.dart'; // For setting MediaType
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 import 'my_page.dart';
@@ -69,8 +70,11 @@ print('imageinfo......$_imageInfo');
                     backgroundColor: Colors.grey[100],
                     backgroundImage: _imagePath != null
                         ? FileImage(File(_imagePath!)) // 새로 선택한 이미지가 있을 경우
-                        : _defaultImage != null ? NetworkImage(_defaultImage!) : null, // 서버에서 불러온 이미지가 있을 경우
-                    child: _imagePath == null && _imageInfo == null
+                        : (_defaultImage != null && _imageInfo != null && _imageInfo!.isNotEmpty
+                        ? NetworkImage(_defaultImage!)
+                        : null), // 서버에서 불러온 이미지가 있을 경우
+                    child: _imagePath == null &&
+                        (_imageInfo == null || _imageInfo!.isEmpty)
                         ? Icon(Icons.person, size: 50.0) // 이미지가 선택되지 않은 경우
                         : null,
                   ),
@@ -121,30 +125,43 @@ print('imageinfo......$_imageInfo');
   }
 
   Future<void> _updateUserInfo(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken');
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? accessToken = prefs.getString('accessToken');
 
-    var url = Uri.parse(ApiConstants.setUserInfo);
+      if (accessToken == null) {
+        throw Exception('No access token found');
+      }
 
-    var request = http.MultipartRequest('POST', url);
-    request.headers['Authorization'] = 'Bearer $accessToken';
-    request.fields['nickName'] = _nicknameController.text; // 닉네임 필드 추가
-    // 이미지가 있는 경우 추가 (여기서는 _imagePath 변수를 사용, 필요시 구현)
-    if (_imagePath != null) {
-      request.files.add(await http.MultipartFile.fromPath('image', _imagePath!));
-    }
+      var url = Uri.parse(ApiConstants.setUserInfo);
 
-    var response = await request.send(); // 요청 전송
+      var request = http.MultipartRequest('POST', url);
+      request.headers['Authorization'] = 'Bearer $accessToken';
+      request.fields['nickName'] = _nicknameController.text; // 닉네임 필드 추가
 
-    if (response.statusCode == 200) {
-      // 요청 성공
-      Navigator.pop(context, true);
-    } else {
-      // 요청 실패
-      print('Failed to update user info: ${response.statusCode}');
+      print('imagePath: $_imagePath');
+      // 이미지가 있는 경우에만 파일 추가
+      if (_imagePath != null && _imagePath!.isNotEmpty) {
+        String mimeType = lookupMimeType(_imagePath!) ?? 'image/jpeg';
+        request.files.add(await http.MultipartFile.fromPath(
+          'image',
+          _imagePath!,
+          contentType: MediaType.parse(mimeType),
+        ));
+      }
+
+      var response = await request.send(); // 요청 전송
+
+      if (response.statusCode == 200) {
+        print('User info updated successfully');
+        Navigator.pop(context, true);
+      } else {
+        print('Failed to update user info: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error updating user info: $e');
     }
   }
-
   Future<void> _fetchUserInfo() async {
     var response = await apiService.get(
       ApiConstants.getUserInfo,
