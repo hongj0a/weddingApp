@@ -6,12 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="11742957-3fdc-4257-b625-c75b3070cca4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/config/ApiConstants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/config/ApiConstants.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/document/contract_detail.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/document/contract_detail.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/main/budget_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/main/budget_card.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screen/main/home_content.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/main/home_content.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/mine/d_day_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/d_day_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/mine/d_day_management.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/d_day_management.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screen/mine/my_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/my_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/screen/mine/profile_edit.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/mine/profile_edit.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/money/budget_setting.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/money/budget_setting.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/screen/money/cost_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screen/money/cost_page.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -24,7 +24,7 @@ class DDayCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String imageUrl = '${ApiConstants.localImagePath}/$image';
+    String imageUrl = image;
     return GestureDetector(
       onTap: () {
         Navigator.push(

@@ -23,7 +23,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   String imageUrl = '${ApiConstants.localImagePath}/';
   final TextEditingController _nicknameController = TextEditingController();
   String? _imagePath;
-  String? _defaultImage;
   String? _imageInfo;
   ApiService apiService = ApiService();
 
@@ -35,9 +34,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
   @override
   Widget build(BuildContext context) {
-print('imagepath.......$_imagePath');
-print('defaultPath....... $_defaultImage');
-print('imageinfo......$_imageInfo');
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -70,8 +66,8 @@ print('imageinfo......$_imageInfo');
                     backgroundColor: Colors.grey[100],
                     backgroundImage: _imagePath != null
                         ? FileImage(File(_imagePath!)) // 새로 선택한 이미지가 있을 경우
-                        : (_defaultImage != null && _imageInfo != null && _imageInfo!.isNotEmpty
-                        ? NetworkImage(_defaultImage!)
+                        : (_imageInfo != null && _imageInfo!.isNotEmpty
+                        ? NetworkImage(_imageInfo!)
                         : null), // 서버에서 불러온 이미지가 있을 경우
                     child: _imagePath == null &&
                         (_imageInfo == null || _imageInfo!.isEmpty)
@@ -172,7 +168,7 @@ print('imageinfo......$_imageInfo');
       setState(() {
         _nicknameController.text = data['nickName'];
         _imageInfo = data['image'];
-        _defaultImage = '$imageUrl${data['image']}';
+        //_defaultImage = data['image'];
       });
     } else {
       throw Exception('Failed to load user info');

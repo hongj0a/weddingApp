@@ -297,7 +297,7 @@ class _HomeContentState extends State<HomeContent> {
         future: futureDDays, // Future 설정
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator()); // 로딩 중
+            return Center(child: Container()); // 로딩 중
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}')); // 에러 처리
           } else {

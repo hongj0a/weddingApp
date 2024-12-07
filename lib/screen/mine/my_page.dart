@@ -133,7 +133,7 @@ class _MyPageState extends State<MyPage> {
                           radius: 50.0,
                           backgroundColor: Colors.grey[100],
                           backgroundImage: _userData?['image'] != null && _userData!['image'].isNotEmpty
-                              ? NetworkImage('$imageUrl${_userData!['image']}')
+                              ? NetworkImage(_userData!['image'])
                               : null,
                           child: _userData?['image'] == null || _userData!['image'].isEmpty
                               ? Icon(Icons.person, size: 50.0)

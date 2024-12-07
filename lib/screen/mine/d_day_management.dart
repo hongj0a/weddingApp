@@ -105,7 +105,7 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
               dday: card.dday,
               title: card.title,
               date: card.date,
-              image: '${ApiConstants.localImagePath}/${card.image}',
+              image: card.image,
               seq: card.seq,// 이미지 경로
               onDelete: () {
                 setState(() {

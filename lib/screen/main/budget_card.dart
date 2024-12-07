@@ -63,7 +63,7 @@ class _BudgetCardState extends State<BudgetCard> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return Center(child: CircularProgressIndicator()); // 로딩 중
+      return Center(child: Container());// 로딩 중
     }
 
     return GestureDetector(

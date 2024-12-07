@@ -54,7 +54,6 @@ class _ContractDetailState extends State<ContractDetail> {
   ApiService apiService = ApiService();
 
   String? imageUrlWithFullPath;
-  String imageUrl = '${ApiConstants.localImagePath}/';
 
   @override
   void initState() {
@@ -94,9 +93,6 @@ class _ContractDetailState extends State<ContractDetail> {
       return; // seq가 null이면 아무 것도 하지 않음
     } else {
       try{
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        String? accessToken = prefs.getString('accessToken');
-
         final response = await apiService.get(
           ApiConstants.getContractDetail,
           queryParameters: {'seq': widget.seq}
@@ -106,14 +102,13 @@ class _ContractDetailState extends State<ContractDetail> {
           // 데이터가 성공적으로 받아졌을 때 컨트롤러에 초기화
           final data = response.data;
           setState(() {
-
             _contractNameController.text = data['data']['name'];
             _contractAmountController.text = _formatNumberWithCommas(data['data']['contractAmount'].toString() ?? '');
             _totalAmountController.text = _formatNumberWithCommas(data['data']['totalAmount'].toString() ?? '');
             _companyNameController.text = data['data']['companyName'] ?? '';
             _eventDateController.text = data['data']['eventDate'] ?? '';
             _eventTimeController.text = data['data']['eventTime'] ?? '';
-            imageUrlWithFullPath = imageUrl + (data['data']['image'] ?? '');
+            imageUrlWithFullPath = data['data']['image'] ?? '';
             print('imageUrl.... $imageUrlWithFullPath}');// 이미지 URL이 null일 경우 빈 문자열 처리
           });
         } else {
