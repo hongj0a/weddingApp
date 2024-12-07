@@ -56,7 +56,7 @@ class ApiConstants {
   static const String delContract = '$baseUrl/contract/delContract';
   static const String setOcrCount = '$baseUrl/contract/setOcrCount';
 
-  static const String webSocketUrl = 'http://3.35.12.18:8888/ws-stomp';
+  static const String webSocketUrl = 'ws://3.35.12.18:8888/ws-stomp';
   //static const String webSocketUrl = 'ws://112.222.141.78:8888/ws-stomp';
   //static const String webSocketUrl = 'ws://192.168.3.50:8888/ws-stomp';
 
