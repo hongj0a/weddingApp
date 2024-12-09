@@ -25,18 +25,12 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
   int balanceBudget =0;
   String pairMan = "";
   ApiService apiService = ApiService();
-  late Future<List<Map<String, dynamic>>> _categoryFuture;
-  bool isDataFetched = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this); // Observer 등록
-    //_fetchCategories();
-    if (!isDataFetched) {
-      _categoryFuture = _fetchCategories();
-      isDataFetched = true;  // 데이터가 불러와졌다고 설정
-    }
+    _fetchCategories();
     _getTotalAmount();
   }
 
@@ -65,15 +59,6 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
     _getTotalAmount().then((_) {
     });
   }
-
- /* Future<void> refreshData() async {
-    // 데이터 새로고침
-    final newCategories = await _fetchCategories();
-    setState(() {
-      categories = newCategories;
-      _categoryFuture = Future.value(newCategories); // 새로 고침된 데이터를 Future로 설정
-    });
-  }*/
 
   Future<void> _getTotalAmount() async{
     try {
@@ -104,17 +89,27 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _fetchCategories() async {
-    try {
-      var response = await apiService.get(ApiConstants.getCategories);
-      if (response.statusCode == 200) {
+  Future<void> _fetchCategories() async {
+    try{
+      var response = await apiService.get(
+        ApiConstants.getCategories,
+      );  // GET 호출
+      if(response.statusCode == 200) {
         final jsonResponse = response.data;
         final categoryList = jsonResponse['data']['categoryList'];
 
+        print('categoryList...####  $categoryList');
         setState(() {
           categories = categoryList.map<Map<String, dynamic>>((category) {
             final seq = category['seq'];
             _isExpandedMap[seq] = false;
+
+            // 각 카테고리의 `items`를 초기화
+            /*_items[seq] = [
+            {'title': 'Sample Item 1', 'price': '5000원'},
+            {'title': 'Sample Item 2', 'price': '10000원'}
+          ];*/
+
             return {
               'seq': seq,
               'name': category['name'],
@@ -123,14 +118,14 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
             };
           }).toList();
         });
-        return categories;
       } else {
+        print('response....msg ... ${response.data}');
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("저장 실패: ${response.statusCode}")));
       }
-    } catch (e) {
+    }catch(e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("에러 발생: $e")));
     }
-    return [];
+
   }
 
   Future<List<Map<String, dynamic>>> _fetchCheckList(int seq) async {
@@ -156,24 +151,30 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
   }
 
   Future<Map<String, dynamic>> _fetchCheckListDetail(int seq) async {
-    var response = await apiService.get(
-      ApiConstants.getCheckListDetail,
-      queryParameters: {'seq': seq},
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accessToken');
+    var url = Uri.parse('${ApiConstants.getCheckListDetail}?seq=$seq');
+
+    var response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      }
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = response.data;
+      final jsonResponse = json.decode(response.body);
       print('jsonResponse... $jsonResponse');
       print('jsonResponseData...  ${jsonResponse['data']}');
 
       return jsonResponse['data']; // 필요한 데이터를 반환
     } else {
       print('response code ... ${response.statusCode}');
-      print('respons.. message ... ${response.data}');
+      print('respons.. message ... ${response.body}');
       throw Exception('Failed to load checklist detail');
     }
   }
-
 
 
   @override
@@ -283,104 +284,92 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
               ),
               SizedBox(height: 35),
               Expanded(
-                  child:  FutureBuilder<List<Map<String, dynamic>>>(
-                  future: _categoryFuture, // 이미 저장된 Future를 사용
-                    builder: (context, snapshot) {
-                      // 새로 갱신된 데이터를 로딩할 때만 로딩 인디케이터 표시
-                      if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-                        return Center(child: CircularProgressIndicator()); // 로딩 중일 때만 보임
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}')); // 에러 처리
-                      } else if (snapshot.hasData && snapshot.data != null) {
-                        final categories = snapshot.data!; // 데이터가 있으면 카테고리 가져오기
-                      return ListView.builder(
-                        itemCount: categories.length,
-                        itemBuilder: (context, index) {
-                          final category = categories[index];
-                          final seq = category['seq'];
-                          return Column(
+                child: ListView.builder(
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final category = categories[index];
+                    final seq = category['seq'];
+
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Tooltip(
-                                      message: '${category['name']} 평균 : ${NumberFormat('#,###').format(category['avgCost'])} 원',
-                                      child: Icon(Icons.info),
-                                    ),
-                                    Text(
-                                      '${category['name']} ${NumberFormat('#,###').format(category['totalCost'])}원',
-                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          _isExpandedMap[seq] = !_isExpandedMap[seq]!;
-                                        });
-                                      },
-                                      child: Icon(_isExpandedMap[seq]! ? Icons.expand_less : Icons.expand_more),
-                                    ),
-                                  ],
-                                ),
+                              Tooltip(
+                                message: '${category['name']} 평균 : ${NumberFormat('#,###').format(category['avgCost'])} 원',
+                                child: Icon(Icons.info),
                               ),
-                              Divider(height: 1, color: Colors.grey.shade300),
-                              if (_isExpandedMap[seq]!) // 카테고리가 확장된 경우
-                                FutureBuilder<List<Map<String, dynamic>>>(
-                                  future: _fetchCheckList(seq), // Future 반환
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState == ConnectionState.waiting) {
-                                      return CircularProgressIndicator();
-                                    } else if (snapshot.hasError) {
-                                      return Text('Error: ${snapshot.error}');
-                                    } else if (snapshot.hasData && snapshot.data != null) {
-                                      // 데이터가 있는 경우
-                                      return AnimatedContainer(
-                                        duration: Duration(milliseconds: 300),
-                                        child: ListView.builder(
-                                          shrinkWrap: true,
-                                          physics: NeverScrollableScrollPhysics(),
-                                          itemCount: snapshot.data!.length + 1,
-                                          itemBuilder: (context, itemIndex) {
-                                            if (itemIndex == snapshot.data!.length) {
-                                              return Container(
-                                                padding: const EdgeInsets.all(16.0),
-                                                child: ElevatedButton(
-                                                  onPressed: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) => AddCostPage(categorySeq: seq),
-                                                      ),
-                                                    ).then((value) {
-                                                      if (value == true) {
-                                                        refreshData(); // 추가 후 데이터 새로 고침
-                                                      }
-                                                    });
-                                                  },
-                                                  style: ElevatedButton.styleFrom(
-                                                    backgroundColor: Colors.white,
-                                                    foregroundColor: Colors.black,
-                                                  ),
-                                                  child: Text('추가하기'),
-                                                ),
-                                              );
-                                            }
-                                            final item = snapshot.data![itemIndex];
-                                            return _buildListTile(item['title']!, item['price']!, item['seq']);
-                                          },
-                                        ),
-                                      );
-                                    }
-                                    return Container(); // 기본적으로 빈 컨테이너
-                                  },
-                                ),
+                              Text(
+                                '${category['name']} ${NumberFormat('#,###').format(category['totalCost'])}원',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _isExpandedMap[seq] = !_isExpandedMap[seq]!;
+                                  });
+                                },
+                                child: Icon(_isExpandedMap[seq]! ? Icons.expand_less : Icons.expand_more),
+                              ),
                             ],
-                          );
-                        },
-                      );
-                  }
-                  return Container(); // 기본적으로 빈 컨테이너
+                          ),
+                        ),
+                        Divider(height: 1, color: Colors.grey.shade300),
+                        if (_isExpandedMap[seq]!) // 카테고리가 확장된 경우
+                          FutureBuilder<List<Map<String, dynamic>>>(
+                            future: _fetchCheckList(seq), // Future 반환
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else if (snapshot.hasData && snapshot.data != null) {
+                                // 데이터가 있는 경우
+                                return AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: snapshot.data!.length + 1,
+                                    itemBuilder: (context, itemIndex) {
+                                      if (itemIndex == snapshot.data!.length) {
+                                        return Container(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => AddCostPage(categorySeq: seq),
+                                                ),
+                                              ).then((value) {
+                                                if (value == true) {
+                                                  refreshData(); // 추가 후 데이터 새로 고침
+                                                }
+                                              });
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.white,
+                                              foregroundColor: Colors.black,
+                                            ),
+                                            child: Text('추가하기'),
+                                          ),
+                                        );
+                                      }
+                                      final item = snapshot.data![itemIndex];
+                                      return _buildListTile(item['title']!, item['price']!, item['seq']);
+                                    },
+                                  ),
+                                );
+                              }
+                              return Container(); // 기본적으로 빈 컨테이너
+                            },
+                          ),
+                      ],
+                    );
+
                   },
                 ),
               ),

@@ -316,10 +316,10 @@ class _HomeContentState extends State<HomeContent> {
                       );
                     },
                     child: SvgPicture.asset(
-                      'asset/img/banner_main.svg',
+                      'asset/img/event_banner.svg',
                       fit: BoxFit.cover,
                       height: 200,
-                      width: double.infinity,
+                      //width: double.minPositive,
                     ),
                   ),
                   SizedBox(height: 16),
