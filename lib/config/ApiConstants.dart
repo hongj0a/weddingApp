@@ -4,7 +4,7 @@ class ApiConstants {
   static const String predict = '$mlUrl/predict';
   static const String feedback = '$mlUrl/feedback';
   //static const String baseUrl = 'http://192.168.3.50:8888';
-  static const String baseUrl = 'http://3.35.12.18:8888';
+  static const String baseUrl = 'https://our-wallet.kro.kr';
   static const String isExistPairingCode = '$baseUrl/api/isExistPairingCode';
   static const String authenticate = '$baseUrl/api/authenticate';
   static const String refreshTokenValidation = '$baseUrl/api/refreshTokenValidation';
@@ -56,7 +56,7 @@ class ApiConstants {
   static const String delContract = '$baseUrl/contract/delContract';
   static const String setOcrCount = '$baseUrl/contract/setOcrCount';
 
-  static const String webSocketUrl = 'ws://3.35.12.18:8888/ws-stomp';
+  static const String webSocketUrl = 'wss://our-wallet.kro.kr/ws-stomp';
   //static const String webSocketUrl = 'ws://112.222.141.78:8888/ws-stomp';
   //static const String webSocketUrl = 'ws://192.168.3.50:8888/ws-stomp';
 

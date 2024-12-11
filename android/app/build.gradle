@@ -58,10 +58,18 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        release {
+            storeFile file("/Applications/workspace/smartWedding/smart_wedding/my-release-key.jks") // .jks 파일의 경로
+            storePassword "ghdwlsdud12!"
+            keyAlias "my-key-alias"
+            keyPassword "ghdwlsdud12!"
+        }
+    }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled true  // 코드 축소 활성화
             shrinkResources true  // 리소스 축소 활성화
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
