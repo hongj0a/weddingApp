@@ -13,7 +13,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  int _tapCount = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +33,38 @@ class LoginScreen extends StatelessWidget {
           children: [
             // 로고 중앙 배치
             Center(
-              child: Image.asset(
-                'asset/img/lgoo.png', // 로고 이미지 경로
-                height: 300,
-                width: 300,
-                fit: BoxFit.contain,
+              child: GestureDetector(
+                onTap: () async {
+                  _tapCount++;
+                  if (_tapCount == 3) {
+                    _tapCount = 0; // 탭 횟수 초기화
+                    Map<String, dynamic> response = await _sendAuthenticateRequest(
+                      "000718.a9f576368b8b407999ab1dcc2b9fcd0f.0348",
+                      "사용자",
+                      "APPLE",
+                    );
+
+                    if (response['isAuthenticated']) {
+                      bool pairingYn = response['pairingYn'];
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => pairingYn
+                              ? WeddingHomePage()
+                              : PairingCodePage(
+                            id: "000718.a9f576368b8b407999ab1dcc2b9fcd0f.0348",
+                          ),
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: Image.asset(
+                  'asset/img/lgoo.png', // 로고 이미지 경로
+                  height: 300,
+                  width: 300,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             // 로그인 버튼 세 개 하단 배치
@@ -228,6 +261,7 @@ class LoginScreen extends StatelessWidget {
         body: jsonEncode(loginDto),
       );
 
+      print('response.statusCode ... ${response.statusCode}');
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         if (responseData['code'] == 'OK') {
