@@ -242,6 +242,12 @@ class _PairingCodePageState extends State<PairingCodePage> {
                   minimumSize: Size(double.infinity, 50), // 버튼 크기
                 ),
               ),
+              SizedBox(height: 30),
+              Text(
+                '초대 코드를 입력하면 파트너와 웨딩 예산 계획을 공유하고 관리할 수 있습니다.\n원활한 서비스 이용을 위해 페어링 등록이 필요합니다.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 10, color: Colors.grey),
+              ),
               SizedBox(height: 50),
               TextButton(
                 onPressed: () async {

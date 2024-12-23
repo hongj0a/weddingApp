@@ -54,7 +54,7 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>이 앱은 사진 라이브러리에 저장하기 위해 권한이 필요합니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>이 앱은 사진 라이브러리에 접근하기 위해 권한이 필요합니다.</string>
+	<string>사용자가 프로필 사진 및 디데이 프로필카드 사진을 업로드하거나 변경할 수 있도록 사진 라이브러리에 접근합니다.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

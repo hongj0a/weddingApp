@@ -40,7 +40,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "com.example.smart_wedding"
+    namespace = "com.superiority.ourwallet"
     compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
@@ -50,7 +50,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.smart_wedding"
+        applicationId = "com.superiority.ourwallet"
         minSdkVersion = 21
         targetSdkVersion = 34
         versionCode = flutterVersionCode.toInteger()

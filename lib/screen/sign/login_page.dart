@@ -123,6 +123,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
+                  SizedBox(height: 20), // 버튼과 텍스트 사이 간격
+                  Text(
+                    "우리의 웨딩 월렛 서비스는 예비 부부가 함께 \n결혼 예산 계획을 관리할 수 있도록 설계 되었습니다. \n원활한 앱 사용을 위해 로그인 후 이용해 주세요.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey[700],
+                    ),
+                  ),
                 ],
               ),
             ),
