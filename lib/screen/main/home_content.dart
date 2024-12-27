@@ -318,7 +318,7 @@ class _HomeContentState extends State<HomeContent> {
                     child: SvgPicture.asset(
                       'asset/img/event_banner.svg',
                       fit: BoxFit.cover,
-                      height: 200,
+                      height: 215,
                       //width: double.minPositive,
                     ),
                   ),
@@ -416,6 +416,7 @@ class _HomeContentState extends State<HomeContent> {
                                                   child: SvgPicture.asset(
                                                     'asset/img/empty_dday.svg', // SVG 이미지 경로
                                                     fit: BoxFit.cover,           // 컨테이너를 덮도록 설정
+                                                    alignment: Alignment.center,
                                                   ),
                                                 ),
                                               ),
@@ -452,14 +453,13 @@ class _HomeContentState extends State<HomeContent> {
 
                   SizedBox(height: 10),
 
-                  // 더보기 버튼 추가, 그림자 제거 및 테두리 연하게 수정
                   Container(
-                    padding: const EdgeInsets.all(0.0),
+                    padding: const EdgeInsets.all(1.0),
                     margin: EdgeInsets.all(5.0),
                     decoration: BoxDecoration(
                       color: Colors.white,
                     ),
-                    child: SingleChildScrollView( // 스크롤 가능하게 추가
+                    child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -468,7 +468,6 @@ class _HomeContentState extends State<HomeContent> {
                             children: [
                               Padding(
                                 padding: EdgeInsets.only(left: 21.0),
-                                // "계약서 종류" 왼쪽에 여백 추가
                                 child: Text(
                                   "계약서 종류",
                                   style: TextStyle(
@@ -489,7 +488,6 @@ class _HomeContentState extends State<HomeContent> {
                                         fontFamily: 'Pretendard')),
                                     Padding(
                                       padding: EdgeInsets.only(right: 20.0),
-                                      // 아이콘 오른쪽 여백 추가
                                       child: Icon(
                                         Icons.arrow_forward_ios,
                                         size: 12,
@@ -502,60 +500,79 @@ class _HomeContentState extends State<HomeContent> {
                             ],
                           ),
                           SizedBox(height: 10),
-                          // GridView를 Column 내부에 넣되, 높이를 명확히 지정하여 크기 초과를 방지
-                          SizedBox(
-                            height: 200, // GridView의 최대 높이를 설정
-                            child: GridView.count(
-                              shrinkWrap: true,
-                              crossAxisCount: 4,
-                              childAspectRatio: 1,
-                              physics: NeverScrollableScrollPhysics(),
-                              children: List.generate(8, (index) {
-                                return Container(
-                                  margin: EdgeInsets.all(0.0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            // 그림자 레이어
-                                            Transform.translate(
-                                              offset: Offset(2, 2),
-                                              // 그림자를 약간 오른쪽 아래로 이동
-                                              child: SvgPicture.asset(
-                                                'asset/img/icon_${index +
-                                                    1}.svg',
-                                                width: 64,
-                                                height: 92,
-                                                color: Colors.black.withOpacity(
-                                                    0.2), // 그림자 색상
-                                              ),
-                                            ),
-                                            // 실제 이미지 레이어
-                                            SvgPicture.asset(
-                                              'asset/img/icon_${index + 1}.svg',
-                                              width: 64,
-                                              height: 92,
-                                            ),
-                                          ],
-                                        ),
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              // 화면 방향 및 디바이스 크기 확인
+                              bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+                              bool isIPad = MediaQuery.of(context).size.width > 600;
+
+                              // 아이패드 세로모드에서 한 줄에 6개, 그 외 조건에 따라 8개 또는 4개로 설정
+                              int crossAxisCount = isIPad && !isLandscape ? 6 : (isLandscape ? 8 : 4);
+                              double aspectRatio = 1.0;
+
+                              // 높이 조정: 아이패드 세로모드 1줄, 그 외 2줄
+                              double height = isIPad && !isLandscape
+                                  ? 125 // 아이패드 세로모드 (1줄)
+                                  : 200; // 아이폰 또는 가로모드 (2줄)
+                              // 아이템 수를 제한해 한 줄로 표시
+                              int maxItems = crossAxisCount; // 열 개수만큼만 아이템 표시
+                              return SizedBox(
+                                  height: height,
+                                  child: GridView.count(
+                                  shrinkWrap: true,
+                                  crossAxisCount: crossAxisCount,
+                                  crossAxisSpacing: 8.0, // 그리드 간격
+                                  mainAxisSpacing: 8.0, // 그리드 간격
+                                  childAspectRatio: aspectRatio,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  children: List.generate(8, (index) {
+                                    return Container(
+                                      margin: EdgeInsets.all(0.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8), // 아이템 모서리 둥글게 처리
                                       ),
-                                    ],
-                                  ),
-                                );
-                              }),
-                            ),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Expanded(
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                // 그림자 레이어
+                                                Positioned(
+                                                  child: SvgPicture.asset(
+                                                    'asset/img/icon_${index + 1}.svg',
+                                                    fit: BoxFit.contain, // 이미지를 컨테이너에 맞게 조정
+                                                    width: 64,
+                                                    height: 92,
+                                                    color: Colors.black.withOpacity(0.2),
+                                                  ),
+                                                ),
+                                                // 실제 이미지 레이어
+                                                Positioned(
+                                                  child: SvgPicture.asset(
+                                                    'asset/img/icon_${index + 1}.svg',
+                                                    fit: BoxFit.contain, // 이미지를 컨테이너에 맞게 조정
+                                                    width: 64,
+                                                    height: 92,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
                     ),
                   ),
-
                   // Budget Info
                   BudgetCard(),
                 ],

@@ -26,8 +26,7 @@ class _BudgetCardState extends State<BudgetCard> {
 
   Future<void> _fetchBudgetData() async {
     setState(() {
-      isLoading = true; // 로딩 시작
-      print('로딩 상태: 시작');
+      isLoading = true;
     });
 
     try {
@@ -38,19 +37,16 @@ class _BudgetCardState extends State<BudgetCard> {
           totalBudget = data['totalAmount'] ?? 0;
           usedBudget = data['usedBudget'] ?? 0;
           balanceBudget = totalBudget - usedBudget;
-          isLoading = false; // 로딩 완료
+          isLoading = false;
         });
       } else {
-        print('Error fetching budget: ${response.statusCode}');
         setState(() {
-          isLoading = false; // 로딩 완료
+          isLoading = false;
         });
       }
     } catch (e) {
-      print('Fetch budget failed: $e');
       setState(() {
-        isLoading = false; // 로딩 완료
-        print('로딩 상태: 완료, 오류 발생: $e');
+        isLoading = false;
       });
     }
   }
@@ -62,8 +58,11 @@ class _BudgetCardState extends State<BudgetCard> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     if (isLoading) {
-      return Center(child: Container());// 로딩 중
+      return Center(child: Container()); // 로딩 중
     }
 
     return GestureDetector(
@@ -73,21 +72,22 @@ class _BudgetCardState extends State<BudgetCard> {
           MaterialPageRoute(builder: (context) => BudgetSetting()),
         );
 
-        // BudgetSetting에서 true 값을 반환한 경우에만 새로고침
         if (result == true) {
           _fetchBudgetData();
         }
       },
       child: Container(
-        margin: const EdgeInsets.all(8.0),
-        padding: const EdgeInsets.all(12.0),
+        margin: EdgeInsets.all(screenWidth * 0.02),
+        padding: EdgeInsets.all(screenWidth * 0.03),
         child: Stack(
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: SizedBox(
-                width: 395,
-                height: 200,
+                width: screenWidth * 0.9,
+                height: MediaQuery.of(context).orientation == Orientation.landscape && screenWidth >= 768
+                    ? screenHeight * 0.40  // iPad 가로모드 (가로 크기가 768 이상일 때)
+                    : screenHeight * 0.247,
                 child: SvgPicture.asset(
                   'asset/img/budget_card_no_line.svg',
                   fit: BoxFit.cover,
@@ -96,7 +96,7 @@ class _BudgetCardState extends State<BudgetCard> {
             ),
             Positioned.fill(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(screenWidth * 0.04),
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,24 +108,24 @@ class _BudgetCardState extends State<BudgetCard> {
                             '예산',
                             style: TextStyle(
                               fontFamily: 'Pretendard',
-                              fontSize: 22,
+                              fontSize: screenWidth * 0.057, // 화면 크기 비례 폰트 크기
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: screenHeight * 0.03), // 화면 크기 비례 여백
                       _buildBudgetRow('총 예산', totalBudget),
-                      const SizedBox(height: 8),
+                      SizedBox(height: screenHeight * 0.01), // 화면 크기 비례 여백
                       _buildBudgetRow('총 지출', usedBudget),
-                      const SizedBox(height: 20),
+                      SizedBox(height: screenHeight * 0.02), // 화면 크기 비례 여백
                       Container(
                         height: 0.5,
                         color: Colors.white,
-                        margin: const EdgeInsets.symmetric(horizontal: 1),
+                        margin: EdgeInsets.symmetric(horizontal: 1),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: screenHeight * 0.02), // 화면 크기 비례 여백
                       _buildBudgetRow('남은 예산', balanceBudget),
                     ],
                   ),
@@ -139,28 +139,31 @@ class _BudgetCardState extends State<BudgetCard> {
   }
 
   Widget _buildBudgetRow(String title, int amount) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontFamily: 'Pretendard',
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 0.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontFamily: 'Pretendard',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+            ),
           ),
-        ),
-        Text(
-          '${_formatCurrency(amount.toString())} 원',
-          style: TextStyle(
-            fontFamily: 'Pretendard',
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
+          Text(
+            '${_formatCurrency(amount.toString())} 원',
+            style: TextStyle(
+              fontFamily: 'Pretendard',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
