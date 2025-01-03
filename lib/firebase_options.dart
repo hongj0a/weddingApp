@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '131880562602',
     projectId: 'our-wallet-6e3f5',
     storageBucket: 'our-wallet-6e3f5.firebasestorage.app',
-    iosBundleId: 'com.example.smartWedding',
+    iosBundleId: 'com.superiority.ourwallet',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(

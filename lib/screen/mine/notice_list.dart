@@ -1,11 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 import 'notice_detail.dart';
-import 'package:http/http.dart' as http;
 
 class NoticeList extends StatefulWidget {
 @override
@@ -27,11 +23,10 @@ class _NoticeListState extends State<NoticeList> {
 
       final response = await apiService.get(
         ApiConstants.getNotice,
-      );// Assuming this returns a Future<Response>
+      );
       if (response.statusCode == 200) {
         final data = response.data['data']['notices'];
 
-        // Map the title and date to the notices list
         setState(() {
           notices = List<Map<String, dynamic>>.from(
             data.map((item) => {
@@ -79,7 +74,7 @@ class _NoticeListState extends State<NoticeList> {
                       builder: (context) => NoticeDetail(
                         title: notice['title'] ?? '',
                         date: notice['date'] ?? '',
-                        seq: notice['seq'] ?? '', // seq 추가
+                        seq: notice['seq'] ?? '',
                       ),
                     ),
                   );

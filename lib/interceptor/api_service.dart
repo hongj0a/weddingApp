@@ -9,31 +9,27 @@ class ApiService {
   ApiService() {
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        // 액세스 토큰을 헤더에 추가
         String? accessToken = await _getAccessToken();
         if (accessToken != null) {
           options.headers['Authorization'] = 'Bearer $accessToken';
         }
-        return handler.next(options); // 요청을 계속 진행
+        return handler.next(options);
       },
       onResponse: (response, handler) {
-        // 응답 처리
         if (response.data['code'] == '1412') {
           _handlePairingDisconnected();
         }
-        return handler.next(response); // 응답을 계속 진행
+        return handler.next(response);
       },
       onError: (DioError error, handler) {
-        // 에러 처리
         if (error.response != null && error.response!.data['code'] == '1412') {
           _handlePairingDisconnected();
         }
-        return handler.next(error); // 에러를 계속 진행
+        return handler.next(error);
       },
     ));
   }
 
-  // GET 요청
   Future<Response<dynamic>> get(String url, {Map<String, dynamic>? queryParameters}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -50,13 +46,11 @@ class ApiService {
       return response;
     } catch (e) {
       print('get...e........$e');
-      rethrow; // 에러 처리 (추후 에러 로깅 등 추가할 수 있음)
+      rethrow;
     }
   }
 
-  // POST 요청
   Future<Response<dynamic>> post(String url, {dynamic data}) async {
-  //Future<Response<dynamic>> post(String url, {Map<String, dynamic>? data}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
@@ -65,32 +59,28 @@ class ApiService {
         data: data,
         options: Options(
           headers: {
-            'Authorization': 'Bearer $accessToken', // Authorization 헤더 추가
-            'Content-Type': 'application/json', // 필요 시 Content-Type 추가
+            'Authorization': 'Bearer $accessToken',
+            'Content-Type': 'application/json',
           },
         ),
       );
       return response;
     } catch (e) {
       print('e........$e');
-      rethrow; // 에러 처리 (추후 에러 로깅 등 추가할 수 있음)
+      rethrow;
     }
   }
 
-  // 페어링 끊어진 경우 처리
   void _handlePairingDisconnected() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('accessToken');
     await prefs.remove('refreshToken');
 
-    // 로그인 화면으로 이동
     runApp(MaterialApp(
       home: LoginScreen(),
     ));
   }
 
-
-  // 액세스 토큰을 SharedPreferences에서 가져오는 함수
   Future<String?> _getAccessToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('accessToken');

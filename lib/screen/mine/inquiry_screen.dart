@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http; // HTTP 패키지 추가
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert'; // JSON 인코딩을 위해 추가
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
@@ -12,41 +10,40 @@ class InquiryScreen extends StatefulWidget {
 }
 
 class _InquiryScreenState extends State<InquiryScreen> {
-  final TextEditingController _controller = TextEditingController(); // TextField의 값을 제어하기 위한 컨트롤러 추가
-  bool _isLoading = false; // 로딩 상태를 나타내는 변수 추가
+  final TextEditingController _controller = TextEditingController();
+  bool _isLoading = false;
   ApiService apiService = ApiService();
 
   void _submitInquiry() async {
-    String content = _controller.text.trim(); // TextField의 값을 가져오기
+    String content = _controller.text.trim();
 
     if (content.isEmpty) {
-      // TextField가 빈 경우 AlertDialog 띄우기
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0), // 약간 직각 모양
+              borderRadius: BorderRadius.circular(8.0),
             ),
             backgroundColor: Colors.white,
             content: Text(
               '내용을 입력해 주세요.',
-              style: TextStyle(color: Colors.black, fontSize: 16), // 내용 글씨 검정색
+              style: TextStyle(color: Colors.black, fontSize: 16),
             ),
             actions: [
               TextButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(AppColors.primaryColor), // 보라색 배경
-                  foregroundColor: MaterialStateProperty.all(Colors.white), // 흰색 텍스트
-                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 10)), // 버튼 크기 조정
+                  backgroundColor: MaterialStateProperty.all(AppColors.primaryColor),
+                  foregroundColor: MaterialStateProperty.all(Colors.white),
+                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
                   shape: MaterialStateProperty.all(
                     RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4.0), // 약간의 둥근 테두리
+                      borderRadius: BorderRadius.circular(4.0),
                     ),
                   ),
                 ),
                 onPressed: () {
-                  Navigator.of(context).pop(); // 다이얼로그 닫기
+                  Navigator.of(context).pop();
                 },
                 child: Text(
                   '확인',
@@ -58,52 +55,47 @@ class _InquiryScreenState extends State<InquiryScreen> {
 
         },
       );
-      return; // 빈 값인 경우 함수 종료
+      return;
     }
 
     setState(() {
-      _isLoading = true; // 로딩 시작
+      _isLoading = true;
     });
 
-    // POST 요청
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
-      var url = Uri.parse(ApiConstants.inquiryMailSend);
 
       final response = await apiService.post(
-        ApiConstants.inquiryMailSend, // ApiConstants의 inquiryMailSend URL // 요청 헤더 설정
-        data: {'content': content}, // body에 content 추가
+        ApiConstants.inquiryMailSend,
+        data: {'content': content},
       );
 
       setState(() {
-        _isLoading = false; // 로딩 끝
+        _isLoading = false;
       });
 
       if (response.statusCode == 200) {
-        // 성공 시 알림을 표시하고 뒤로 가기
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              backgroundColor: Colors.white, // 배경색을 흰색으로 설정
+              backgroundColor: Colors.white,
               title: Text(
                 '알림',
-                style: TextStyle(color: Colors.black), // 제목 글씨 색을 검은색으로 설정
+                style: TextStyle(color: Colors.black),
               ),
               content: Text(
                 '문의하기가 완료되었습니다.',
-                style: TextStyle(color: Colors.black), // 내용 글씨 색을 검은색으로 설정
+                style: TextStyle(color: Colors.black),
               ),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context); // 다이얼로그 닫기
-                    Navigator.pop(context); // 페이지 뒤로 가기
+                    Navigator.pop(context);
+                    Navigator.pop(context);
                   },
                   child: Text(
                     '확인',
-                    style: TextStyle(color: Colors.black), // 버튼 글씨 색을 검은색으로 설정
+                    style: TextStyle(color: Colors.black),
                   ),
                 ),
               ],
@@ -111,14 +103,12 @@ class _InquiryScreenState extends State<InquiryScreen> {
           },
         );
       } else {
-        // 실패 시 에러 메시지 출력
         _showErrorDialog('문의하기에 실패했습니다. 다시 시도해 주세요.');
       }
     } catch (e) {
-      // 요청 중 에러 발생 시 에러 메시지 출력
       _showErrorDialog('서버와의 연결에 실패했습니다. 다시 시도해 주세요.');
       setState(() {
-        _isLoading = false; // 로딩 끝
+        _isLoading = false;
       });
     }
   }
@@ -128,23 +118,23 @@ class _InquiryScreenState extends State<InquiryScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white, // 배경색을 흰색으로 설정
+          backgroundColor: Colors.white,
           title: Text(
             '오류',
-            style: TextStyle(color: Colors.black), // 제목 글씨 색상을 검정색으로 설정
+            style: TextStyle(color: Colors.black),
           ),
           content: Text(
             message,
-            style: TextStyle(color: Colors.black), // 내용 글씨 색상을 검정색으로 설정
+            style: TextStyle(color: Colors.black),
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // 다이얼로그 닫기
+                Navigator.of(context).pop();
               },
               child: Text(
                 '확인',
-                style: TextStyle(color: Colors.black), // 버튼 글씨 색상을 검정색으로 설정
+                style: TextStyle(color: Colors.black),
               ),
             ),
           ],
@@ -168,7 +158,7 @@ class _InquiryScreenState extends State<InquiryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              RichText(
+              /*RichText(
                 text: TextSpan(
                   children: [
                     TextSpan(
@@ -185,16 +175,16 @@ class _InquiryScreenState extends State<InquiryScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20),*/
               TextField(
-                controller: _controller, // TextField에 컨트롤러 연결
+                controller: _controller,
                 maxLines: 12,
                 maxLength: 1000,
                 decoration: InputDecoration(
                   hintText: '여기에 내용을 적어주세요 :)',
                   border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.primaryColor, width: 1), // 활성화 시 색상 변경
+                    borderSide: BorderSide(color: AppColors.primaryColor, width: 1),
                   ),
                 ),
               ),
@@ -211,10 +201,10 @@ class _InquiryScreenState extends State<InquiryScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton(
-                    onPressed: _submitInquiry, // 버튼 클릭 시 _submitInquiry 호출
+                    onPressed: _submitInquiry,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.black, // 글씨 색상
-                      side: BorderSide(color: Colors.grey), // 테두리 색상
+                      foregroundColor: Colors.black,
+                      side: BorderSide(color: Colors.grey),
                     ),
                     child: Text('문의하기'),
                   ),

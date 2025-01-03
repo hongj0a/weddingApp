@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/mine/question_list.dart';
-import 'package:http/http.dart' as http; // HTTP 패키지 임포트
-import 'dart:convert';
-
 import '../../config/ApiConstants.dart';
-import '../../interceptor/api_service.dart'; // JSON 디코딩을 위해 임포트
+import '../../interceptor/api_service.dart';
 
 class FAQScreen extends StatefulWidget {
   @override
@@ -14,7 +10,7 @@ class FAQScreen extends StatefulWidget {
 
 class _FAQScreenState extends State<FAQScreen> {
   List<String> faqTitles = [];
-  List<int> faqSeqs = []; // seq를 저장할 리스트
+  List<int> faqSeqs = [];
   ApiService apiService = ApiService();
 
   @override
@@ -33,7 +29,6 @@ class _FAQScreenState extends State<FAQScreen> {
         final data = response.data;
         if (data['data'] != null && data['data']['faqCategories'] != null) {
           setState(() {
-            // data['terms']에서 title과 seq를 가져옵니다.
             faqTitles = List<String>.from(data['data']['faqCategories'].map((item) => item['title']));
             faqSeqs = List<int>.from(data['data']['faqCategories'].map((item) => item['seq']));
           });
@@ -45,7 +40,6 @@ class _FAQScreenState extends State<FAQScreen> {
       }
     } catch (e) {
       print('Error fetching FAQ list: $e');
-      // 에러 처리 (예: 사용자에게 알림)
     }
   }
 
@@ -70,11 +64,10 @@ class _FAQScreenState extends State<FAQScreen> {
             title: Text(faqTitles[index]),
             trailing: Icon(Icons.chevron_right),
             onTap: () {
-              // seq를 인자로 넘겨주기
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => QuestionList(seq: faqSeqs[index]), // seq 전달
+                  builder: (context) => QuestionList(seq: faqSeqs[index]),
                 ),
               );
             },

@@ -1,15 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../config/ApiConstants.dart';
-import 'package:http/http.dart' as http;
-
 import '../../interceptor/api_service.dart';
 
 class FaqDetail extends StatefulWidget {
-  final int seq; // seq 변수를 선언
+  final int seq;
 
   const FaqDetail({Key? key, required this.seq}) : super(key: key);
 
@@ -26,7 +21,7 @@ class _FaqDetailState extends State<FaqDetail> {
   @override
   void initState() {
     super.initState();
-    _fetchFaqDetail(); // 페이지가 열리면 API를 통해 세부 정보를 가져옴
+    _fetchFaqDetail();
   }
 
   Future<void> _fetchFaqDetail() async {
@@ -34,14 +29,14 @@ class _FaqDetailState extends State<FaqDetail> {
 
       final response = await apiService.get(
         ApiConstants.getFaqDetail,
-        queryParameters: {'seq': widget.seq.toString()}, // seq를 요청 파라미터로 전달
+        queryParameters: {'seq': widget.seq.toString()},
       );
 
       if (response.statusCode == 200) {
         final data = response.data;
         setState(() {
           title = data['data']['title'] ?? '';
-          content = data['data']['content'] ?? ''; // 데이터에서 내용 가져오기
+          content = data['data']['content'] ?? '';
         });
       } else {
         throw Exception('Failed to load notice detail');
@@ -73,9 +68,9 @@ class _FaqDetailState extends State<FaqDetail> {
           child: ConstrainedBox(
             constraints: BoxConstraints(
               minHeight: MediaQuery.of(context).size.height -
-                  AppBar().preferredSize.height, // AppBar 높이를 제외한 높이로 설정
+                  AppBar().preferredSize.height,
             ),
-            child: Html(data: content), // HTML 콘텐츠 표시
+            child: Html(data: content),
           ),
         )
             : Center(child: Text('로딩 중...')),

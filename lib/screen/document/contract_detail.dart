@@ -6,23 +6,19 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 
-// 세자리마다 콤마를 추가하는 Formatter
 class ThousandsSeparatorFormatter extends TextInputFormatter {
   final _formatter = NumberFormat('#,###');
 
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    // 입력 값에서 숫자만 남기고 콤마 추가
     String newText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
     if (newText.isEmpty) {
       return newValue.copyWith(text: '');
     }
-    // 숫자로 변환 후 콤마 추가
     final intValue = int.tryParse(newText);
     final formattedText = _formatter.format(intValue);
     return newValue.copyWith(
@@ -36,7 +32,6 @@ class ContractDetail extends StatefulWidget {
   final String? seq;
   final Map<String, String?>? contractInfo;
   final File? imageFile;
-
 
   ContractDetail({ this.seq,  this.contractInfo,  this.imageFile});
 
@@ -69,15 +64,12 @@ class _ContractDetailState extends State<ContractDetail> {
     _eventTimeController = TextEditingController();
 
     if (widget.seq != null) {
-      // seq가 있을 경우 서버에서 데이터를 가져옴
       _fetchContractDetails();
     } else if (widget.contractInfo != null) {
-      // contractInfo가 있으면 초기화
       _initializeFromContractInfo(widget.contractInfo!);
     }
   }
 
-  // contractInfo 초기화
   void _initializeFromContractInfo(Map<String, String?> info) {
     _contractNameController.text = info["ContractName"] ?? '';
     _contractAmountController.text = _formatNumberWithCommas(info["ContractAmount"] ?? '');
@@ -90,7 +82,7 @@ class _ContractDetailState extends State<ContractDetail> {
   Future<void> _fetchContractDetails() async {
 
     if (widget.seq == null) {
-      return; // seq가 null이면 아무 것도 하지 않음
+      return;
     } else {
       try{
         final response = await apiService.get(
@@ -99,7 +91,6 @@ class _ContractDetailState extends State<ContractDetail> {
         );
 
         if (response.statusCode == 200) {
-          // 데이터가 성공적으로 받아졌을 때 컨트롤러에 초기화
           final data = response.data;
           setState(() {
             _contractNameController.text = data['data']['name'];
@@ -109,7 +100,7 @@ class _ContractDetailState extends State<ContractDetail> {
             _eventDateController.text = data['data']['eventDate'] ?? '';
             _eventTimeController.text = data['data']['eventTime'] ?? '';
             imageUrlWithFullPath = data['data']['image'] ?? '';
-            print('imageUrl.... $imageUrlWithFullPath}');// 이미지 URL이 null일 경우 빈 문자열 처리
+            print('imageUrl.... $imageUrlWithFullPath}');
           });
         } else {
           print('response...message... ${response.data}');
@@ -133,7 +124,6 @@ class _ContractDetailState extends State<ContractDetail> {
     super.dispose();
   }
 
-  // 숫자에 세자리마다 콤마 추가
   String _formatNumberWithCommas(String number) {
     if (number.isEmpty) return '';
     final formatter = NumberFormat('#,###');
@@ -159,7 +149,6 @@ class _ContractDetailState extends State<ContractDetail> {
     }
 
     try {
-      // 1. 예측 요청
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? accessToken = prefs.getString('accessToken');
       Uri predictUrl = Uri.parse(ApiConstants.predict); // 서버 URL로 변경
@@ -176,11 +165,9 @@ class _ContractDetailState extends State<ContractDetail> {
         var predictData = jsonDecode(predictResponse.body);
         String predictedCategory = predictData['predicted_category'];
 
-        // 2. 예측 카테고리 확인
         bool? isCorrect = await _showConfirmationDialog(predictedCategory);
 
         if (isCorrect == true) {
-          // 3. 예측 결과가 올바르다고 확인 -> 계약 정보 저장
           await _sendContractData(
             accessToken,
             contractName,
@@ -192,20 +179,17 @@ class _ContractDetailState extends State<ContractDetail> {
             predictedCategory,
           );
         } else {
-          // 4. 예측 결과가 틀림 -> 카테고리 수정 다이얼로그 표시
           Map<String, dynamic>? result = await _showCategoryCorrectionDialog();
           if (result != null) {
             String? correctedCategory = result['category'];
             int? correctedIndex = result['index'];
-            // 수정된 카테고리와 예측 결과가 틀렸다는 피드백 전송
             await _sendCategoryFeedback(
-              accessToken,        // 액세스 토큰
-              contractName,       // 계약 이름
-              false,              // 예측이 틀렸다는 값
-              correctedIndex!,  // 수정된 카테고리
+              accessToken,
+              contractName,
+              false,
+              correctedIndex!,
             );
 
-            // 5. 카테고리 수정 후 계약서 내용도 저장
             await _sendContractData(
               accessToken,
               contractName,
@@ -225,7 +209,7 @@ class _ContractDetailState extends State<ContractDetail> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('오류 발생: $e')));
     }
   }
-// 사용자에게 예측 결과를 확인하는 다이얼로그를 표시
+
   Future<bool?> _showConfirmationDialog(String predictedCategory) async {
     return showDialog<bool>(
       context: context,
@@ -236,38 +220,38 @@ class _ContractDetailState extends State<ContractDetail> {
           title: Text('추천 카테고리'),
           content: Text('예측된 카테고리: $predictedCategory\n이 카테고리가 맞습니까?'),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4), // 직각 모서리 (둥근 부분을 4로 설정)
+            borderRadius: BorderRadius.circular(4),
           ),
           actions: <Widget>[
             TextButton(
               child: Text(
                 '아니요',
                 style: TextStyle(
-                  color: Colors.black, // 텍스트 색상
-                  fontWeight: FontWeight.bold, // 텍스트 두께
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               onPressed: () {
-                Navigator.of(context).pop(false); // 틀렸다고 답변
+                Navigator.of(context).pop(false);
               },
             ),
-            SizedBox(width: 8), // 버튼 간 간격
+            SizedBox(width: 8),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(true); // 맞다고 답변
+                Navigator.of(context).pop(true);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor, // 버튼 배경색
+                backgroundColor: AppColors.primaryColor,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4), // 직각 모서리
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // 버튼 내부 패딩
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               ),
               child: Text(
                 '예',
                 style: TextStyle(
-                  color: Colors.white, // 텍스트 색상
-                  fontWeight: FontWeight.bold, // 텍스트 두께
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -277,7 +261,6 @@ class _ContractDetailState extends State<ContractDetail> {
     );
   }
 
-// 계약 정보 저장 요청
   Future<void> _sendContractData(
       String? accessToken,
       String contractName,
@@ -319,7 +302,6 @@ class _ContractDetailState extends State<ContractDetail> {
     }
   }
 
-// 예측 결과 피드백 전송
   Future<void> _sendCategoryFeedback(String? accessToken, String contractName, bool isCorrect, int correctedIndex) async {
     Uri feedbackUrl = Uri.parse(ApiConstants.predict);
     var response = await http.post (
@@ -328,9 +310,9 @@ class _ContractDetailState extends State<ContractDetail> {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        'contract_name': contractName,    // 계약 이름 웨딩홀 계약서
-        'feedback': isCorrect,           // 예측이 맞았는지 여부
-        'true_category': correctedIndex, // 실제 맞는 카테고리
+        'contract_name': contractName,
+        'feedback': isCorrect,
+        'true_category': correctedIndex,
       }),
     );
 
@@ -393,12 +375,12 @@ class _ContractDetailState extends State<ContractDetail> {
           backgroundColor: Colors.white,
           title: Text('카테고리 선택'),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4), // 직각 모서리
+            borderRadius: BorderRadius.circular(4),
           ),
           content: DropdownButtonFormField<String>(
             value: selectedCategory,
             hint: Text('선택하세요', style: TextStyle(color: Colors.grey)),
-            dropdownColor: Colors.white, // 드롭다운 배경색을 흰색으로 설정// 힌트 텍스트
+            dropdownColor: Colors.white,
             items: categories.asMap().entries.map((entry) {
               int index = entry.key;
               String category = entry.value;
@@ -416,26 +398,26 @@ class _ContractDetailState extends State<ContractDetail> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(null); // 취소 버튼
+                Navigator.of(context).pop(null);
               },
               style: TextButton.styleFrom(
-                foregroundColor: Colors.black, // 텍스트 색상
+                foregroundColor: Colors.black,
               ),
               child: Text('취소'),
             ),
-            SizedBox(width: 8), // 버튼 간 간격
+            SizedBox(width: 8),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop({
                   'category': selectedCategory,
                   'index': selectedIndex,
-                }); // 수정된 카테고리와 인덱스를 반환
+                });
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor, // 버튼 배경색
-                foregroundColor: Colors.white, // 텍스트 색상
+                backgroundColor: AppColors.primaryColor,
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4), // 직각 모서리
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               ),
@@ -448,8 +430,6 @@ class _ContractDetailState extends State<ContractDetail> {
   }
 
 
-
-// 서버에서 카테고리 데이터 가져오기
   Future<List<String>> _fetchCategories() async {
     var response = await apiService.get(
       ApiConstants.getCategories
@@ -458,21 +438,18 @@ class _ContractDetailState extends State<ContractDetail> {
     if (response.statusCode == 200) {
       final jsonResponse = response.data;
       final categoryList = jsonResponse['data']['categoryList'];
-      // name 키로부터 리스트 생성
       return List<String>.from(categoryList.map((item) => item['name'] as String));
     } else {
       throw Exception('카테고리 목록을 가져오는데 실패했습니다. 상태 코드: ${response.statusCode}');
     }
   }
 
-  // 날짜 선택기 표시 함수
   Future<void> _selectDate(BuildContext context) async {
     DateTime initialDate = DateTime.now();
     if (_eventDateController.text.isNotEmpty) {
       try {
         initialDate = DateFormat("yyyy-MM-dd").parse(_eventDateController.text);
       } catch (e) {
-        // 날짜 포맷이 잘못되었으면 현재 날짜로 초기화
         initialDate = DateTime.now();
       }
     }
@@ -485,18 +462,18 @@ class _ContractDetailState extends State<ContractDetail> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: AppColors.primaryColor, // 선택된 색상
-            colorScheme: ColorScheme.light(primary: AppColors.primaryColor), // 주요 색상
-            dialogBackgroundColor: Colors.white, // 배경 색상
+            primaryColor: AppColors.primaryColor,
+            colorScheme: ColorScheme.light(primary: AppColors.primaryColor),
+            dialogBackgroundColor: Colors.white,
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: Colors.black, // 버튼 텍스트 색상 (primary 대신 foregroundColor 사용)
+                foregroundColor: Colors.black,
               ),
             ),
             textTheme: TextTheme(
-              bodyMedium: TextStyle(color: Colors.black), // 일반 텍스트 색상 (bodyText1 대신 bodyMedium 사용)
-              bodyLarge: TextStyle(color: Colors.black), // 일반 텍스트 색상 (bodyText2 대신 bodyLarge 사용)
-              labelLarge: TextStyle(color: Colors.black), // 버튼 텍스트 색상 (button 대신 labelLarge 사용)
+              bodyMedium: TextStyle(color: Colors.black),
+              bodyLarge: TextStyle(color: Colors.black),
+              labelLarge: TextStyle(color: Colors.black),
             ),
           ),
           child: child ?? Container(),
@@ -514,21 +491,18 @@ class _ContractDetailState extends State<ContractDetail> {
   Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),  // 기본 시간은 현재 시간
+      initialTime: TimeOfDay.now(),
     );
 
     if (picked != null && picked != TimeOfDay.now()) {
       final now = DateTime.now();
       final DateTime dateTime = DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
 
-      // 24-hour 형식으로 시간 포맷
       final String formattedTime = DateFormat('HH:mm').format(dateTime);
 
-      // 텍스트 필드에 포맷된 시간 설정
       _eventTimeController.text = formattedTime;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -540,10 +514,10 @@ class _ContractDetailState extends State<ContractDetail> {
         actions: [
           if (widget.seq == null)
           TextButton(
-            onPressed: _saveContractDetails,  // 저장 버튼 클릭 시 저장 함수 호출
+            onPressed: _saveContractDetails,
             child: Text(
               "저장",
-              style: TextStyle(color: Colors.black),  // 텍스트 색상 설정
+              style: TextStyle(color: Colors.black),
             ),
           ),
         ],
@@ -582,11 +556,9 @@ class _ContractDetailState extends State<ContractDetail> {
               Center(
                 child: Builder(
                   builder: (context) {
-                    // 파일이 존재하면 로컬 이미지 사용
                     if (widget.imageFile != null) {
                       return Image.file(widget.imageFile!);
                     }
-                    // URL이 유효하면 네트워크 이미지 사용
                     if (imageUrlWithFullPath != null && imageUrlWithFullPath!.isNotEmpty) {
                       return Image.network(
                         imageUrlWithFullPath!,
@@ -602,7 +574,6 @@ class _ContractDetailState extends State<ContractDetail> {
                         },
                       );
                     }
-                    // 둘 다 없는 경우 기본 메시지 출력
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -613,8 +584,6 @@ class _ContractDetailState extends State<ContractDetail> {
                   },
                 ),
               ),
-
-
 
               SizedBox(height: 25),
               _buildTextField("계약서 이름", _contractNameController),
@@ -640,26 +609,25 @@ class _ContractDetailState extends State<ContractDetail> {
           border: OutlineInputBorder(),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: AppColors.primaryColor, // 활성화된 TextField의 테두리 색상
+              color: AppColors.primaryColor,
               width: 2.0,
             ),
           ),
         ),
         enabled: widget.seq == null,
         style: TextStyle(
-          color: Colors.black, // 텍스트 색상 항상 검정색으로 설정
+          color: Colors.black,
         ),
       ),
     );
   }
 
-  // 날짜 필드를 만드는 함수
   Widget _buildDateField(String label, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: GestureDetector(
-        onTap: widget.seq == null ? () => _selectDate(context) : null,  // 날짜 선택기 띄우기
-        child: AbsorbPointer(  // 텍스트 필드를 클릭할 때 키보드가 뜨지 않도록
+        onTap: widget.seq == null ? () => _selectDate(context) : null,
+        child: AbsorbPointer(
           child: TextFormField(
             controller: controller,
             decoration: InputDecoration(
@@ -674,7 +642,7 @@ class _ContractDetailState extends State<ContractDetail> {
             ),
             enabled: widget.seq == null,
             style: TextStyle(
-              color: Colors.black, // 텍스트 색상 항상 검정색으로 설정
+              color: Colors.black,
             ),
           ),
         ),
@@ -682,7 +650,6 @@ class _ContractDetailState extends State<ContractDetail> {
     );
   }
 
-  // 금액 관련 텍스트 필드를 만드는 함수
   Widget _buildAmountField(String label, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -693,36 +660,33 @@ class _ContractDetailState extends State<ContractDetail> {
           border: OutlineInputBorder(),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: AppColors.primaryColor, // 활성화된 TextField의 테두리 색상
+              color: AppColors.primaryColor,
               width: 2.0,
             ),
           ),
         ),
         enabled: widget.seq == null,
         style: TextStyle(
-          color: Colors.black, // 텍스트 색상 항상 검정색으로 설정
+          color: Colors.black,
         ),
         inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,  // 숫자만 입력 가능
-          ThousandsSeparatorFormatter(),  // 세자리마다 콤마 추가
+          FilteringTextInputFormatter.digitsOnly,
+          ThousandsSeparatorFormatter(),
         ],
         onChanged: (text) {
-          // 콤마 없이 숫자만 서버로 전달
           String rawValue = text.replaceAll(',', '');
-          // 여기서 서버로 rawValue를 전송하면 됩니다
         },
-        keyboardType: TextInputType.numberWithOptions(decimal: false),  // 소수점 없이 숫자만 입력
+        keyboardType: TextInputType.numberWithOptions(decimal: false),
       ),
     );
   }
 
-  // 행사 시간 입력받는 필드 구현
   Widget _buildTimeField(String label, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: GestureDetector(
-        onTap: widget.seq == null ? () => _selectTime(context) : null,  // seq가 null일 때만 시간 선택기 실행
-        child: AbsorbPointer(  // 텍스트 필드를 클릭할 때 키보드가 뜨지 않도록
+        onTap: widget.seq == null ? () => _selectTime(context) : null,
+        child: AbsorbPointer(
           child: TextFormField(
             controller: controller,
             decoration: InputDecoration(
@@ -735,9 +699,9 @@ class _ContractDetailState extends State<ContractDetail> {
                 ),
               ),
             ),
-            enabled: widget.seq == null,  // seq가 null일 때만 수정 가능
+            enabled: widget.seq == null,
             style: TextStyle(
-              color: Colors.black, // 텍스트 색상 항상 검정색으로 설정
+              color: Colors.black,
             ),
           ),
         ),

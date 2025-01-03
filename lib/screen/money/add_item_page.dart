@@ -1,4 +1,3 @@
-// add_item_page.dart
 import 'package:flutter/material.dart';
 import 'package:smart_wedding/screen/money/add_cost_page.dart';
 
@@ -18,7 +17,6 @@ class _AddItemPageState extends State<AddItemPage> {
         actions: [
           TextButton(
             onPressed: () {
-              // Implement delete functionality if needed
             },
             child: Text(
               '삭제',

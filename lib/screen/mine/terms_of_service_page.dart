@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:http/http.dart' as http;
 import 'package:smart_wedding/interceptor/api_service.dart';
 import '../../config/ApiConstants.dart';
 
@@ -16,7 +13,7 @@ class TermsOfServicePage extends StatefulWidget {
 }
 
 class _TermsOfServicePageState extends State<TermsOfServicePage> {
-  String htmlContent = ''; // HTML content directly from API response
+  String htmlContent = '';
   String subTitle = '';
   bool isLoading = true;
   String accessToken = '';
@@ -45,7 +42,7 @@ class _TermsOfServicePageState extends State<TermsOfServicePage> {
         }
 
         setState(() {
-          htmlContent = data['data']['content']; // Load HTML content directly
+          htmlContent = data['data']['content'];
           subTitle = data['data']['title'];
           isLoading = false;
         });
@@ -74,10 +71,10 @@ class _TermsOfServicePageState extends State<TermsOfServicePage> {
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView( // Enable scrolling
+          : SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0), // Optional padding
-          child: Html(data: htmlContent), // Display parsed HTML content
+          padding: const EdgeInsets.all(16.0),
+          child: Html(data: htmlContent),
         ),
       ),
     );

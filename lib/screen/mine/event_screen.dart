@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
@@ -23,7 +20,7 @@ class _EventScreenState extends State<EventScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0), // 다이얼로그의 둥근 모서리
+            borderRadius: BorderRadius.circular(8.0),
           ),
           title: Text(
             "응모하기",
@@ -39,39 +36,36 @@ class _EventScreenState extends State<EventScreen> {
               hintText: "응모하실 포스트 URL을 입력해 주세요.",
               hintStyle: TextStyle(color: Colors.grey),
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey), // 비활성 상태의 밑줄
+                borderSide: BorderSide(color: Colors.grey),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.purple, width: 2.0), // 포커스 상태의 밑줄
+                borderSide: BorderSide(color: Colors.purple, width: 2.0),
               ),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // 입력창 닫기
+                Navigator.of(context).pop();
               },
               child: Text("취소", style: TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor, // 보라색 배경
+                backgroundColor: AppColors.primaryColor,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4.0), // 버튼의 직각 모양
+                  borderRadius: BorderRadius.circular(4.0),
                 ),
               ),
               onPressed: () async {
-                String userInput = inputController.text.trim(); // 입력값 공백 제거
+                String userInput = inputController.text.trim();
                 if (userInput.isNotEmpty) {
-                  // 중복 검사 API 호출
                   bool isPostUnique = await _checkPostDuplication(userInput);
                   print('isbool.... $isPostUnique');
                   if (isPostUnique) {
-                    // 새로운 포스트라면 이벤트 등록 API 호출
                     bool isEventRegistered = await _registerEvent(userInput);
                     print('isEventRegistered... $isEventRegistered');
                     if (isEventRegistered) {
-                      // 성공 시
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text("응모가 완료되었습니다."),
@@ -80,7 +74,6 @@ class _EventScreenState extends State<EventScreen> {
                       );
                       Navigator.of(context).pop();
                     } else {
-                      // 실패 시
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text("응모에 실패했습니다. 다시 시도해주세요."),
@@ -90,7 +83,6 @@ class _EventScreenState extends State<EventScreen> {
                       Navigator.of(context).pop();
                     }
                   } else {
-                    // 중복된 응모 URL
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text("이미 응모하셨습니다. 다른 URL로 응모해주세요."),
@@ -100,7 +92,6 @@ class _EventScreenState extends State<EventScreen> {
                     Navigator.of(context).pop();
                   }
                 } else {
-                  // 빈 값 처리
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text("응모하실 포스트 URL을 입력해 주세요."),
@@ -120,7 +111,6 @@ class _EventScreenState extends State<EventScreen> {
     );
   }
 
-// 중복 검사 API 호출 함수
   Future<bool> _checkPostDuplication(String postUrl) async {
     try {
       final response = await apiService.get(
@@ -136,7 +126,7 @@ class _EventScreenState extends State<EventScreen> {
         }
       } else {
         print("중복 검사 실패: ${response.statusCode}");
-        return false; // 실패 시 중복으로 처리
+        return false;
       }
     } catch (e) {
       print("중복 검사 에러: $e");
@@ -144,14 +134,13 @@ class _EventScreenState extends State<EventScreen> {
     }
   }
 
-// 이벤트 등록 API 호출 함수
   Future<bool> _registerEvent(String postUrl) async {
     try {
       final response = await apiService.get(
-        ApiConstants.setEvent, // 이벤트 등록 API
+        ApiConstants.setEvent,
         queryParameters: {'link': postUrl},
       );
-      return response.statusCode == 200; // 200 응답이면 성공
+      return response.statusCode == 200;
     } catch (e) {
       print("이벤트 등록 에러: $e");
       return false;
@@ -169,34 +158,31 @@ class _EventScreenState extends State<EventScreen> {
           "진행 중인 이벤트",
           style: TextStyle(color: Colors.black),
         ),
-        iconTheme: IconThemeData(color: Colors.black), // 아이콘 색상 설정
-        elevation: 0, // AppBar 그림자 제거
+        iconTheme: IconThemeData(color: Colors.black),
+        elevation: 0,
       ),
       body: Stack(
         children: [
-          // 배경 이미지
           SvgPicture.asset(
             'asset/img/event_page.svg',
             width: double.infinity,
             height: double.infinity,
-            fit: BoxFit.contain, // 이미지가 화면에 꽉 차도록 조정
+            fit: BoxFit.contain,
           ),
-          // 응모하기 버튼
           Positioned(
-            bottom: 30.0, // 하단에서 20px 위에 위치
+            bottom: 30.0,
             left: 0,
             right: 0,
             child: Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.secondaryColor, // 버튼 배경색
+                  backgroundColor: AppColors.secondaryColor,
                   padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40.0), // 버튼 모서리를 둥글게
+                    borderRadius: BorderRadius.circular(40.0),
                   ),
                 ),
                 onPressed: () {
-                  // 응모하기 버튼을 눌렀을 때의 동작
                   print("응모하기 버튼 눌림!");
                   _showInputDialog(context);
                 },

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
@@ -28,8 +25,8 @@ class _SettingsPageState extends State<SettingsPage> {
     var response = await apiService.post(
       ApiConstants.updateYnSetting,
       data: {
-        "key": key, // 문자열 "key"로 수정
-        "value": value.toString(), // boolean 값을 문자열로 변환
+        "key": key,
+        "value": value.toString(),
       },
     );
 
@@ -51,7 +48,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
       if (response.statusCode == 200) {
         var jsonResponse = response.data;
-        var data = jsonResponse['data']; // 'data' 부분을 따로 분리
+        var data = jsonResponse['data'];
 
         print('data ....... $data');
         print('data.scheduleYn ..... ${data['scheduleYn']}');
@@ -72,7 +69,6 @@ class _SettingsPageState extends State<SettingsPage> {
       }
     } catch (e) {
       print('Error fetching settings: $e');
-      // 기본값을 사용할 수 있음
       setState(() {
         isScheduleNotificationOn = false;
         isBudgetNotificationOn = false;
@@ -119,7 +115,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {
                       isScheduleNotificationOn = value;
                     });
-                    // 서버에 상태 변경 요청
                     updateNotificationSetting('scheduleYn', value);
                   },
                 ),
@@ -145,7 +140,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {
                       isBudgetNotificationOn = value;
                     });
-                    // 서버에 상태 변경 요청
                     updateNotificationSetting('budgetYn', value);
                   },
                 ),
@@ -174,7 +168,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {
                       isMarketingAgreementOn = value;
                     });
-                    // 서버에 상태 변경 요청
                     updateNotificationSetting('marketingYn', value);
                   },
                 ),
@@ -200,7 +193,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {
                       isAwesomeMessagesOn = value;
                     });
-                    // 서버에 상태 변경 요청
                     updateNotificationSetting('systemYn', value);
                   },
                 ),

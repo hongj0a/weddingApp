@@ -17,12 +17,9 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Firebase 초기화 먼저
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  // Firebase가 초기화된 후에 Kakao SDK 초기화
   KakaoSdk.init(nativeAppKey: '9a794384618b41b8322fb7fed2baa529');
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -34,16 +31,11 @@ void main() async {
   print('accessToken...!!!!!!!!! $accessToken');
   print('isFirstYn...!!!!!!!!!!! $isFirstYn');
 
-  /*String? _fcmToken = await FirebaseMessaging.instance.getToken();
-  print('_fcmToken... $_fcmToken');
-*/
-  // refreshToken이 있는 경우에만 로그인 연장 시도
   if (refreshToken != null) {
     try {
       Map<String, dynamic> result = await _extendLogin(refreshToken);
       bool pairingYn = result['pairingYn'];
       String id = result['id'];
-      // 로그인 연장이 성공하면 홈 화면으로 이동
       if (pairingYn) {
         runApp(WeddingApp());
       } else {
@@ -51,11 +43,9 @@ void main() async {
       }
     } catch (e) {
       print('토큰 갱신 실패: $e');
-      // refreshToken 만료 등으로 실패 시 로그인 화면으로 이동
       runApp(LoginApp());
     }
   } else {
-    // refreshToken이 없으면 바로 로그인 화면으로 이동
     runApp(LoginApp());
   }
 }

@@ -1,17 +1,13 @@
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import 'package:mime/mime.dart'; // For MIME type lookup
-import 'package:http_parser/http_parser.dart'; // For setting MediaType
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
-import 'my_page.dart';
-
 
 
 class ProfileEditPage extends StatefulWidget {
@@ -29,7 +25,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   @override
   void initState() {
     super.initState();
-    _fetchUserInfo(); // 사용자 정보를 가져옴
+    _fetchUserInfo();
   }
 
   @override
@@ -42,7 +38,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         actions: [
           TextButton(
             onPressed: () async {
-              // 완료 버튼을 눌렀을 때 실행될 코드
               await _updateUserInfo(context);
             },
             child: Text(
@@ -65,20 +60,20 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                     radius: 50.0,
                     backgroundColor: Colors.grey[100],
                     backgroundImage: _imagePath != null
-                        ? FileImage(File(_imagePath!)) // 새로 선택한 이미지가 있을 경우
+                        ? FileImage(File(_imagePath!))
                         : (_imageInfo != null && _imageInfo!.isNotEmpty
                         ? NetworkImage(_imageInfo!)
-                        : null), // 서버에서 불러온 이미지가 있을 경우
+                        : null),
                     child: _imagePath == null &&
                         (_imageInfo == null || _imageInfo!.isEmpty)
-                        ? Icon(Icons.person, size: 50.0) // 이미지가 선택되지 않은 경우
+                        ? Icon(Icons.person, size: 50.0)
                         : null,
                   ),
                   Positioned(
                     bottom: 0,
                     right: 140,
                     child: GestureDetector(
-                      onTap: _selectImage, // 이미지 선택 함수 호출
+                      onTap: _selectImage,
                       child: CircleAvatar(
                         radius: 15.0,
                         backgroundColor: Colors.white,
@@ -98,7 +93,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               ),
               SizedBox(height: 10.0),
               TextField(
-                controller: _nicknameController, // 닉네임 컨트롤러 설정
+                controller: _nicknameController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                 ),
@@ -111,11 +106,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   }
   Future<void> _selectImage() async {
     final ImagePicker _picker = ImagePicker();
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery); // 갤러리에서 이미지 선택
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
-        _imagePath = pickedFile.path; // 선택한 이미지의 경로 저장
+        _imagePath = pickedFile.path;
       });
     }
   }
@@ -133,10 +128,9 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
       var request = http.MultipartRequest('POST', url);
       request.headers['Authorization'] = 'Bearer $accessToken';
-      request.fields['nickName'] = _nicknameController.text; // 닉네임 필드 추가
+      request.fields['nickName'] = _nicknameController.text;
 
       print('imagePath: $_imagePath');
-      // 이미지가 있는 경우에만 파일 추가
       if (_imagePath != null && _imagePath!.isNotEmpty) {
         String mimeType = lookupMimeType(_imagePath!) ?? 'image/jpeg';
         request.files.add(await http.MultipartFile.fromPath(
@@ -146,7 +140,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         ));
       }
 
-      var response = await request.send(); // 요청 전송
+      var response = await request.send();
 
       if (response.statusCode == 200) {
         print('User info updated successfully');
@@ -158,6 +152,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       print('Error updating user info: $e');
     }
   }
+
   Future<void> _fetchUserInfo() async {
     var response = await apiService.get(
       ApiConstants.getUserInfo,
@@ -168,7 +163,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       setState(() {
         _nicknameController.text = data['nickName'];
         _imageInfo = data['image'];
-        //_defaultImage = data['image'];
       });
     } else {
       throw Exception('Failed to load user info');

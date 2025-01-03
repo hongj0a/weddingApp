@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/sign/login_page.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:http/http.dart' as http;
-
 import '../../config/ApiConstants.dart';
 import '../../themes/theme.dart';
 import '../main/home_screen.dart';
@@ -234,12 +233,12 @@ class _PairingCodePageState extends State<PairingCodePage> {
                 },
                 child: Text(
                   '연결하기',
-                  style: TextStyle(color: Colors.black), // 글씨 색 검정
+                  style: TextStyle(color: Colors.black),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white, // 버튼 배경색 흰색
-                  side: BorderSide(color: Colors.grey), // 테두리 회색
-                  minimumSize: Size(double.infinity, 50), // 버튼 크기
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: Colors.grey),
+                  minimumSize: Size(double.infinity, 50),
                 ),
               ),
               SizedBox(height: 30),
@@ -253,11 +252,9 @@ class _PairingCodePageState extends State<PairingCodePage> {
                 onPressed: () async {
                   SharedPreferences prefs = await SharedPreferences.getInstance();
 
-                  // SharedPreferences에서 accessToken과 refreshToken 삭제
                   await prefs.remove('accessToken');
                   await prefs.remove('refreshToken');
 
-                  // 로그인 페이지로 이동
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => LoginScreen()),

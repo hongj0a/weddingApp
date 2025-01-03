@@ -1,13 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/money/add_cost_page.dart';
 import 'package:http/http.dart' as http;
-import 'package:smart_wedding/screen/money/budget_setting.dart';
 import '../../config/ApiConstants.dart';
 import 'package:intl/intl.dart';
-
 import '../../interceptor/api_service.dart';
 import 'detail_page.dart';
 
@@ -18,7 +15,6 @@ class CostPage extends StatefulWidget {
 
 class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
   List<Map<String, dynamic>> categories = [];
-  //Map<int, List<Map<String, String>>> _items = {}; // seq별 데이터를 저장할 Map
   Map<int, bool> _isExpandedMap = {};
   int totalBudget = 0;
   int usedBudget = 0;
@@ -29,26 +25,29 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this); // Observer 등록
+    WidgetsBinding.instance.addObserver(this);
     _fetchCategories();
     _getTotalAmount();
+    //refreshData();
   }
 
   String _formatCurrency(String amount) {
-    final number = int.tryParse(amount.replaceAll(',', '')) ?? 0; // 쉼표 제거 후 변환
-    return NumberFormat('#,###').format(number); // 3자리마다 쉼표
+    final number = int.tryParse(amount.replaceAll(',', '')) ?? 0;
+    return NumberFormat('#,###').format(number);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this); // Observer 해제
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    print('didChangeAppLifecycleState called with state: $state');
     if (state == AppLifecycleState.resumed) {
-      refreshData(); // 앱이 다시 활성화되면 데이터 새로 고침
+      refreshData();
     }
   }
 
@@ -93,7 +92,7 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
     try{
       var response = await apiService.get(
         ApiConstants.getCategories,
-      );  // GET 호출
+      );
       if(response.statusCode == 200) {
         final jsonResponse = response.data;
         final categoryList = jsonResponse['data']['categoryList'];
@@ -103,12 +102,6 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
           categories = categoryList.map<Map<String, dynamic>>((category) {
             final seq = category['seq'];
             _isExpandedMap[seq] = false;
-
-            // 각 카테고리의 `items`를 초기화
-            /*_items[seq] = [
-            {'title': 'Sample Item 1', 'price': '5000원'},
-            {'title': 'Sample Item 2', 'price': '10000원'}
-          ];*/
 
             return {
               'seq': seq,
@@ -168,7 +161,7 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
       print('jsonResponse... $jsonResponse');
       print('jsonResponseData...  ${jsonResponse['data']}');
 
-      return jsonResponse['data']; // 필요한 데이터를 반환
+      return jsonResponse['data'];
     } else {
       print('response code ... ${response.statusCode}');
       print('respons.. message ... ${response.body}');
@@ -317,16 +310,15 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                           ),
                         ),
                         Divider(height: 1, color: Colors.grey.shade300),
-                        if (_isExpandedMap[seq]!) // 카테고리가 확장된 경우
+                        if (_isExpandedMap[seq]!)
                           FutureBuilder<List<Map<String, dynamic>>>(
-                            future: _fetchCheckList(seq), // Future 반환
+                            future: _fetchCheckList(seq),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return CircularProgressIndicator();
                               } else if (snapshot.hasError) {
                                 return Text('Error: ${snapshot.error}');
                               } else if (snapshot.hasData && snapshot.data != null) {
-                                // 데이터가 있는 경우
                                 return AnimatedContainer(
                                   duration: Duration(milliseconds: 300),
                                   child: ListView.builder(
@@ -346,7 +338,7 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                                                 ),
                                               ).then((value) {
                                                 if (value == true) {
-                                                  refreshData(); // 추가 후 데이터 새로 고침
+                                                  refreshData();
                                                 }
                                               });
                                             },
@@ -364,7 +356,7 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
                                   ),
                                 );
                               }
-                              return Container(); // 기본적으로 빈 컨테이너
+                              return Container();
                             },
                           ),
                       ],
@@ -393,17 +385,15 @@ class _CostPageState extends State<CostPage> with WidgetsBindingObserver {
               SizedBox(width: 18.0),
               GestureDetector(
                 onTap: () {
-                  // 아이콘 클릭 시 seq를 사용하여 세부 정보를 가져옴
                   _fetchCheckListDetail(seq).then((detailData) {
                     print('detailData... $detailData');
-                    // 세부 정보를 처리하는 페이지로 이동
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DetailPage(detailData: detailData), // DetailPage로 데이터를 넘김
+                        builder: (context) => DetailPage(detailData: detailData),
                       ),
                     ).then((result) {
-                      print('Result from DetailPage: $result'); // 로그 추가
+                      print('Result from DetailPage: $result');
                       if (result == true) {
                         refreshData();
                       }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/mine/event_screen.dart';
 import 'package:smart_wedding/screen/mine/setting.dart';
 import 'package:smart_wedding/screen/money/budget_setting.dart';
@@ -9,8 +8,6 @@ import 'package:smart_wedding/screen/mine/inquiry_screen.dart';
 import 'package:smart_wedding/screen/mine/notice_list.dart';
 import 'package:smart_wedding/screen/mine/profile_edit.dart';
 import 'package:smart_wedding/screen/mine/terms_and_policies.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
@@ -25,12 +22,12 @@ class MyPage extends StatefulWidget {
 class _MyPageState extends State<MyPage> {
   Future<Map<String, dynamic>>? _userInfoFuture;
   Map<String, dynamic>? _userData;
-  ApiService apiService = ApiService();// userData를 상태 변수로 추가
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    _userInfoFuture = fetchUserInfo(); // API 호출
+    _userInfoFuture = fetchUserInfo();
   }
 
   Future<Map<String, dynamic>> fetchUserInfo() async {
@@ -42,7 +39,7 @@ class _MyPageState extends State<MyPage> {
     );
 
     if (response.statusCode == 200) {
-      return response.data['data']; // 'data' 부분에서 필요한 정보를 가져옴
+      return response.data['data'];
     } else {
       throw Exception('Failed to load user info');
     }
@@ -50,7 +47,6 @@ class _MyPageState extends State<MyPage> {
 
   @override
   Widget build(BuildContext context) {
-    String imageUrl = '${ApiConstants.localImagePath}/';
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -58,14 +54,13 @@ class _MyPageState extends State<MyPage> {
           Flexible(
             flex: 2,
             child: FutureBuilder<Map<String, dynamic>>(
-              future: _userInfoFuture, // API 호출
+              future: _userInfoFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator()); // 로딩 중
+                  return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}')); // 에러 발생 시
+                  return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (snapshot.hasData) {
-                  // 성공적으로 데이터를 받아왔을 때
                   _userData = snapshot.data!;
                   return Container(
                     padding: EdgeInsets.all(16.0),
@@ -81,8 +76,7 @@ class _MyPageState extends State<MyPage> {
                               Row(
                                 children: [
                                   Text(
-                                    '${_userData?['nickName'] ?? "사용자"} 님', // null 체크 및 기본값 설정
-                                    // API에서 받은 닉네임 사용
+                                    '${_userData?['nickName'] ?? "사용자"} 님',
                                     style: TextStyle(
                                       
                                       color: Colors.black,
@@ -91,7 +85,7 @@ class _MyPageState extends State<MyPage> {
                                       fontFamily: 'Pretendard'
                                     ),
                                   ),
-                                  SizedBox(width: 20.0), // 아이콘과 텍스트 사이 여백
+                                  SizedBox(width: 20.0),
                                   GestureDetector(
                                     onTap: ()  async {
                                       final result = await Navigator.push(
@@ -102,7 +96,7 @@ class _MyPageState extends State<MyPage> {
                                       );
                                       if (result == true) {
                                         setState(() {
-                                          _userInfoFuture = fetchUserInfo(); // 새로 고침
+                                          _userInfoFuture = fetchUserInfo();
                                         });
                                       }
                                     },
@@ -116,8 +110,7 @@ class _MyPageState extends State<MyPage> {
                               ),
                               SizedBox(height: 10.0),
                               Text(
-                                '${_userData?['pairing'] ?? "페어링 정보 없음"}님과 페어링 중', // null 체크 및 기본값 설정
-                                // API에서 받은 페어링 정보 사용
+                                '${_userData?['pairing'] ?? "페어링 정보 없음"}님과 페어링 중',
                                 style: TextStyle(
                                    
                                   color: Colors.black,
@@ -150,8 +143,8 @@ class _MyPageState extends State<MyPage> {
             ),
           ),
           Container(
-            height: 0.5, // 선의 두께
-            color: Colors.grey, // 선의 색상
+            height: 0.5,
+            color: Colors.grey,
           ),
           SizedBox(height: 10.0),
           Flexible(
@@ -258,10 +251,9 @@ class _MyPageState extends State<MyPage> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) {
-                          // 이 곳에서 print를 찍습니다.
                           print('user... ${_userData}');
-                          print('userId.... ${_userData?['id']}'); // ID 출력
-                          return Setting(userId: _userData?['id']); // ID 전달
+                          print('userId.... ${_userData?['id']}');
+                          return Setting(userId: _userData?['id']);
                         },
                       ),
                     );

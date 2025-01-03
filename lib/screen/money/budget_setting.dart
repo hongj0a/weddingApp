@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // intl 패키지 추가
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import '../../config/ApiConstants.dart';
 import 'dart:async';
 
@@ -64,7 +62,6 @@ class _BudgetSettingState extends State<BudgetSetting> {
   }
 
 
-
   Future<void> _initializeBudgetData() async {
     try {
       final response = await apiService.get(
@@ -81,9 +78,8 @@ class _BudgetSettingState extends State<BudgetSetting> {
           totalAmount = decodedData['data']['totalAmount']?.toString() ?? '0';
 
           if (budgets.isEmpty) {
-            // 기본 budgetItems를 서버에 저장하고 화면에 보여주기
             setState(() {
-              budgetItems.clear(); // 기존 요소 제거
+              budgetItems.clear();
               budgetItems.addAll([
                 {'label': '상견례', 'amount': '0'},
                 {'label': '예식장', 'amount': '0'},
@@ -102,14 +98,13 @@ class _BudgetSettingState extends State<BudgetSetting> {
             await _initBudgetOnServer();
             _initializeBudgetData();
           } else {
-            // API에서 받은 budgetItems로 초기화
             setState(() {
               print("Before clear: $budgetItems");
               budgetItems.clear();
-              print("After clear: $budgetItems"); // 기존 요소 제거
+              print("After clear: $budgetItems");
               budgetItems.addAll(budgets.map((item) {
                 return {
-                  'seq': item['seq']?.toString() ?? '', // seq 추가
+                  'seq': item['seq']?.toString() ?? '',
                   'label': item['title'] as String,
                   'amount': item['budget']?.toString() ?? '0',
                 };
@@ -119,7 +114,6 @@ class _BudgetSettingState extends State<BudgetSetting> {
         }
       }
 
-      // TextEditingController와 FocusNode 초기화
       for (var item in budgetItems) {
         final amount = item['amount'] ?? '0';
         _controllers[item['label']!] =
@@ -129,16 +123,13 @@ class _BudgetSettingState extends State<BudgetSetting> {
         _focusNodes[item['label']!] = FocusNode();
       }
     } catch (e) {
-      // 예외 처리: API 호출 실패 시 사용자에게 알림 등 처리 추가 가능
       print("Error loading budget data: $e");
     }
   }
 
-
-  // 금액을 원화 형식으로 변환
   String _formatCurrency(String amount) {
-    final number = int.tryParse(amount.replaceAll(',', '')) ?? 0; // 쉼표 제거 후 변환
-    return NumberFormat('#,###').format(number); // 3자리마다 쉼표
+    final number = int.tryParse(amount.replaceAll(',', '')) ?? 0;
+    return NumberFormat('#,###').format(number);
   }
 
   Future<void> _initBudgetOnServer() async {
@@ -150,14 +141,13 @@ class _BudgetSettingState extends State<BudgetSetting> {
         );
       }).toList();
 
-      // BudgetDto 리스트를 JSON으로 변환
       final List<Map<String, dynamic>> jsonData = budgetData.map((item) => item.toJson()).toList();
 
-      print('budgetdata... $jsonData'); // JSON으로 변환된 데이터 출력
+      print('budgetdata... $jsonData');
 
       final response = await apiService.post(
         ApiConstants.initBudgets,
-        data: jsonData, // JSON 인코딩하여 전송
+        data: jsonData,
       );
 
       if (response.statusCode == 200) {
@@ -175,7 +165,7 @@ class _BudgetSettingState extends State<BudgetSetting> {
     try {
       final response = await apiService.post(
         ApiConstants.setBudget,
-        data: {'label': label, 'amount': '0'}, // Adjust as necessary
+        data: {'label': label, 'amount': '0'},
       );
 
       if (response.statusCode == 200) {
@@ -227,14 +217,11 @@ class _BudgetSettingState extends State<BudgetSetting> {
       );
 
       if (response.statusCode == 200) {
-        // 성공적으로 삭제된 경우
         print("Budget item removed successfully.");
       } else {
-        // 오류 처리
         print('Failed to delete budget item: ${response.statusCode}');
       }
     } catch (e) {
-      // 예외 처리
       print('Error occurred while deleting budget item: $e');
     }
   }
@@ -260,7 +247,6 @@ class _BudgetSettingState extends State<BudgetSetting> {
     }
   }
 
-  // onChanged 핸들러 수정
   void _onAmountChanged(String value, String seq, String label, Map<String, String> item) {
     String formattedValue = _formatCurrency(value);
 
@@ -278,10 +264,8 @@ class _BudgetSettingState extends State<BudgetSetting> {
       }
     });
 
-    // 타이머가 활성화 중이면 취소
     if (_debounce?.isActive ?? false) _debounce?.cancel();
 
-    // 500ms 지연 후 서버 업데이트
     _debounce = Timer(const Duration(milliseconds: 500), () async {
       await _updateBudgetOnServer(seq, label, item['amount']!);
       await _initializeBudgetData();
@@ -293,7 +277,7 @@ class _BudgetSettingState extends State<BudgetSetting> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white, // 고정된 배경색
+        backgroundColor: Colors.white,
         elevation: 0,
         title: Text('예산 설정'),
         leading: IconButton(
@@ -311,7 +295,7 @@ class _BudgetSettingState extends State<BudgetSetting> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
-              mainAxisSize: MainAxisSize.min, // Column이 자식의 크기에 맞게 축소됨
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Align(
@@ -448,21 +432,21 @@ class _BudgetSettingState extends State<BudgetSetting> {
         return AlertDialog(
           title: Text(
             '예산 항목 추가',
-            style: TextStyle(color: Colors.black), // 제목 글씨 색을 검은색으로 설정
+            style: TextStyle(color: Colors.black),
           ),
           content: TextField(
             controller: controller,
             decoration: InputDecoration(
               hintText: '항목명을 입력하세요',
-              hintStyle: TextStyle(color: Colors.black), // hint 글씨 색을 검은색으로 설정
+              hintStyle: TextStyle(color: Colors.black),
             ),
           ),
-          backgroundColor: Colors.white, // 배경색을 흰색으로 설정
+          backgroundColor: Colors.white,
           actions: <Widget>[
             TextButton(
               child: Text(
                 '취소',
-                style: TextStyle(color: Colors.black), // 버튼 글씨 색을 검은색으로 설정
+                style: TextStyle(color: Colors.black),
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -471,23 +455,21 @@ class _BudgetSettingState extends State<BudgetSetting> {
             TextButton(
               child: Text(
                 '추가',
-                style: TextStyle(color: Colors.black), // 버튼 글씨 색을 검은색으로 설정
+                style: TextStyle(color: Colors.black),
               ),
               onPressed: () async {
                 String newItemLabel = controller.text.trim();
                 if (newItemLabel.isNotEmpty) {
-                  // 예산 항목을 추가
                   setState(() {
-                    budgetItems.add({'label': newItemLabel, 'amount': '0'}); // 기본값 0으로 설정
-                    _controllers[newItemLabel] = TextEditingController(); // '원' 없이 추가
+                    budgetItems.add({'label': newItemLabel, 'amount': '0'});
+                    _controllers[newItemLabel] = TextEditingController();
                     _labelControllers[newItemLabel] = TextEditingController(text: newItemLabel);
                     _focusNodes[newItemLabel] = FocusNode();
                   });
 
-                  // 서버에 예산 항목을 저장
                   await _saveBudgetToServer(newItemLabel);
                 }
-                _initializeBudgetData(); // 삭제 후 데이터 새로 고침
+                _initializeBudgetData();
                 Navigator.of(context).pop();
               },
             ),

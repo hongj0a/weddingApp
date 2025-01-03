@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/document/document_upload.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
@@ -21,12 +17,10 @@ class _ContractPageState extends State<ContractPage> {
   @override
   void initState() {
     super.initState();
-    loadData();// API 호출하여 contracts 업데이트
+    loadData();
   }
 
-  // 데이터를 새로 불러오는 함수
   void loadData() {
-    // API 호출 또는 데이터 새로 고침 로직
     setState(() {
       getContracts();
     });
@@ -40,7 +34,7 @@ class _ContractPageState extends State<ContractPage> {
       );
 
       if (response.statusCode == 200) {
-        final data = response.data['data']['contracts']; // 서버의 데이터 형식에 맞게 수정
+        final data = response.data['data']['contracts'];
         setState(() {
           contracts = [
             for (var item in data)
@@ -52,7 +46,6 @@ class _ContractPageState extends State<ContractPage> {
           ];
         });
       } else {
-        // 에러 처리 (예: 토스트 메시지 표시)
         print('Failed to load contracts');
       }
     } catch (e) {
@@ -106,7 +99,6 @@ class _ContractPageState extends State<ContractPage> {
               context,
               MaterialPageRoute(builder: (context) => DocumentUploadPage()),
             ).then((value) {
-              // DocumentUploadPage에서 돌아오면 loadData() 호출
               loadData();
             });
           },
@@ -126,36 +118,36 @@ class _ContractPageState extends State<ContractPage> {
           builder: (BuildContext context) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0), // 약간 직각 모양
+                borderRadius: BorderRadius.circular(8.0),
               ),
               backgroundColor: Colors.white,
               content: Text(
                 "${contract['title']}를 삭제하시겠어요?",
-                style: TextStyle(color: Colors.black), // 내용 글씨 검정색
+                style: TextStyle(color: Colors.black),
               ),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(false); // 취소
+                    Navigator.of(context).pop(false);
                   },
                   child: Text(
                     "취소",
-                    style: TextStyle(color: Colors.black), // 버튼 글씨 검정색
+                    style: TextStyle(color: Colors.black),
                   ),
                 ),
                 TextButton(
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(AppColors.primaryColor), // 보라색 배경
-                    foregroundColor: MaterialStateProperty.all(Colors.white), // 흰색 텍스트
-                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 10)), // 버튼 크기 조정
+                    backgroundColor: MaterialStateProperty.all(AppColors.primaryColor),
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
                     shape: MaterialStateProperty.all(
                       RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4.0), // 약간의 둥글기
+                        borderRadius: BorderRadius.circular(4.0),
                       ),
                     ),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop(true); // 확인
+                    Navigator.of(context).pop(true);
                   },
                   child: Text(
                     "삭제",

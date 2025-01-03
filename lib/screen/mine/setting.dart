@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import 'package:smart_wedding/screen/sign/login_page.dart';
 import 'package:smart_wedding/screen/sign/pairing_page.dart';
 import 'package:smart_wedding/themes/theme.dart';
@@ -10,13 +9,11 @@ import '../../interceptor/api_service.dart';
 class Setting extends StatefulWidget {
   final String userId;
 
-  // 생성자 추가
   Setting({required this.userId});
 
   @override
   _SettingState createState() => _SettingState();
 }
-
 
 class _SettingState extends State<Setting> {
   ApiService apiService = ApiService();
@@ -48,37 +45,37 @@ class _SettingState extends State<Setting> {
                       content: Text(
                         '앱 내 모든 데이터를 삭제해요.\n미리 내려받지 않았거나, 기기에 저장되지 않은 \n데이터는 저장기간이 만료된 이후 \n다시 불러올 수 없어요.',
                         style: TextStyle(color: Colors.black, fontFamily: 'Pretendard'),
-                        textAlign: TextAlign.justify, // 텍스트 정렬 설정
+                        textAlign: TextAlign.justify,
                         softWrap: true,
                       ),actions: <Widget> [
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pop(false); // 다이얼로그 닫기
+                          Navigator.of(context).pop(false);
                         },
                         child: Text(
                           '취소',
                           style: TextStyle(
                             color: Colors.black,
-                            fontFamily: 'Pretendard'// 검은색 취소 버튼 텍스트
+                            fontFamily: 'Pretendard'
                           ),
                         ),
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pop(true); // 다이얼로그 닫기
+                          Navigator.of(context).pop(true);
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryColor, // 보라색 배경
-                            borderRadius: BorderRadius.circular(8.0), // 둥근 모서리
+                            color: AppColors.primaryColor,
+                            borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: Text(
                             '확인',
                             style: TextStyle(
-                              color: Colors.white, // 흰색 텍스트
+                              color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'Pretendard'// 확인 텍스트를 두껍게
+                              fontFamily: 'Pretendard'
                             ),
                           ),
                         ),
@@ -121,7 +118,7 @@ class _SettingState extends State<Setting> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    backgroundColor: Colors.white, // 하얀색 배경 설정
+                    backgroundColor: Colors.white,
                     title: Text(
                       '페어링 해제',
                       style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontFamily: 'Pretendard'), // 검은색 제목 텍스트
@@ -129,44 +126,44 @@ class _SettingState extends State<Setting> {
                     content: Text(
                       '페어링을 해제하면 페어링 코드에 엮인 \n데이터가 모두 삭제돼요. \n정말로 페어링을 해제 하시겠어요?',
                       style: TextStyle(
-                        color: Colors.black, // 검은색 내용 텍스트
+                        color: Colors.black,
                         fontSize: 16.0,
-                        fontFamily: 'Pretendard'// 내용 텍스트 크기 조정
-                      ), // 검은색 내용 텍스트
+                        fontFamily: 'Pretendard'
+                      ),
                     ),
-                    shape: RoundedRectangleBorder( //
-                      borderRadius: BorderRadius.circular(12.0), // 각지게 처리 (모서리 둥글게)
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pop(); // 다이얼로그 닫기
+                          Navigator.of(context).pop();
                         },
                         child: Text(
                           '취소',
                           style: TextStyle(
                             color: Colors.black,
-                            fontFamily: 'Pretendard'// 검은색 취소 버튼 텍스트
+                            fontFamily: 'Pretendard'
                           ),
                         ),
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pop(); // 다이얼로그 닫기
+                          Navigator.of(context).pop();
                           _setPairingDelete(context);
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryColor, // 보라색 배경
-                            borderRadius: BorderRadius.circular(8.0), // 둥근 모서리
+                            color: AppColors.primaryColor,
+                            borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: Text(
                             '확인',
                             style: TextStyle(
-                              color: Colors.white, // 흰색 텍스트
+                              color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'Pretendard'// 확인 텍스트를 두껍게
+                              fontFamily: 'Pretendard'
                             ),
                           ),
                         ),
@@ -190,56 +187,56 @@ class _SettingState extends State<Setting> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    backgroundColor: Colors.white, // 하얀색 배경
+                    backgroundColor: Colors.white,
                     title: Text(
                       '탈퇴 확인',
                       style: TextStyle(
-                        color: Colors.black, // 검은색 제목 텍스트
+                        color: Colors.black,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Pretendard'// 제목 텍스트를 두껍게
+                        fontFamily: 'Pretendard'
                       ),
                     ),
                     content: Text(
                       '탈퇴하시면 모든 데이터가 삭제되며, \n삭제된 데이터는 복구할 수 없어요. \n정말로 탈퇴하시겠어요?',
                       style: TextStyle(
-                        color: Colors.black, // 검은색 내용 텍스트
+                        color: Colors.black,
                         fontSize: 16.0,
-                        fontFamily: 'Pretendard'// 내용 텍스트 크기 조정
+                        fontFamily: 'Pretendard'
                       ),
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0), // 각지게 처리 (모서리 둥글게)
+                      borderRadius: BorderRadius.circular(12.0),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pop(); // 다이얼로그 닫기
+                          Navigator.of(context).pop();
                         },
                         child: Text(
                           '취소',
                           style: TextStyle(
                             color: Colors.black,
-                            fontFamily: 'Pretendard'// 검은색 취소 버튼 텍스트
+                            fontFamily: 'Pretendard'
                           ),
                         ),
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pop(); // 다이얼로그 닫기
-                          _setUserDelete(context); // 탈퇴 함수 호출
+                          Navigator.of(context).pop();
+                          _setUserDelete(context);
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryColor, // 보라색 배경
-                            borderRadius: BorderRadius.circular(8.0), // 둥근 모서리
+                            color: AppColors.primaryColor,
+                            borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: Text(
                             '확인',
                             style: TextStyle(
-                              color: Colors.white, // 흰색 텍스트
+                              color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'Pretendard'// 확인 텍스트를 두껍게
+                              fontFamily: 'Pretendard'
                             ),
                           ),
                         ),
@@ -258,13 +255,11 @@ class _SettingState extends State<Setting> {
   Future<void> _logout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // 토큰 삭제
     await prefs.remove('accessToken');
     await prefs.remove('refreshToken');
 
-    // 로그인 페이지로 이동
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => LoginScreen()), // 로그인 페이지로 이동
+      MaterialPageRoute(builder: (context) => LoginScreen()),
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -282,13 +277,12 @@ class _SettingState extends State<Setting> {
 
       if (response.statusCode == 200) {
 
-        print('회원 탈퇴 성공');// 토큰 삭제 및 로그인 페이지로 이동
+        print('회원 탈퇴 성공');
         await prefs.remove('accessToken');
         await prefs.remove('refreshToken');
 
-        // 로그인 페이지로 이동
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => LoginScreen()), // 로그인 페이지로 이동
+          MaterialPageRoute(builder: (context) => LoginScreen()),
         );
       } else {
         print('회원 탈퇴 실패: ${response.statusCode}');
@@ -308,7 +302,7 @@ class _SettingState extends State<Setting> {
       if (response.statusCode == 200) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => PairingCodePage(id: widget.userId)),
-              (route) => false, // 이전 모든 화면을 제거하여 뒤로가기 버튼 표시 안 됨
+              (route) => false,
         );
         print('페어링 끊기 성공');
       } else {

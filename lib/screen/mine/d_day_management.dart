@@ -1,13 +1,9 @@
-import 'dart:convert'; // JSON 파싱을 위한 import
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http; // HTTP 요청을 위한 import
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 import 'd_day_registration.dart';
 
-// 디데이 카드 모델
 class DDayCardModel {
   final String dday;
   final String title;
@@ -34,20 +30,19 @@ class DDayCardModel {
   }
 }
 
-// 디데이 관리 페이지
 class DDayManagementPage extends StatefulWidget {
   @override
   _DDayManagementPageState createState() => _DDayManagementPageState();
 }
 
 class _DDayManagementPageState extends State<DDayManagementPage> {
-  List<DDayCardModel> ddayCards = []; // 리스트 타입 수정
+  List<DDayCardModel> ddayCards = [];
   ApiService apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    fetchDDays(); // API 호출
+    fetchDDays();
   }
 
   Future<void> fetchDDays() async {
@@ -55,17 +50,14 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
       ApiConstants.getDDay,
     );
 
-    print('Response status: ${response.statusCode}'); // 상태 코드 출력
-    print('Response body: ${ response.data}'); // 응답 본문 출력
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${ response.data}');
 
     if (response.statusCode == 200) {
-      // 응답을 JSON으로 디코드
       final jsonResponse = response.data;
 
-      // 'data'에서 'days' 배열을 가져오기
       List<dynamic> days = jsonResponse['data']['days'];
 
-      // 상태 업데이트
       setState(() {
         ddayCards = days.map((data) => DDayCardModel.fromJson(data)).toList();
       });
@@ -106,13 +98,13 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
               title: card.title,
               date: card.date,
               image: card.image,
-              seq: card.seq,// 이미지 경로
+              seq: card.seq,
               onDelete: () {
                 setState(() {
-                  ddayCards.remove(card); // 삭제된 카드 제거
+                  ddayCards.remove(card);
                 });
               },
-              key: UniqueKey(), // 유니크 키 추가
+              key: UniqueKey(),
             );
           }).toList(),
           SizedBox(height: 15),
@@ -120,26 +112,25 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
             child: Container(
               width: double.infinity,
               child: ElevatedButton.icon(
-                icon: Icon(Icons.add, color: Colors.black), // 아이콘 색상 변경
+                icon: Icon(Icons.add, color: Colors.black),
                 label: Text(
                   '추가하기',
                   style: TextStyle(
-                    color: Colors.black, // 글자 색상 변경
+                    color: Colors.black,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white, // 배경 색상 변경
+                  backgroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 14.0),
-                  side: BorderSide(color: Colors.grey, width: 1), // 얇은 회색선 테두리 추가
-                  elevation: 0, // 그림자 제거
+                  side: BorderSide(color: Colors.grey, width: 1),
+                  elevation: 0,
                 ),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => DDayRegistrationPage()),
                   ).then((_) {
-                    // 페이지에서 돌아왔을 때 리스트 갱신
                     fetchDDays();
                   });
                 },
@@ -153,7 +144,6 @@ class _DDayManagementPageState extends State<DDayManagementPage> {
   }
 }
 
-// 디데이 카드 위젯
 class DDayCard extends StatelessWidget {
   ApiService apiService = ApiService();
   final String dday;
@@ -161,7 +151,7 @@ class DDayCard extends StatelessWidget {
   final String date;
   final String image;
   final int seq;
-  final Function onDelete; // 삭제 기능을 위한 콜백 추가
+  final Function onDelete;
 
   DDayCard({
     required this.dday,
@@ -169,21 +159,19 @@ class DDayCard extends StatelessWidget {
     required this.date,
     required this.image,
     required this.seq,
-    required this.onDelete, // 콜백 받기
+    required this.onDelete,
     Key? key,
   }) : super(key: key);
 
   Future<void> deleteDDay() async {
-    // API 호출
     final response = await apiService.get(
       ApiConstants.delDDay,
-      queryParameters: {'seq': seq},// 삭제 API URL
+      queryParameters: {'seq': seq},
     );
 
     if (response.statusCode == 200) {
-      onDelete(); // 성공적으로 삭제된 경우 콜백 호출
+      onDelete();
     } else {
-      // 에러 처리
       throw Exception('Failed to delete DDay');
     }
   }
@@ -191,10 +179,9 @@ class DDayCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: ValueKey(dday), // 각 항목을 고유하게 식별하기 위한 키
-      direction: DismissDirection.endToStart, // 오른쪽 -> 왼쪽 스와이프
+      key: ValueKey(dday),
+      direction: DismissDirection.endToStart,
       onDismissed: (direction) async {
-        // 삭제 동작
         await deleteDDay();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('$title 삭제 되었습니다.')),
@@ -203,7 +190,7 @@ class DDayCard extends StatelessWidget {
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        color: Colors.red, // 스와이프 시 배경색
+        color: Colors.red,
         child: const Icon(Icons.delete, color: Colors.white, size: 30),
       ),
       child: Container(
@@ -216,14 +203,13 @@ class DDayCard extends StatelessWidget {
               color: Colors.grey.withOpacity(0.3),
               spreadRadius: 2,
               blurRadius: 6,
-              offset: Offset(0, 3), // 그림자 위치
+              offset: Offset(0, 3),
             ),
           ],
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // 동그란 이미지
             ClipOval(
               child: image.startsWith('http')
                   ? Image.network(
@@ -255,8 +241,7 @@ class DDayCard extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(width: 23), // 이미지와 텍스트 사이 간격
-            // 텍스트들
+            const SizedBox(width: 23),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

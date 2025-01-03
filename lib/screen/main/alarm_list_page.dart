@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_wedding/screen/main/setting.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 
@@ -17,9 +12,9 @@ class Alarm {
 
   factory Alarm.fromJson(Map<String, dynamic> json) {
     return Alarm(
-      title: json['title'], // API의 title에 해당하는 필드
+      title: json['title'],
       readYn: json['readYn'],
-      content: json['content'],// API의 readYn에 해당하는 필드
+      content: json['content'],
     );
   }
 }
@@ -43,8 +38,6 @@ class AlarmListPage extends StatelessWidget {
       throw Exception('Failed to load alarms');
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -72,10 +65,10 @@ class AlarmListPage extends StatelessWidget {
         ],
       ),
       body: FutureBuilder<List<Alarm>>(
-        future: fetchAlarms(), // API 호출
+        future: fetchAlarms(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator()); // 로딩 중
+            return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
@@ -107,7 +100,7 @@ class AlarmListPage extends StatelessWidget {
               },
             );
           } else {
-            return Center(child: Text('No alarms available')); // 알림이 없을 때
+            return Center(child: Text('No alarms available'));
           }
         },
       ),

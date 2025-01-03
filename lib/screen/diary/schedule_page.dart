@@ -1,11 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
@@ -17,7 +13,7 @@ class SchedulePage extends StatefulWidget {
 
 class _SchedulePageState extends State<SchedulePage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
-  DateTime _focusedDay = DateTime.now().toLocal(); // 현재 로컬 시간
+  DateTime _focusedDay = DateTime.now().toLocal();
   DateTime? _selectedDay;
   List<String> scheduleDate = [];
   ApiService apiService = ApiService();
@@ -30,10 +26,8 @@ class _SchedulePageState extends State<SchedulePage> {
   @override
   void initState() {
     super.initState();
-    // 현재 날짜를 기본 선택 날짜로 설정
     _selectedDay = DateTime.now();
     initializeDateFormatting('ko_KR').then((_) {
-      // 로케일 초기화 완료 후 _fetchSchedule() 등을 호출
       _fetchSchedule();
       _fetchSchedulesForDate(DateFormat('yyyy-MM-dd').format(_selectedDay!));
     });
@@ -43,7 +37,6 @@ class _SchedulePageState extends State<SchedulePage> {
     setState(() {
       _selectedDay = selectedDay;
     });
-    // 선택된 날짜에 맞는 스케줄 호출
     _fetchSchedulesForDate(DateFormat('yyyy-MM-dd').format(selectedDay));
   }
 
@@ -57,7 +50,6 @@ class _SchedulePageState extends State<SchedulePage> {
         _events[_selectedDay!]!.add({'event': event, 'time': time});
       });
 
-      // 선택된 날짜, 메모(event), 시간(time)을 API에 저장
       final String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDay!);
       try {
         var response = await apiService.post(
@@ -85,7 +77,7 @@ class _SchedulePageState extends State<SchedulePage> {
 
   Future<void> _fetchSchedule() async {
     try {
-      String month = DateFormat('yyyy-MM').format(_focusedDay); // "2024-10" 형식으로 전달
+      String month = DateFormat('yyyy-MM').format(_focusedDay);
 
       var response = await apiService.get(
         ApiConstants.getScheduleMark,
@@ -94,10 +86,8 @@ class _SchedulePageState extends State<SchedulePage> {
       );
 
       if (response.statusCode == 200) {
-        // 응답이 List인지 확인
         var responseBody = response.data;
 
-        // responseBody가 List인지 체크하고 null인 경우 빈 리스트로 초기화
         List<dynamic> scheduleMarks = responseBody['data']['scheduleMarks'] ?? [];
 
         setState(() {
@@ -105,9 +95,8 @@ class _SchedulePageState extends State<SchedulePage> {
           scheduleDate.clear();
           for (var schedule in scheduleMarks) {
             String date = schedule['date'];
-            scheduleDate.add(date);  // scheduleDate 배열에 날짜 추가
+            scheduleDate.add(date);
 
-            // 만약 _events에 특정 날짜 관련 작업을 하고 싶다면
             DateTime formattedDate = DateTime(_focusedDay.year, _focusedDay.month, int.parse(date));
 
             if (_events[formattedDate] == null) {
@@ -130,29 +119,25 @@ class _SchedulePageState extends State<SchedulePage> {
     }
   }
 
-  // 해당 날짜에 대해 API 호출하여 데이터를 가져오는 함수
   Future<void> _fetchSchedulesForDate(String selectedDate) async {
     try {
       print('selectedDate ... $selectedDate');
-      // API 호출
       var response = await apiService.get(
         ApiConstants.getSchedules,
         queryParameters: {'date': selectedDate}
       );
 
       if (response.statusCode == 200) {
-        // 응답에서 스케줄 리스트 추출
         var responseBody = response.data;
         List<dynamic> schedules = responseBody['data']['schedules'] ?? [];
 
         setState(() {
-          // 스케줄 리스트가 빈 배열이 아닌 경우에만 _events에 추가
           if (schedules.isNotEmpty) {
             _tmpEvents = schedules.map((schedule) {
               return {
                 'seq': schedule['seq'] as String,
-                'event': schedule['memo'] as String,  // 메모
-                'time': schedule['time'] as String,   // 시간
+                'event': schedule['memo'] as String,
+                'time': schedule['time'] as String,
               };
             }).toList();
           } else {
@@ -191,25 +176,25 @@ class _SchedulePageState extends State<SchedulePage> {
                     _calendarFormat = format;
                   });
                 },
-                onDaySelected: _onDaySelected,  // 날짜 선택 시 호출
+                onDaySelected: _onDaySelected,
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 onPageChanged: (focusedDay) {
                   setState(() {
                     _focusedDay = focusedDay;
                   });
-                  _fetchSchedule();  // 페이지 변경 시마다 스케줄 업데이트
+                  _fetchSchedule();
                 },
                 eventLoader: (day) {
                   return _events[day] ?? [];
                 },
                 headerStyle: HeaderStyle(
                   formatButtonVisible: false,
-                  headerMargin: EdgeInsets.symmetric(vertical: 10.0), // 헤더 여백 조정
-                  titleCentered: true, // 제목을 가운데 정렬
+                  headerMargin: EdgeInsets.symmetric(vertical: 10.0),
+                  titleCentered: true,
                   titleTextStyle: TextStyle(
 
-                    fontWeight: FontWeight.bold, // 폰트 두껍게 설정
-                    fontSize: 20, // 폰트 크기 설정
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
                   ),
                 ),
                 calendarStyle: CalendarStyle(
@@ -230,13 +215,10 @@ class _SchedulePageState extends State<SchedulePage> {
                 daysOfWeekVisible: true,
                 calendarBuilders: CalendarBuilders(
                   markerBuilder: (context, day, events) {
-                    // 현재 선택된 월을 가져오기
                     String currentMonth = DateFormat('yyyy-MM').format(_focusedDay);
                     String dayMonth = DateFormat('yyyy-MM').format(day);
                     String dayString = day.day.toString().padLeft(2, '0');
 
-
-                    // 선택된 월과 날짜가 일치하며, 해당 날짜가 scheduleDate에 포함되어 있는지 확인
                     if (currentMonth == dayMonth && scheduleDate.contains(dayString)) {
                       return Positioned(
                         right: 1,
@@ -251,8 +233,6 @@ class _SchedulePageState extends State<SchedulePage> {
                     return null;
                   },
                 ),
-
-
 
               ),
             ),
@@ -325,36 +305,36 @@ class _SchedulePageState extends State<SchedulePage> {
           builder: (BuildContext context) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0), // 약간 직각 모양
+                borderRadius: BorderRadius.circular(8.0),
               ),
               backgroundColor: Colors.white,
               content: Text(
                 "$event를 삭제하시겠어요?",
-                style: TextStyle(color: Colors.black, fontSize: 16), // 내용 글씨 검정색
+                style: TextStyle(color: Colors.black, fontSize: 16),
               ),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(false); // 취소
+                    Navigator.of(context).pop(false);
                   },
                   child: Text(
                     "취소",
-                    style: TextStyle(color: Colors.black), // 검정색 텍스트
+                    style: TextStyle(color: Colors.black),
                   ),
                 ),
                 TextButton(
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(AppColors.primaryColor), // 보라색 배경
-                    foregroundColor: MaterialStateProperty.all(Colors.white), // 흰색 텍스트
-                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 10)), // 버튼 크기 조정
+                    backgroundColor: MaterialStateProperty.all(AppColors.primaryColor),
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
                     shape: MaterialStateProperty.all(
                       RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4.0), // 약간의 둥근 테두리
+                        borderRadius: BorderRadius.circular(4.0),
                       ),
                     ),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop(true); // 확인
+                    Navigator.of(context).pop(true);
                   },
                   child: Text(
                     "삭제",
@@ -363,53 +343,37 @@ class _SchedulePageState extends State<SchedulePage> {
                 ),
               ],
             );
-
           },
         );
       },
       onDismissed: (direction) async {
         try {
-          // API 호출
           var response = await apiService.post(
           ApiConstants.delSchedule,
             data: {'seq': seq},
           );
 
           if (response.statusCode == 200) {
-            // 삭제 성공
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('$event가 삭제되었습니다.', style: TextStyle( ))),
             );
 
-            // 스케줄 새로고침
             /*scheduleDate = []; // 먼저 빈 배열로 초기화
-            // 새로운 데이터를 가져와서 업데이트
             _fetchSchedule(); // 또는 _fetchSchedulesForDate(DateFormat('yyyy-MM-dd').format(_selectedDay!));
-            // 업데이트된 scheduleDate를 설정
             scheduleDate = getScheduleDatesFromEvents();*/
 
-            // 스케줄 새로고침
-            // 여기서 _tmpEvents에서 현재 인덱스의 이벤트를 삭제합니다.
             setState(() {
-              _tmpEvents.removeAt(index); // 현재 인덱스의 이벤트 삭제
+              _tmpEvents.removeAt(index);
             });
 
-            // 스케줄 새로고침
             scheduleDate.clear();
 
-            await _fetchSchedule(); // 스케줄을 새로고침하고
-            await _fetchSchedulesForDate(DateFormat('yyyy-MM-dd').format(_selectedDay!)); // 특정 날짜의 스케줄을 다시 가져옵니다.
-
-            // 업데이트된 scheduleDate를 가져옵니다.
-            // setState로 UI를 갱신합니다.
-            setState(() {}); // UI 업데이트를 위해 setState 호출
-
-            /*final String formattedDate = DateFormat('yyyy-MM-dd').format(day);
             await _fetchSchedule();
-            await _fetchSchedulesForDate(formattedDate);*/
+            await _fetchSchedulesForDate(DateFormat('yyyy-MM-dd').format(_selectedDay!));
+
+            setState(() {});
 
           } else {
-            // 삭제 실패 시 에러 처리
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('삭제 실패: ${response.data}', style: TextStyle( ))),
             );
@@ -486,7 +450,7 @@ class _SchedulePageState extends State<SchedulePage> {
             padding: EdgeInsets.all(25.0),
             width: 500,
             height: 450,
-            child: SingleChildScrollView( // 추가된 부분
+            child: SingleChildScrollView(
               child: StatefulBuilder(
                 builder: (context, setState) {
                   return Column(
@@ -502,20 +466,20 @@ class _SchedulePageState extends State<SchedulePage> {
                         decoration: InputDecoration(
                           hintText: '일정 내용을 입력하세요.',
                           border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey[300]!), // 연한 회색 테두리
-                            borderRadius: BorderRadius.circular(8.0), // 테두리 모서리 둥글게
+                            borderSide: BorderSide(color: Colors.grey[300]!),
+                            borderRadius: BorderRadius.circular(8.0),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey[500]!), // 포커스된 상태의 테두리 색상
+                            borderSide: BorderSide(color: Colors.grey[500]!),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey[300]!), // 활성화된 상태의 테두리 색상
+                            borderSide: BorderSide(color: Colors.grey[300]!),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
-                        maxLines: null, // 자동 높이 조정
-                        minLines: 7, // 최소 3줄로 설정
+                        maxLines: null,
+                        minLines: 7,
                       ),
                       SizedBox(height: 16.0),
                       Row(
@@ -564,7 +528,7 @@ class _SchedulePageState extends State<SchedulePage> {
                                     duration: Duration(seconds: 2),
                                   ),
                                 );
-                                return; // 추가 동작을 막고 함수 종료
+                                return;
                               }
 
                               _addEvent(event, time);

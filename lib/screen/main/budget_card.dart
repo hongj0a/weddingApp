@@ -17,6 +17,7 @@ class _BudgetCardState extends State<BudgetCard> {
   int usedBudget = 0;
   int balanceBudget = 0;
   bool isLoading = true;
+  bool always =true;
 
   @override
   void initState() {
@@ -62,7 +63,7 @@ class _BudgetCardState extends State<BudgetCard> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     if (isLoading) {
-      return Center(child: Container()); // 로딩 중
+      return Center(child: Container());
     }
 
     return GestureDetector(
@@ -72,7 +73,7 @@ class _BudgetCardState extends State<BudgetCard> {
           MaterialPageRoute(builder: (context) => BudgetSetting()),
         );
 
-        if (result == true) {
+        if (result == true || always == true) {
           _fetchBudgetData();
         }
       },
@@ -86,7 +87,7 @@ class _BudgetCardState extends State<BudgetCard> {
               child: SizedBox(
                 width: screenWidth * 0.9,
                 height: MediaQuery.of(context).orientation == Orientation.landscape && screenWidth >= 768
-                    ? screenHeight * 0.40  // iPad 가로모드 (가로 크기가 768 이상일 때)
+                    ? screenHeight * 0.40
                     : screenHeight * 0.247,
                 child: SvgPicture.asset(
                   'asset/img/budget_card_no_line.svg',
@@ -108,24 +109,24 @@ class _BudgetCardState extends State<BudgetCard> {
                             '예산',
                             style: TextStyle(
                               fontFamily: 'Pretendard',
-                              fontSize: screenWidth * 0.057, // 화면 크기 비례 폰트 크기
+                              fontSize: screenWidth * 0.057,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: screenHeight * 0.03), // 화면 크기 비례 여백
+                      SizedBox(height: screenHeight * 0.03),
                       _buildBudgetRow('총 예산', totalBudget),
-                      SizedBox(height: screenHeight * 0.01), // 화면 크기 비례 여백
+                      SizedBox(height: screenHeight * 0.01),
                       _buildBudgetRow('총 지출', usedBudget),
-                      SizedBox(height: screenHeight * 0.02), // 화면 크기 비례 여백
+                      SizedBox(height: screenHeight * 0.02),
                       Container(
                         height: 0.5,
                         color: Colors.white,
                         margin: EdgeInsets.symmetric(horizontal: 1),
                       ),
-                      SizedBox(height: screenHeight * 0.02), // 화면 크기 비례 여백
+                      SizedBox(height: screenHeight * 0.02),
                       _buildBudgetRow('남은 예산', balanceBudget),
                     ],
                   ),

@@ -1,20 +1,14 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
-import 'cost_page.dart';
 
 class AddCostPage extends StatefulWidget {
-  final int? categorySeq; // 카테고리 시퀀스를 추가
-  final ApiService apiService = ApiService(); // ApiService 인스턴스 추가
+  final int? categorySeq;
+  final ApiService apiService = ApiService();
   AddCostPage({Key? key, this.categorySeq}) : super(key: key);
-
 
   @override
   _AddCostPageState createState() => _AddCostPageState();
@@ -33,7 +27,7 @@ class _AddCostPageState extends State<AddCostPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('카테고리 시퀀스: ${widget.categorySeq}'); // 여기서 출력
+    print('카테고리 시퀀스: ${widget.categorySeq}');
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -91,9 +85,9 @@ class _AddCostPageState extends State<AddCostPage> {
         ),
       ),
       keyboardType: isCost ? TextInputType.numberWithOptions(decimal: true) : TextInputType.text,
-      textInputAction: TextInputAction.done, // 완료 버튼 추가
+      textInputAction: TextInputAction.done,
       onEditingComplete: () {
-        FocusScope.of(context).unfocus(); // 완료 버튼 클릭 시 키보드 닫기
+        FocusScope.of(context).unfocus();
       },
       inputFormatters: isCost ? [CurrencyInputFormatter()] : [],
     );
@@ -115,18 +109,17 @@ class _AddCostPageState extends State<AddCostPage> {
             hintText: '메모를 남겨보세요(최대 100자)',
             border: OutlineInputBorder(),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.primaryColor, width: 1), // 활성화 시 색상 변경
+              borderSide: BorderSide(color: AppColors.primaryColor, width: 1),
             ),
           ),
           maxLength: 100,
-          maxLines: 4, // 최대 줄 수를 4줄로 설정
+          maxLines: 4,
         ),
       ],
     );
   }
 
   void saveCostItem() async {
-    // 빈 값 체크
     if (itemController.text.isEmpty || totalCostController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("항목과 총 비용을 모두 입력해 주세요.")),
@@ -154,7 +147,7 @@ class _AddCostPageState extends State<AddCostPage> {
       print('response....msg ... ${response.data}');
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("저장되었습니다.")));
-        Navigator.pop(context, true);  // 뒤로 가면서 true 반환
+        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("저장 실패: ${response.statusCode}")));
       }
@@ -167,12 +160,10 @@ class _AddCostPageState extends State<AddCostPage> {
 class CurrencyInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    // 콤마 없이 숫자만 남기기
     String newText = newValue.text.replaceAll(',', '');
 
     if (newText.isEmpty) return newValue;
 
-    // 형식화된 문자열 만들기 (콤마 추가)
     String formattedText = _formatWithComma(newText);
 
     return newValue.copyWith(
@@ -186,29 +177,4 @@ class CurrencyInputFormatter extends TextInputFormatter {
     return number != null ? NumberFormat('#,###').format(number) : value;
   }
 
-
-  /*void main() {
-    runApp(MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        textTheme: TextTheme(
-          bodyMedium: TextStyle(color: Colors.black, fontSize: 16.0),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.blue, width: 2.0),
-          ),
-          labelStyle: TextStyle(color: Colors.black),
-          hintStyle: TextStyle(color: Colors.grey),
-        ),
-        appBarTheme: AppBarTheme(
-          color: Colors.blue,
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20.0),
-          iconTheme: IconThemeData(color: Colors.white),
-        ),
-      ),
-      home: AddCostPage(),
-    ));
-  }*/
 }

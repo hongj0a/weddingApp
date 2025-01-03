@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../config/ApiConstants.dart';
 import '../../interceptor/api_service.dart';
 import '../../themes/theme.dart';
 
 
 class DetailPage extends StatefulWidget {
-  final Map<String, dynamic> detailData; // detailData를 Map으로 받음
+  final Map<String, dynamic> detailData;
   final ApiService apiService = ApiService();
   DetailPage({Key? key, required this.detailData}) : super(key: key);
 
@@ -33,7 +29,6 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize controllers with existing values from detailData
     _titleController = TextEditingController(text: widget.detailData['name'] ?? '');
     _totalCostController = TextEditingController(text: _formatWithComma(widget.detailData['totalCost']?.toString() ?? ''));
     _depositController = TextEditingController(text: _formatWithComma(widget.detailData['contractCost']?.toString() ?? ''));
@@ -49,7 +44,6 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Future<void> _saveData() async {
-    // 서버로 보낼 데이터를 Map으로 준비합니다.
     final data = {
       'seq': widget.detailData['seq'],
       'item': _titleController.text,
@@ -63,7 +57,6 @@ class _DetailPageState extends State<DetailPage> {
     };
 
     try {
-      // POST 요청을 통해 서버로 데이터를 전송합니다.
       final response = await apiService.post(
         ApiConstants.updateChecklist,
         data: data,
@@ -93,7 +86,7 @@ class _DetailPageState extends State<DetailPage> {
       if (response.statusCode == 200) {
         if (mounted) {
           print('데이터 삭제 성공');
-          Navigator.pop(context, true); // 삭제 후 이전 화면으로 돌아감
+          Navigator.pop(context, true);
         }
       } else {
         print('데이터 삭제 실패: ${response.data}');
@@ -106,7 +99,6 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   void dispose() {
-    // Dispose controllers
     _titleController.dispose();
     _totalCostController.dispose();
     _depositController.dispose();
@@ -122,8 +114,8 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        await _saveData(); // 데이터 저장
-        return true; // 데이터 저장 후 팝 허용
+        await _saveData();
+        return true;
       },
     child: Scaffold(
       backgroundColor: Colors.white,
@@ -176,16 +168,16 @@ class _DetailPageState extends State<DetailPage> {
         labelText: label,
         suffixText: isCost ? '원' : null,
         border: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey[300]!, width: 0.5), // 연한 회색으로 아주 얇게 설정
+          borderSide: BorderSide(color: Colors.grey[300]!, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.primaryColor, width: 1), // 포커스 시 테두리 색상
+          borderSide: BorderSide(color: AppColors.primaryColor, width: 1),
         ),
       ),
       keyboardType: isCost ? TextInputType.number : TextInputType.text,
-      textInputAction: TextInputAction.done, // 완료 버튼 추가
+      textInputAction: TextInputAction.done,
       onEditingComplete: () {
-        FocusScope.of(context).unfocus(); // 완료 버튼 클릭 시 키보드 닫기
+        FocusScope.of(context).unfocus();
       },
       inputFormatters: isCost ? [CurrencyInputFormatter()] : [],
     );
@@ -208,11 +200,11 @@ class _DetailPageState extends State<DetailPage> {
             hintText: '메모를 남겨보세요(최대 100자)',
             border: OutlineInputBorder(),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: AppColors.primaryColor, width: 1), // 활성화 시 색상 변경
+              borderSide: BorderSide(color: AppColors.primaryColor, width: 1),
             ),
           ),
           maxLength: 100,
-          maxLines: 4, // 최대 줄 수를 4줄로 설정
+          maxLines: 4,
         ),
       ],
     );
@@ -223,12 +215,10 @@ class CurrencyInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue,
       TextEditingValue newValue) {
-    // 콤마 없이 숫자만 남기기
     String newText = newValue.text.replaceAll(',', '');
 
     if (newText.isEmpty) return newValue;
 
-    // 형식화된 문자열 만들기 (콤마 추가)
     String formattedText = _formatWithComma(newText);
 
     return newValue.copyWith(

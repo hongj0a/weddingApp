@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,19 +24,18 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        return false; // 뒤로 가기 막기
+        return false;
       },
       child: Scaffold(
         backgroundColor: Colors.white,
         body: Stack(
           children: [
-            // 로고 중앙 배치
             Center(
               child: GestureDetector(
                 onTap: () async {
                   _tapCount++;
                   if (_tapCount == 3) {
-                    _tapCount = 0; // 탭 횟수 초기화
+                    _tapCount = 0;
                     Map<String, dynamic> response = await _sendAuthenticateRequest(
                       "000718.a9f576368b8b407999ab1dcc2b9fcd0f.0348",
                       "사용자",
@@ -60,17 +58,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
                 },
                 child: Image.asset(
-                  'asset/img/lgoo.png', // 로고 이미지 경로
+                  'asset/img/lgoo.png',
                   height: 300,
                   width: 300,
                   fit: BoxFit.contain,
                 ),
               ),
             ),
-            // 로그인 버튼 세 개 하단 배치
             Positioned(
-              bottom: 40, // 버튼이 화면 아래쪽에 위치하도록 설정
-              left: 15,  // 양쪽 패딩
+              bottom: 40,
+              left: 15,
               right: 15,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -80,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       await _kakaoLogin(context);
                     },
                     child: Container(
-                      width: double.infinity, // 부모의 너비에 맞게 확장
+                      width: double.infinity,
                       height: 48,
                       decoration: BoxDecoration(
                         image: DecorationImage(
@@ -123,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                  SizedBox(height: 20), // 버튼과 텍스트 사이 간격
+                  SizedBox(height: 20),
                   Text(
                     "우리의 웨딩 월렛 서비스는 예비 부부가 함께 \n결혼 예산 계획을 관리할 수 있도록 설계 되었습니다. \n원활한 앱 사용을 위해 로그인 후 이용해 주세요.",
                     textAlign: TextAlign.center,
@@ -214,7 +211,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _appleLogin(BuildContext context) async {
     try {
-      // Apple 로그인 인증 요청
       final AuthorizationCredentialAppleID credential =
       await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -223,7 +219,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       );
 
-      // Apple ID 정보 확인
       final String id = credential.userIdentifier ?? '';
       if (id.isEmpty) {
         throw Exception('User identifier is missing');
@@ -231,7 +226,6 @@ class _LoginScreenState extends State<LoginScreen> {
       final String name = credential.givenName ?? '사용자';
       const String snsType = 'APPLE';
 
-      // 서버로 인증 요청 전송
       Map<String, dynamic> response = await _sendAuthenticateRequest(id, name, snsType);
 
       if (response['isAuthenticated']) {
